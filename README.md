@@ -1,13 +1,24 @@
 # cmput404-project
-=================
+------------------
 This is the course work for CMPUT 404 (Winter 2017) @ University of Alberta, Canada.
 
 # Set up Enviroment
-===================
+-------------------
 This section described how to set up your environment in you local computer. The software can only run if your environment set up properly, so be careful of it.
+
 
 ##  Dependency & Tools Installation (First time on your computer)
 You can skip this part is you have ```virtualenv```, ```pip```,```python2.7``` installed. If you didn't done that, use the follow cammands to get them install,
+
+
+### Python
+We recommend to install Python 2 >=2.7.9 or Python 3 >=3.4 downloaded from [python.org](https://www.python.org/). 
+
+Mac OS X users can also install Python via [Homebrew](#homebrew-for-mac) using this code:
+```bash
+$ brew install python
+```
+
 
 ### pip
 According to this link: [https://pip.pypa.io/en/stable/installing/#do-i-need-to-install-pip](https://pip.pypa.io/en/stable/installing/#do-i-need-to-install-pip), 
@@ -22,25 +33,73 @@ Mac users who install Python via [Homebrew](#homebrew-for-mac) will have pip rea
 The detail documentation and/or guides of pip could be found in [here](https://pip.pypa.io/en/stable/)
 
 
-### Python
-We recommend to install Python 2 >=2.7.9 or Python 3 >=3.4 downloaded from [python.org](https://www.python.org/). 
-
-Mac OS X users can also install Python via [Homebrew](#homebrew-for-mac) using this code:
-```bash
-$ brew install python
-```
-
 #### virthualenv (the virtual environment for python)
 ```
 $ pip install virtualenv
 ```
 
 
+# Get Project Running
+---------------------
+If you don't want to see those details explanation, there is a (Quick Start)[Quick Start] section for you.
+
+## Details Explanation
+Once your enviroment have set up, run following command to download the project,
+```
+$ git clone https://github.com/Web-Applications-and-Architect-Group/cmput404-project.git 
+```
+
+Then, goes into this directory and create a python virtual environment in it,
+```
+$ cd cmput404-project
+$ virtualenv venv
+```
+
+When the virtual environment have been created, Mac & and Linux can activate it by command,
+```
+$ . venv/bin/activate
+```
+Windows can activate it by command,
+```
+$ venv\Scripts\activate
+```
+
+Make sure you are inside the virtual environment (see if there is a ```(venv)``` before your username in terminal). Then, install requirements on Mac by command,
+```
+$ sudo pip install -r requirements.txt
+```
+Install requirements on Windows by command,
+```
+$ pip install -r requirements.txt
+```
+
+Now, you should able to run the project on your local computer! Test it with Django's server this command,
+```
+$ python manage.py runserver
+```
 
 
+## Quick Start
+No explanation here, copy the following command into terminal and it could run magically!
 
+#### Mac
+```
+git clone https://github.com/Web-Applications-and-Architect-Group/cmput404-project.git 
+cd cmput404-project
+virtualenv venv
+. venv/bin/activate
+sudo pip install -r requirements.txt
+```
+#### Windows
+```
+git clone https://github.com/Web-Applications-and-Architect-Group/cmput404-project.git 
+cd cmput404-project
+virtualenv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+```
 
-
-
-
-
+Then test it by command,
+```
+$ python manage.py runserver
+```
