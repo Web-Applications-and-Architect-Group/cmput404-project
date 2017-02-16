@@ -39,9 +39,11 @@ $ pip install virtualenv
 ```
 
 
+
+
 # Get Project Running
 ---------------------
-If you don't want to see those details explanation, there is a (Quick Start)[Quick Start] section for you.
+If you don't want to see those details explanation, there is a [Quick Start](#quick-start) section for you.
 
 ## Details Explanation
 Once your enviroment have set up, run following command to download the project,
