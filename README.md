@@ -121,7 +121,7 @@ We prefer to have a new branch for each new implementation of a function. So, th
 To copy dev branch as a new branch,
 ```
 $ git checkout dev
-$ git checkkout -b <name of branch>
+$ git checkout -b <name of branch>
 ```
 
 **Step 2: Implementation**
