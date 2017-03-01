@@ -31,6 +31,7 @@ ALLOWED_HOSTS = ['cloud-dingkai.c9users.io']
 # Application definition
 
 INSTALLED_APPS = [
+    'cmput404_project',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -118,3 +119,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# for login required decorator
+# https://docs.djangoproject.com/en/1.10/topics/auth/default/#django.contrib.auth.decorators.login_required
+LOGIN_URL = "/login/"

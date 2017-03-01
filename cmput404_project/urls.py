@@ -19,7 +19,8 @@ from django.contrib.auth.forms import UserCreationForm
 from django.views.generic.edit import CreateView
 from . import views
 urlpatterns = [
- 	url(r'^', include('registration.backends.simple.urls')), # go to http://127.0.0.1:8000/register/
-    url(r'^$', views.reg_complete, name="reg_complete"),
+ 	url(r'^', include('registration.backends.simple.urls')),
+ 	url(r'^profile',views.profile,name="profile"),
+    url(r'^$', views.home ,name="home"),
     url(r'^admin/', admin.site.urls),
 ]
