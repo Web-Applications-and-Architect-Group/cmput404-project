@@ -20,7 +20,7 @@ from django.views.generic.edit import CreateView
 from . import views
 urlpatterns = [
  	url(r'^', include('registration.backends.simple.urls')),
- 	url(r'^profile',views.profile,name="profile"),
+ 	url(r'^profile/',views.profile,name="profile"),
     url(r'^$', views.home ,name="home"),
     url(r'^admin/', admin.site.urls),
 ]
