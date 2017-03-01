@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.contrib.auth.forms import UserCreationForm
 from django.views.generic.edit import CreateView
 from . import views
+
 urlpatterns = [
  	url(r'^', include('registration.backends.simple.urls')),
  	url(r'^profile/',views.profile,name="profile"),

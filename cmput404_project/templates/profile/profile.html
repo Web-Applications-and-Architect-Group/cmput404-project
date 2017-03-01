@@ -27,12 +27,12 @@
                       {% endif %}</td><tr>
 
               <tr><td>Github</td>
-                <td>{% if profile.github %} {{ profile.github }}
+                <td>{% if user.profile.github %} {{ user.profile.github }}
                     {% else %} n/a
                     {% endif %}</td><tr>
 
               <tr><td>Bio</td>
-                <td>{% if profile.Bio %} {{ profile.bio }}
+                <td>{% if user.profile.bio %} {{ user.profile.bio }}
                     {% else %} n/a
                     {% endif %}</td><tr>
        </tbody></table>

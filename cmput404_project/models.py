@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 
 @python_2_unicode_compatible
 class Profile(models.Model):
-    user = models.ForeignKey(User)
+    user = models.OneToOneField(User,on_delete=models.CASCADE,primary_key=True)
     github = models.CharField(max_length=200)
     bio = models.CharField(max_length=200)
     def __str__(self):
