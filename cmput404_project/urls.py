@@ -15,8 +15,12 @@ Including another URLconf
 """
 from django.conf.urls import include,url
 from django.contrib import admin
-
+from django.contrib.auth.forms import UserCreationForm
+from django.views.generic.edit import CreateView
+from . import views
 urlpatterns = [
+ 	url(r'^sign-up/', include('registration.backends.simple.urls')), # go to http://127.0.0.1:8000/sign-up/register/
     url('^',include("django.contrib.auth.urls")),
+    url(r'^$', views.reg_complete, name="reg_complete"),
     url(r'^admin/', admin.site.urls),
 ]
