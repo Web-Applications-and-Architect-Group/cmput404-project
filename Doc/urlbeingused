@@ -1,0 +1,12 @@
+^ ^register/$ [name='registration_register']
+^ ^register/closed/$ [name='registration_disallowed']
+^ ^login/$ [name='auth_login']
+^ ^logout/$ [name='auth_logout']
+^ ^password/change/$ [name='auth_password_change']
+^ ^password/change/done/$ [name='auth_password_change_done']
+^ ^password/reset/$ [name='auth_password_reset']
+^ ^password/reset/confirm/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/$ [name='auth_password_reset_confirm']
+^ ^password/reset/complete/$ [name='auth_password_reset_complete']
+^ ^password/reset/done/$ [name='auth_password_reset_done']
+^$ [name='reg_complete']
+^admin/
