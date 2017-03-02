@@ -17,8 +17,8 @@
             <img alt="user photo" src="{% static "/images/defaultUserImage.png" %}" width = "150" height = "150">
         {% endif %}
         <br/><br/>
-	
-	
+
+
         <table><tbody>
               <tr><td>Username</td><td>{{ user.username }}</td><tr>
               <tr><td>Email</td>
@@ -39,7 +39,9 @@
     </div>
     <br/>
 
-    <button id="show" class="editProfile">Edit Profile</button>
+    <button id="show" class="editProfile">
+      <a href="{% url 'profile_edit' %}">Edit Profile</a>
+    </button>
     <button id="show" class="uploadPhoto">Upload Photo</button>
 
 
