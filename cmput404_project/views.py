@@ -18,26 +18,47 @@ def home(request):
 
 @login_required
 def profile(request):
-
-    user = User.objects.get(username = request.user.username)
-
     return render(request,'profile/profile.html',{'user':request.user})
 
 @login_required
 def profile_edit(request):
+    """
+    Profile edit view
+
+    """
+
     try:
         profile = Profile.objects.get(user_id=request.user.id)
     except (KeyError, Profile.DoesNotExist):
-        print "profile no found create new"
+        # profile no found create new
         profile = Profile.create(request.user)
-        # profile.save()
+        profile.save()
     else:
         print profile
 
-    profile.github = "you have changed!"
-    profile.save()
-
     return render(request,'profile/profile_edit.html',{'user':request.user})
 
-def profie_update(request, user):
-    pass
+
+@login_required
+def profile_update(request):
+    """
+    POST handler for profile update
+
+    """
+
+    try:
+        profile = Profile.objects.get(user_id=request.user.id)
+        user = User.objects.get(id=request.user.id)
+    except (KeyError, Profile.DoesNotExist):
+        # profile no found create new
+        profile = Profile.create(request.user)
+    else:
+        print profile
+
+    user.email = request.POST['user_email']
+    user.save()
+    profile.github = request.POST['github']
+    profile.bio = request.POST['bio']
+    profile.save()
+
+    return HttpResponseRedirect(reverse('profile'))
