@@ -25,7 +25,12 @@ SECRET_KEY = '&05u$z+3so!@zf(+f8gx#ec2zak5b+c-%!a8p6wk4ic5g6s86u'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['cloud-dingkai.c9users.io','localhost']
+ALLOWED_HOSTS = [
+    'cloud-dingkai.c9users.io',
+    'localhost',
+    '127.0.0.1',
+    '192.168.31.109'
+]
 
 
 # Application definition
