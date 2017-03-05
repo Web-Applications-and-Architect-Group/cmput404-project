@@ -15,3 +15,13 @@ class Profile(models.Model):
 
     def __str__(self):
         return self.user.username
+
+@python_2_unicode_compatible
+class Post(models.Model):
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    post_text = models.CharField(max_length=200)
+    pub_date = models.DateField('date published')
+	# votes = models.IntegerField(default=0)
+
+    def __str__(self):
+        return self.post_text
