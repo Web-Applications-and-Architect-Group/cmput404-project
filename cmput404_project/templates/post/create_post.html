@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Write a new POST</title>
+</head>
+
+<form method="post" action="{% url 'create_post' %}">
+	<div class="input-control selec">
+		<select>
+		<option name= "public">public</option>
+		<option name= "friends">only friends</option>
+		<option name= "private">only me can see</option>
+		<option name= "fof">Friends of friends</option>
+		</select>
+	</div>
+
+	<input type="submit" name="create new post" value="new_post">
+
+</form>

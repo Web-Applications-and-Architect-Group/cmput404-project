@@ -69,7 +69,8 @@ def create_post(request):
     Create new post view
 
     """
-    new_post = Post.create(request.user,"a new one")
+    post_text = request.POST['POST_TEXT']
+    new_post = Post.create(request.user,post_text)
     new_post.save()
 
     return HttpResponseRedirect(reverse('profile'))
