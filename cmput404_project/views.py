@@ -64,6 +64,10 @@ def profile_update(request):
     return HttpResponseRedirect(reverse('profile'))
 
 @login_required
+def create_post_html(request):
+    return render(request,'post/create_post.html',{'user':request.user})
+
+@login_required
 def create_post(request):
     """
     Create new post view
