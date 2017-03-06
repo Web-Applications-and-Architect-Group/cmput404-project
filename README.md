@@ -2,6 +2,8 @@
 ------------------
 This is the course work for CMPUT 404 (Winter 2017) @ University of Alberta, Canada.
 
+
+
 # Set up Enviroment
 -------------------
 This section described how to set up your environment in you local computer. The software can only run if your environment set up properly, so be careful of it.
@@ -105,3 +107,43 @@ Then test it by command,
 ```
 $ python manage.py runserver
 ```
+
+
+
+# Start Developing
+------------------
+When you start developing a task, a function, and/or a user case, please follows these steps bellow.
+
+**Step 1: Create a new branch**
+
+We prefer to have a new branch for each new implementation of a function. So, the first step of developing is to create a new branch. Since the dev branch will be the most updated version of our software, it a good idea to copy the dev branch as a starting point of the new branch. The ```name of branch``` will be the task code in Trello sprint board. 
+
+To copy dev branch as a new branch,
+```
+$ git checkout dev
+$ git checkout -b <name of branch>
+```
+
+**Step 2: Implementation**
+
+Now, you can start implement the new function. 
+
+**Step 3: Set Branch Upstream Server**
+
+Once you have your first commit. You will be able to add this branch to git upstream server by the following code,
+```
+$ git push --set-upstream https://github.com/Web-Applications-and-Architect-Group/cmput404-project.git <name of branch>
+```
+
+After you have done those 3 steps, you should able to push your commit without --set-upstream flag, like the following command,
+```
+$ git push
+```
+
+
+
+# Code Reviewing
+----------------
+
+
+
