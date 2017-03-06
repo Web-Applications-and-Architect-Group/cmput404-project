@@ -73,8 +73,14 @@ def create_post(request):
     Create new post view
 
     """
+    user = User.objects.get(id=request.user.id)
+    can_view = request.POST['post_type']
     post_text = request.POST['POST_TEXT']
-    new_post = Post.create(request.user,post_text)
+    new_post = Post.create(request.user,post_text,can_view)
+    #==========
+       #image = request.FILES['file']
+       #new_post = Post.create(request.user,post_text,can_view,image)
+    #=========
     new_post.save()
 
     return HttpResponseRedirect(reverse('profile'))
