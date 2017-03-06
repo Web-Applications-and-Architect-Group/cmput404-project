@@ -2,7 +2,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 import os
-from .models import Profile
+from .models import Profile, Post
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 import sys
@@ -60,5 +60,16 @@ def profile_update(request):
     profile.github = request.POST['github']
     profile.bio = request.POST['bio']
     profile.save()
+
+    return HttpResponseRedirect(reverse('profile'))
+
+@login_required
+def create_post(request):
+    """
+    Create new post view
+
+    """
+    new_post = Post.create(request.user,"a new one")
+    new_post.save()
 
     return HttpResponseRedirect(reverse('profile'))
