@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>My Profile</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{%static 'css/profile.css' %}">
+
+</head>
+
+<body>
+    <div class="profile">
+
+        {% if profile.photo %}
+            <img alt="user photo" src="{{ STATIC_URL }}/users/{{user.id}}/{{profile.photo }}" >
+        {% else %}
+            <img alt="user photo" src="{% static "/images/defaultUserImage.png" %}" width = "150" height = "150">
+        {% endif %}
+        <br/><br/>
+
+        <form action="{% url 'profile_update' %}" method="post">
+            {% csrf_token %}
+            <table><tbody>
+                <tr>
+                  <td>Username</td>
+                  <td>{{ user.username }}</td>
+                <tr>
+                <tr>
+                  <td>Email</td>
+                  <td>
+                    {% if user.email %}
+                      <input name="user_email" value="{{ user.email }}" />
+                    {% else %}
+                      <input name="user_email" />
+                    {% endif %}
+                  </td>
+                <tr>
+
+                <tr>
+                  <td>Github</td>
+                  <td>
+                    {% if user.profile.github %}
+                      <input name="github" value="{{ user.profile.github }}" />
+                    {% else %}
+                      <input name="github" />
+                    {% endif %}
+                  </td>
+                <tr>
+
+              <tr>
+                <td>Bio</td>
+                <td>
+                  {% if user.profile.bio %}
+                    <input name="bio" value="{{ user.profile.bio }}" />
+                  {% else %}
+                    <input name="bio" />
+                  {% endif %}
+                </td>
+              <tr>
+            </tbody></table>
+
+
+            <input type="submit"/>
+         </form>
+    </div>
+    <br/>
+    <button id="show" class="uploadPhoto">Upload Photo</button>
+
+
+</body>

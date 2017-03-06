@@ -21,7 +21,10 @@ from . import views
 
 urlpatterns = [
  	url(r'^', include('registration.backends.simple.urls')),
- 	url(r'^profile/',views.profile,name="profile"),
+ 	url(r'^profile/$', views.profile, name="profile"),
+    url(r'^profile/edit$', views.profile_edit, name="profile_edit"),
+    url(r'^profile/update$', views.profile_update, name="profile_update"),
+    url(r'^create_post$', views.create_post, name="create_post"),
     url(r'^$', views.home ,name="home"),
     url(r'^admin/', admin.site.urls),
 ]
