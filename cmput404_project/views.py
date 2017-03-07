@@ -68,6 +68,12 @@ def create_post_html(request):
     return render(request,'post/create_post.html',{'user':request.user})
 
 @login_required
+def view_all_posts(request):
+    Posts = Post.objects.order_by('-pub_datetime')
+    context = { 'posts':Posts}
+    return render(request,'post/view_all_posts.html',context)
+
+@login_required
 def create_post(request):
     """
     Create new post view

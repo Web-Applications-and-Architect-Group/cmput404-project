@@ -26,6 +26,7 @@ urlpatterns = [
     url(r'^profile/update$', views.profile_update, name="profile_update"),
     url(r'^create_post_html$', views.create_post_html, name="create_post_html"),
     url(r'^create_post$', views.create_post, name="create_post"),
+    url(r'^view_all_posts$', views.view_all_posts, name="view_all_posts"),
     url(r'^$', views.home ,name="home"),
     url(r'^admin/', admin.site.urls),
 ]
