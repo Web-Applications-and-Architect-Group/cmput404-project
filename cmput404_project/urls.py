@@ -15,8 +15,20 @@ Including another URLconf
 """
 from django.conf.urls import include,url
 from django.contrib import admin
+from django.contrib.auth.forms import UserCreationForm
+from django.views.generic.edit import CreateView
+from . import views
+from django.contrib.auth.models import User
+from rest_framework import routers, serializers, viewsets
 
 urlpatterns = [
-    url('^',include("django.contrib.auth.urls")),
+ 	url(r'^', include('registration.backends.simple.urls')),
+ 	url(r'^profile/$', views.profile, name="profile"),
+    url(r'^profile/edit$', views.profile_edit, name="profile_edit"),
+    url(r'^profile/update$', views.profile_update, name="profile_update"),
+    url(r'^create_post$', views.create_post, name="create_post"),
+    url(r'^$', views.home ,name="home"),
     url(r'^admin/', admin.site.urls),
+    url(r'^mystream$', views.ViewMyStream, name="ViewMyStream"),
+    url(r'^delete_post/$', views.delete_post, name="delete_post"),
 ]
