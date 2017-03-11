@@ -67,9 +67,9 @@ def profile_update(request):
 def create_post_html(request):
     return render(request,'post/create_post.html',{'user':request.user})
 
-@login_required
+# @login_required
 def view_all_posts(request):
-    Posts = Post.objects.order_by('-pub_datetime')
+    Posts = Post.objects.filter(can_view=0).order_by('-pub_datetime')
     context = { 'posts':Posts}
     return render(request,'post/view_all_posts.html',context)
 
@@ -99,7 +99,7 @@ def create_post(request):
 
 @login_required
 def ViewMyStream(request):
-    Posts = Post.objects.order_by('-pub_datetime')
+    Posts = Post.objects.filter(author=request.user.id).order_by('-pub_datetime')
     context = { 'posts': Posts }
 
     return render(request, 'stream/mystream.html', context)
