@@ -1,0 +1,47 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{ user.username }}</title>
+  </head>
+
+  <body>
+    <style>
+      ul {
+        list-style-type: none;
+      }
+      li {
+        border-style: solid;
+      }
+      .myStream {
+        text-align: center;
+      }
+    </style>
+    {% if posts %}
+      <div class="myStream">
+      <ul style= "width: 70%; margin-left:12%;  ">{% for post in posts %}
+              {% if post.author == request.user %}
+            <li>  </br>
+                  {% if profile.photo %}
+                      <img alt="user photo" src="{{ STATIC_URL }}/users/{{user.id}}/{{profile.photo }}" >
+                  {% else %}
+                      <img alt="user photo" src="{% static "../static/images/defaultUserImage.png" %}" width = "30" height = "30">
+                  {% endif %}
+
+                  {{ post.author }}  ({{ post.pub_datetime }})</br></br>
+                  {{ post.post_text }}</br></br>
+
+              <form action="{% url 'delete_post' %}" method="GET">
+                      <button name="post_id" value="{{ post.post_id }}">Delete Post</button>
+              </form>
+
+            </li></br>
+             {% endif %}
+         {% endfor %}</ul>
+    {% else %}
+      <p>You do no have any stream to show yet.</p>
+    </div>
+    {% endif %}
+  </body>
+
+</html>
