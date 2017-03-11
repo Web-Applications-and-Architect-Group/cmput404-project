@@ -79,6 +79,7 @@ def create_post(request):
     Create new post view
 
     """
+
     user = User.objects.get(id=request.user.id)
     can_view = request.POST['post_type']
     post_text = request.POST['POST_TEXT']
@@ -90,3 +91,25 @@ def create_post(request):
     new_post.save()
 
     return HttpResponseRedirect(reverse('profile'))
+
+    # new_post = Post.create(request.user,"a new one")
+    # new_post.save()
+    #
+    # return HttpResponseRedirect(reverse('profile'))
+
+@login_required
+def ViewMyStream(request):
+    Posts = Post.objects.order_by('-pub_datetime')
+    context = { 'posts': Posts }
+
+    return render(request, 'stream/mystream.html', context)
+
+@login_required
+def delete_post(request):
+    myText = request.GET['post_text']
+    #print myText
+    allPost = Post.objects.all()
+    for i in allPost:
+        if (i.author == request.user and i.post_text== myText):
+                i.delete()
+    return HttpResponseRedirect(reverse('ViewMyStream'))

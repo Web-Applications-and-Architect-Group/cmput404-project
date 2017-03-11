@@ -19,6 +19,10 @@ from django.contrib.auth.forms import UserCreationForm
 from django.views.generic.edit import CreateView
 from . import views
 
+from django.contrib.auth.models import User
+from rest_framework import routers, serializers, viewsets
+
+
 urlpatterns = [
  	url(r'^', include('registration.backends.simple.urls')),
  	url(r'^profile/$', views.profile, name="profile"),
@@ -27,6 +31,9 @@ urlpatterns = [
     url(r'^create_post_html$', views.create_post_html, name="create_post_html"),
     url(r'^create_post$', views.create_post, name="create_post"),
     url(r'^view_all_posts$', views.view_all_posts, name="view_all_posts"),
+    url(r'^create_post$', views.create_post, name="create_post"),
     url(r'^$', views.home ,name="home"),
     url(r'^admin/', admin.site.urls),
+    url(r'^mystream$', views.ViewMyStream, name="ViewMyStream"),
+    url(r'^delete_post/$', views.delete_post, name="delete_post"),
 ]
