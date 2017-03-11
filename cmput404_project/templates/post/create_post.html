@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Write a new POST</title>
+</head>
+<div>
+  <h1>Write A New Post ~</h1>
+</div>
+
+<form method="post" enctype="multipart/form-data" action="{% url 'create_post' %}">
+{% csrf_token %}
+	<div class="selection">
+		<select name="post_type">
+		<option value= 0>public</option>
+		<option value= 1>only friends</option>
+		<option value= 2>Friends of friends</option>
+		<option value= 3>Private</option>
+		</select>
+	</div>
+	<div>
+	<textarea name="POST_TEXT" rows="4" cols="50" >
+
+	</textarea>
+	</div>
+
+	<div>
+		<h3>Choose a picture to upload!</h3>
+		<input name="uploadFile" type="file" />
+	</div>
+
+	<input type="submit" name="create new post" value="Submit">
+
+</form>

@@ -64,12 +64,29 @@ def profile_update(request):
     return HttpResponseRedirect(reverse('profile'))
 
 @login_required
+def create_post_html(request):
+    return render(request,'post/create_post.html',{'user':request.user})
+
+@login_required
+def view_all_posts(request):
+    Posts = Post.objects.order_by('-pub_datetime')
+    context = { 'posts':Posts}
+    return render(request,'post/view_all_posts.html',context)
+
+@login_required
 def create_post(request):
     """
     Create new post view
 
     """
-    new_post = Post.create(request.user,"a new one")
+    user = User.objects.get(id=request.user.id)
+    can_view = request.POST['post_type']
+    post_text = request.POST['POST_TEXT']
+    new_post = Post.create(request.user,post_text,can_view)
+    #==========
+       #image = request.FILES['file']
+       #new_post = Post.create(request.user,post_text,can_view,image)
+    #=========
     new_post.save()
 
     return HttpResponseRedirect(reverse('profile'))
