@@ -1,0 +1,24 @@
+{% if error_message %}
+        <p><strong>{{error_message}}</strong></p>
+{% endif %}
+
+{% if next %}
+    {% if user.is_authenticated %}
+    <p>If you want to create an new account. Please log out first.</p>
+    {% endif %}
+{% endif %}
+
+{% block content %}
+<div>
+  <h1>Registration</h1>
+</div>
+
+<form method="post" action=".">
+  {% csrf_token %}
+  {{ form.as_p }}
+
+  <input type="submit" value="register" />
+  <input type="hidden" name="next" value="{{ next }}" />
+</form>
+
+{% endblock %}

@@ -25,18 +25,25 @@ SECRET_KEY = '&05u$z+3so!@zf(+f8gx#ec2zak5b+c-%!a8p6wk4ic5g6s86u'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'cloud-dingkai.c9users.io',
+    'localhost',
+    '127.0.0.1',
+    '192.168.31.109'
+]
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'cmput404_project',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -99,6 +106,14 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ]
+}
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
@@ -115,6 +130,10 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.10/howto/static-files/
+
 
 STATIC_URL = '/static/'
+
+# for login required decorator
+# https://docs.djangoproject.com/en/1.10/topics/auth/default/#django.contrib.auth.decorators.login_required
+LOGIN_URL = "/login/"

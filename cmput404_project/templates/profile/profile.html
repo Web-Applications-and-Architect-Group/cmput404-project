@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>My Profile</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{%static 'css/profile.css' %}">
+
+</head>
+
+<body>
+    <div class="profile">
+
+        {% if profile.photo %}
+            <img alt="user photo" src="{{ STATIC_URL }}/users/{{user.id}}/{{profile.photo }}" >
+        {% else %}
+            <img alt="user photo" src="{% static "/images/defaultUserImage.png" %}" width = "150" height = "150">
+        {% endif %}
+        <br/><br/>
+
+
+        <table><tbody>
+              <tr><td>Username</td><td>{{ user.username }}</td><tr>
+              <tr><td>Email</td>
+                  <td>{% if user.email %} {{ user.email }}
+                      {% else %} n/a
+                      {% endif %}</td><tr>
+
+              <tr><td>Github</td>
+                <td>{% if user.profile.github %} {{ user.profile.github }}
+                    {% else %} n/a
+                    {% endif %}</td><tr>
+
+              <tr><td>Bio</td>
+                <td>{% if user.profile.bio %} {{ user.profile.bio }}
+                    {% else %} n/a
+                    {% endif %}</td><tr>
+       </tbody></table>
+    </div>
+    <br/>
+
+    <button id="show" class="editProfile">
+      <a href="{% url 'profile_edit' %}">Edit Profile</a>
+    </button>
+    <button id="show" class="uploadPhoto">Upload Photo</button>
+
+    <button id="show" class="write post">
+      <a href="{% url 'create_post_html' %}">Write post</a>
+    </button>
+    <!-- <button id="show" class="write post">
+      <a href="{% url 'create_post' %}">Write post</a>
+
+    </button> -->
+
+
+</body>
