@@ -1,0 +1,1 @@
+web: gunicorn cmput404_project.wsgi --log-file -
