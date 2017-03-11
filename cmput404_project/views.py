@@ -1,5 +1,5 @@
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 import os
 from .models import Profile, Post
@@ -18,7 +18,14 @@ def home(request):
 
 @login_required
 def profile(request):
-    return render(request,'profile/profile.html',{'user':request.user})
+    return render(request,'profile/profile.html',{'user':request.user, 'request_by':request.user})
+
+def view_profile(request, username):
+    user = get_object_or_404(User, username=username)
+    # profile = Profile.objects.get(user_id=user.id)
+    print(username)
+
+    return render(request,'profile/profile.html',{'user':user, 'request_by':request.user})
 
 @login_required
 def profile_edit(request):
