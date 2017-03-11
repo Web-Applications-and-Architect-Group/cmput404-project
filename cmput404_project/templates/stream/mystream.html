@@ -19,6 +19,9 @@
     </style>
     {% if posts %}
       <div class="myStream">
+     <button id="show" class="home">
+      <a href="{% url 'profile' %}"><h4>Home</h4></a>
+    </button>
       <ul style= "width: 70%; margin-left:12%;  ">{% for post in posts %}
               {% if post.author == request.user %}
             <li>  </br>
@@ -33,6 +36,9 @@
 
               <form action="{% url 'delete_post' %}" method="GET">
                       <button name="post_id" value="{{ post.post_id }}">Delete Post</button>
+              </form>
+              <form action="{% url 'manage_post' %}" method="GET">
+                      <button name="post_id" value="{{ post.post_id }}">Modiify my Post</button>
               </form>
 
             </li></br>

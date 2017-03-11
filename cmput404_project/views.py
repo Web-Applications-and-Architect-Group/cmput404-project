@@ -96,6 +96,28 @@ def create_post(request):
     # new_post.save()
     #
     # return HttpResponseRedirect(reverse('profile'))
+@login_required
+def manage_post(request):
+    """
+    post edit view
+
+    """
+
+    post = Post.objects.get(post_id=request.GET['post_id'])
+
+        
+    return render(request,'post/manage_post.html',{'post':post})
+
+@login_required
+def update_post(request):
+    post = Post.objects.get(post_id=request.POST['post_id'])
+    new_post_text = request.POST['post_text']
+    new_can_view = request.POST['post_type']
+    post.post_text = new_post_text
+    post.can_view = new_can_view
+    post.save()
+
+    return HttpResponseRedirect(reverse('ViewMyStream'))
 
 @login_required
 def ViewMyStream(request):
@@ -112,3 +134,4 @@ def delete_post(request):
         if (str(i.post_id) == str(myPost)):
             i.delete()
     return HttpResponseRedirect(reverse('ViewMyStream'))
+
