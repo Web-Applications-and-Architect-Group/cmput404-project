@@ -2,7 +2,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 import os
-from .models import Profile, Post
+from .models import Profile, Post, Comment
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 import sys
@@ -70,7 +70,9 @@ def create_post_html(request):
 @login_required
 def view_all_posts(request):
     Posts = Post.objects.order_by('-pub_datetime')
-    context = { 'posts':Posts}
+    comments = Comment.objects.all()
+    context = { 'posts': Posts , 'comments': comments}
+    #context = { 'posts':Posts}
     return render(request,'post/view_all_posts.html',context)
 
 @login_required
@@ -94,13 +96,27 @@ def create_post(request):
 
     # new_post = Post.create(request.user,"a new one")
     # new_post.save()
-    #
+
     # return HttpResponseRedirect(reverse('profile'))
+
+@login_required
+def comment(request):
+    author = User.objects.get(id = request.user.id)
+    comment_text = request.POST['comment_text']
+    #user = User.objects.get(id=request.user.id)
+    post_id= request.POST['post_id']
+    post = Post.objects.get(post_id = post_id)
+
+    new_comment = Comment.create(author, comment_text, post)
+    new_comment.save()
+
+    return HttpResponseRedirect(reverse('ViewMyStream'))
 
 @login_required
 def ViewMyStream(request):
     Posts = Post.objects.order_by('-pub_datetime')
-    context = { 'posts': Posts }
+    comments = Comment.objects.all()
+    context = { 'posts': Posts , 'comments': comments}
 
     return render(request, 'stream/mystream.html', context)
 

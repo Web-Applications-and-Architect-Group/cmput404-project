@@ -36,4 +36,5 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^mystream$', views.ViewMyStream, name="ViewMyStream"),
     url(r'^delete_post/$', views.delete_post, name="delete_post"),
+    url(r'^comment/$', views.comment, name="comment"),
 ]

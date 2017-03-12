@@ -31,9 +31,30 @@
                   {{ post.author }}  ({{ post.pub_datetime }})</br></br>
                   {{ post.post_text }}</br></br>
 
+              <div style="text-align:left; margin-left:30%">
+                  {% for comment in comments %}
+
+                      {% if comment.post_id == post%}
+                          comment by {{comment.author}}: {{comment.comment_text}} ({{comment.comment_date}})</br>
+                      {%endif%}
+
+                  {% endfor %}
+              </div>
+
+              <form action="{% url 'comment' %}" method="POST">
+                    {% csrf_token %}
+                      <input style= "width:50%" name="comment_text"/>
+                      <input hidden="hidden" name="post_id" value = "{{post.post_id }}"/>
+                      <input type="submit" value = "comment"/>
+              </form></br>
+
+
               <form action="{% url 'delete_post' %}" method="GET">
                       <button name="post_id" value="{{ post.post_id }}">Delete Post</button>
-              </form>
+              </form></br>
+
+
+         </form>
 
             </li></br>
              {% endif %}

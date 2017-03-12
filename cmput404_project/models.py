@@ -51,3 +51,21 @@ class Post(models.Model):
 
     def __str__(self):
         return self.post_text
+
+@python_2_unicode_compatible
+class Comment(models.Model):
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    comment_text = models.CharField(max_length=1000)
+    comment_date = models.DateTimeField('date commented')
+    comment_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    post_id = models.ForeignKey(Post, on_delete=models.CASCADE, db_column='post_id', default='', editable='False')
+
+    @classmethod
+    def create(cls, user, comment_text, post):
+        print post
+        print type(post)
+        new_comment = cls(author=user, comment_text=comment_text, post_id=post, comment_date=timezone.now())
+        return new_comment
+
+    def __str__(self):
+        return self.comment_text
