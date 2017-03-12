@@ -9,8 +9,6 @@
 </head>
 
 <body>
-  {% if user.profile.is_active %}
-    <!--{# {% user.profile.is_active == True %} #}-->
     <div class="profile">
 
         {% if profile.photo %}
@@ -41,13 +39,10 @@
     </div>
     <br/>
 
-    {% if request_by %}
-      {% if request_by.id == user.id %}
-        <!-- <p> Your account has not yet been approved by admin. Please wait until you been approved.</p> -->
-        <!-- <button id="show" class="editProfile"> -->
-          <a class="editProfile" href="{% url 'profile_edit' %}">Edit Profile</a>
-        <!-- </button> -->
-        <button id="show" class="uploadPhoto">Upload Photo</button>
+    <!-- <button id="show" class="editProfile"> -->
+      <a class="editProfile" href="{% url 'profile_edit' %}">Edit Profile</a>
+    <!-- </button> -->
+    <button id="show" class="uploadPhoto">Upload Photo</button>
 
 
     <!-- <button id="show" class="write post"> -->
@@ -81,6 +76,7 @@
     {% endif %}
 
   {% endif %}
+
 
 
 </body>
