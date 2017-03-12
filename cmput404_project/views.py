@@ -37,14 +37,20 @@ def profile(request):
         'friend_list':friends,'friend_request':friend_requests})
 
 def view_profile(request, username):
+
     user = get_object_or_404(User, username=username)
     # profile = Profile.objects.get(user_id=user.id)
 
     friend_requests = friend_request.objects.filter(request_receiver=request.user)
-    print (friend_requests)
-    print(username)
+    friends = Profile.objects.get(user=request.user).friends.all()
+    isfriend = False
+    for friend in friends:
+        if (friend.user == user):
+            isfriend = True
 
-    return render(request,'profile/profile.html',{'user':user, 'request_by':request.user,'friend_request':friend_requests})
+
+
+    return render(request,'profile/profile.html',{'user':user,'isFriend':isfriend, 'request_by':request.user,'friend_request':friend_requests})
 
 @login_required
 def profile_edit(request):

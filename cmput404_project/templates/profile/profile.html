@@ -105,20 +105,40 @@
 
 
       {% else %}
+
+
         <!-- <p> This user haven been approved by admin. </p> -->
+<!--         {% if friend_list %}
+            {% for friend in friend_list %}
+             
+             {% if friend.user == user%}
+                <p> You guys are Friend !</p>
 
-        <button id="show" class="uploadPhoto">Follow</button>
 
-        <!-- <button id="show" class="Add_friend"><a href="{% url 'Add_friend' %}">Add Friend</a></button> -->
+              {% else %}
+
+             {% endif %}
+             
+
+             {% endfor %}
+
+         {% endif %} -->
+          {% if  isfriend == True %}
+            <p> you guys are friends !</p>
+          {% else%}
+                         <button id="show" class="uploadPhoto">Follow</button>
+
+            <!-- <button id="show" class="Add_friend"><a href="{% url 'Add_friend' %}">Add Friend</a></button> -->
 
 
-        <form action="{% url 'Add_friend' %}" method="post">
-            {% csrf_token %}
-            <input name="request_sender" value="{{ request_by.id }}" type = "hidden" />
-            <input name="request_receiver" value="{{ user.id }}" type = "hidden" />
+            <form action="{% url 'Add_friend' %}" method="post">
+                {% csrf_token %}
+                <input name="request_sender" value="{{ request_by.id }}" type = "hidden" />
+                <input name="request_receiver" value="{{ user.id }}" type = "hidden" />
 
-            <input type="submit" value="Add Friend"/>
-         </form>
+                <input type="submit" value="Add Friend"/>
+             </form>
+         {% endif %}
 
 
 
