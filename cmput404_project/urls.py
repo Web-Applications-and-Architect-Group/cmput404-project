@@ -37,6 +37,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^mystream$', views.ViewMyStream, name="ViewMyStream"),
     url(r'^delete_post/$', views.delete_post, name="delete_post"),
+    url(r'^post/(?P<post_id>[a-zA-z0-9-_]+)$', views.viewUnlistedPost, name="viewUnlistedPost"),
     url(r'^manage_post/$', views.manage_post, name="manage_post"),
     url(r'^update_post/$', views.update_post, name="update_post"),
 ]
