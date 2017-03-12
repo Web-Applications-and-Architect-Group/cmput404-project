@@ -23,7 +23,16 @@
       <a href="{% url 'profile' %}"><h4>Home</h4></a>
     </button>
       <ul style= "width: 70%; margin-left:12%;  ">
+
 {%for post in posts%}
+
+<script>
+    var x ="ss";
+    if (post.author == request.user){
+        x="s";
+    }
+</script>
+
 
             <li>  </br>
                   {% if profile.photo %}
@@ -56,10 +65,12 @@
               {%if post.author == request.user  %}
                   <form action="{% url 'delete_post' %}" method="GET">
                          {% csrf_token %}
+                         <input hidden="hidden" name="post_type" value = "{{post_type}}"/>
                           <button name="post_id" value="{{ post.post_id }}">Delete Post</button>
                   </form></br>
 
                   <form action="{% url 'manage_post' %}" method="GET">
+                          <input hidden="hidden" name="post_type" value = "{{post_type}}"/>
                           <button name="post_id" value="{{ post.post_id }}">Modiify my Post</button>
                   </form>
 

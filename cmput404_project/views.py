@@ -107,8 +107,9 @@ def manage_post(request):
 
     post = Post.objects.get(post_id=request.GET['post_id'])
 
+    post_type = request.GET['post_type']
 
-    return render(request,'post/manage_post.html',{'post':post})
+    return render(request,'post/manage_post.html',{'post':post, 'post_type2':post_type})
 
 @login_required
 def update_post(request):
@@ -119,24 +120,26 @@ def update_post(request):
     post.can_view = new_can_view
     post.save()
 
-    return HttpResponseRedirect(reverse('ViewMyStream'))
+    post_type = request.POST['post_type']
+    context = postContent(post_type, request)
+    return render(request, 'stream/mystream.html', context)
+    #return HttpResponseRedirect(reverse('ViewMyStream'))
 
 @login_required
 def comment(request):
     author = User.objects.get(id = request.user.id)
     comment_text = request.GET['comment_text']
-    #user = User.objects.get(id=request.user.id)
     post_id= request.GET['post_id']
     post = Post.objects.get(post_id = post_id)
 
     new_comment = Comment.create(author, comment_text, post)
     new_comment.save()
 
-    #post_type = request.GET['post_type']
-    #context= postContent(post_type,request)
+    post_type = request.GET['post_type']
+    context= postContent(post_type,request)
 
-    #return render(request, 'stream/mystream.html', context)
-    return HttpResponseRedirect(reverse('ViewMyStream'))
+    return render(request, 'stream/mystream.html', context)
+    #return HttpResponseRedirect(reverse('ViewMyStream'), kwargs={'post_type':post_type})
 
 def postContent(post_type,request):
     comments = Comment.objects.all()
@@ -145,7 +148,6 @@ def postContent(post_type,request):
             post = Post.objects.filter(author = request.user)
     else:
         post=Post.objects.all()
-        print post
 
     context = { 'posts': post , 'comments': comments, 'post_type': post_type}
 
@@ -155,19 +157,9 @@ def postContent(post_type,request):
 def ViewMyStream(request):
     Posts = Post.objects.order_by('-pub_datetime')
     comments = Comment.objects.all()
-    '''
+
     post_type = request.GET['post_type']
-
-    if str(post_type)== "my_post":
-            post = Post.objects.filter(author = request.user)
-    else:
-        post=Post.objects.all()
-        print post
-
-    context = { 'posts': post , 'comments': comments, 'post_type': post_type}
-    '''
-    context = { 'posts': Posts , 'comments': comments}
-    #context= postContent(post_type,request)
+    context = postContent(post_type,request)
     return render(request, 'stream/mystream.html', context)
 
 @login_required
@@ -177,4 +169,7 @@ def delete_post(request):
     for i in allPost:
         if (str(i.post_id) == str(myPost)):
             i.delete()
-    return HttpResponseRedirect(reverse('ViewMyStream'))
+    #return HttpResponseRedirect(reverse('ViewMyStream'))
+    post_type = request.GET['post_type']
+    context = postContent(post_type,request)
+    return render(request, 'stream/mystream.html', context)
