@@ -21,6 +21,25 @@
                                 <li>{{ post.author}} {{ post.pub_datetime}}
                                 <div>
                                         {{ post.post_text}}
+
+                                        <div style="text-align:left; margin-left:30%">
+                                            {% for comment in comments %}
+
+                                                {% if comment.post_id == post%}
+                                                    comment by {{comment.author}}: {{comment.comment_text}} ({{comment.comment_date}})</br>
+                                                {%endif%}
+
+                                            {% endfor %}
+                                        </div>
+
+                                        <form action="{% url 'comment' %}" method="POST">
+                                              {% csrf_token %}
+                                                <input style= "width:50%" name="comment_text"/>
+                                                <input hidden="hidden" name="post_id" value = "{{post.post_id }}"/>
+                                                <input hidden="hidden" name="path" value = "{{ path }}"/>
+
+                                                <input type="submit" value = "comment"/>
+                                        </form></br>
                                 </div>
                                 </li>
                         </div>
