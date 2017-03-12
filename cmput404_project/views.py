@@ -107,7 +107,7 @@ def manage_post(request):
 
     post = Post.objects.get(post_id=request.GET['post_id'])
 
-        
+
     return render(request,'post/manage_post.html',{'post':post})
 
 @login_required
@@ -124,22 +124,50 @@ def update_post(request):
 @login_required
 def comment(request):
     author = User.objects.get(id = request.user.id)
-    comment_text = request.POST['comment_text']
+    comment_text = request.GET['comment_text']
     #user = User.objects.get(id=request.user.id)
-    post_id= request.POST['post_id']
+    post_id= request.GET['post_id']
     post = Post.objects.get(post_id = post_id)
 
     new_comment = Comment.create(author, comment_text, post)
     new_comment.save()
 
+    #post_type = request.GET['post_type']
+    #context= postContent(post_type,request)
+
+    #return render(request, 'stream/mystream.html', context)
     return HttpResponseRedirect(reverse('ViewMyStream'))
+
+def postContent(post_type,request):
+    comments = Comment.objects.all()
+
+    if str(post_type)== "my_post":
+            post = Post.objects.filter(author = request.user)
+    else:
+        post=Post.objects.all()
+        print post
+
+    context = { 'posts': post , 'comments': comments, 'post_type': post_type}
+
+    return context
 
 @login_required
 def ViewMyStream(request):
     Posts = Post.objects.order_by('-pub_datetime')
     comments = Comment.objects.all()
-    context = { 'posts': Posts , 'comments': comments}
+    '''
+    post_type = request.GET['post_type']
 
+    if str(post_type)== "my_post":
+            post = Post.objects.filter(author = request.user)
+    else:
+        post=Post.objects.all()
+        print post
+
+    context = { 'posts': post , 'comments': comments, 'post_type': post_type}
+    '''
+    context = { 'posts': Posts , 'comments': comments}
+    #context= postContent(post_type,request)
     return render(request, 'stream/mystream.html', context)
 
 @login_required
@@ -150,4 +178,3 @@ def delete_post(request):
         if (str(i.post_id) == str(myPost)):
             i.delete()
     return HttpResponseRedirect(reverse('ViewMyStream'))
-

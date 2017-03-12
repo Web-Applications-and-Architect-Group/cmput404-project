@@ -62,8 +62,6 @@ class Comment(models.Model):
 
     @classmethod
     def create(cls, user, comment_text, post):
-        print post
-        print type(post)
         new_comment = cls(author=user, comment_text=comment_text, post_id=post, comment_date=timezone.now())
         return new_comment
 
