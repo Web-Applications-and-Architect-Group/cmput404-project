@@ -71,3 +71,6 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.comment_text
+
+class temp(models.Model):
+    name = "hahah"
