@@ -1,11 +1,13 @@
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 import os
-from .models import Profile, Post
+from .models import Profile, Post, Comment
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 import sys
+from django.shortcuts import render, get_object_or_404
+import uuid
 
 '''
 def reg_complete(request):
@@ -38,11 +40,11 @@ def view_profile(request, username):
 
     return render(request,'profile/profile.html',{'user':user, 'request_by':request.user})
 
+
 @login_required
 def profile_edit(request):
     """
     Profile edit view
-
     """
 
     try:
@@ -62,7 +64,6 @@ def profile_edit(request):
 def profile_update(request):
     """
     POST handler for profile update
-
     """
 
     try:
@@ -97,13 +98,13 @@ def view_all_posts(request):
 def create_post(request):
     """
     Create new post view
-
     """
 
     user = User.objects.get(id=request.user.id)
     can_view = request.POST['post_type']
     post_text = request.POST['POST_TEXT']
-    new_post = Post.create(request.user,post_text,can_view)
+    post_type = request.POST['content_type']
+    new_post = Post.create(request.user,post_text,can_view, post_type)
     #==========
        #image = request.FILES['file']
        #new_post = Post.create(request.user,post_text,can_view,image)
@@ -114,36 +115,76 @@ def create_post(request):
 
     # new_post = Post.create(request.user,"a new one")
     # new_post.save()
-    #
+
     # return HttpResponseRedirect(reverse('profile'))
 @login_required
 def manage_post(request):
     """
     post edit view
-
     """
 
     post = Post.objects.get(post_id=request.GET['post_id'])
 
-        
-    return render(request,'post/manage_post.html',{'post':post})
+    post_type = request.GET['post_type']
+
+    return render(request,'post/manage_post.html',{'post':post, 'post_type2':post_type})
+
 
 @login_required
 def update_post(request):
     post = Post.objects.get(post_id=request.POST['post_id'])
     new_post_text = request.POST['post_text']
     new_can_view = request.POST['post_type']
+    new_post_type = request.POST['content_type']
     post.post_text = new_post_text
     post.can_view = new_can_view
+    post.post_type = new_post_type
     post.save()
 
-    return HttpResponseRedirect(reverse('ViewMyStream'))
+    post_type2 = request.POST['post_type2']
+    print post_type2
+    context = postContent(post_type2, request)
+    return render(request, 'stream/mystream.html', context)
+    #return HttpResponseRedirect(reverse('ViewMyStream'))
+
+@login_required
+def comment(request):
+    author = User.objects.get(id = request.user.id)
+    comment_text = request.GET['comment_text']
+    post_id= request.GET['post_id']
+    post = Post.objects.get(post_id = post_id)
+
+    new_comment = Comment.create(author, comment_text, post)
+    new_comment.save()
+
+    post_type = request.GET['post_type']
+    context= postContent(post_type,request)
+
+    return render(request, 'stream/mystream.html', context)
+    #return HttpResponseRedirect(reverse('ViewMyStream'), kwargs={'post_type':post_type})
+
+def postContent(post_type,request):
+    comments = Comment.objects.all()
+
+    if str(post_type)== "my_post":
+            post = Post.objects.filter(author = request.user).order_by('-pub_datetime')
+    else:
+        post= Post.objects.filter(can_view=0).order_by('-pub_datetime')
+        #post2=Post.objects.filter(can_view=3).order_by('-pub_datetime')
+        #print post
+
+    context = { 'posts': post , 'comments': comments, 'post_type': post_type}
+
+    return context
 
 @login_required
 def ViewMyStream(request):
-    Posts = Post.objects.filter(author=request.user.id).order_by('-pub_datetime')
-    context = { 'posts': Posts }
+    Posts = Post.objects.order_by('-pub_datetime')
+    comments = Comment.objects.all()
 
+
+    post_type = request.GET['post_type']
+    context = postContent(post_type,request)
     return render(request, 'stream/mystream.html', context)
 
 @login_required
@@ -153,5 +194,29 @@ def delete_post(request):
     for i in allPost:
         if (str(i.post_id) == str(myPost)):
             i.delete()
-    return HttpResponseRedirect(reverse('ViewMyStream'))
 
+    #return HttpResponseRedirect(reverse('ViewMyStream'))
+    post_type = request.GET['post_type']
+    context = postContent(post_type,request)
+    return render(request, 'stream/mystream.html', context)
+
+def viewUnlistedPost(request, post_id):
+    post = get_object_by_uuid_or_404(Post, post_id)
+
+    # post_id = request.GET['post_id']
+    unlistedPost = Post.objects.get(pk=post_id)
+    context = { 'post': unlistedPost }
+
+    return render(request, 'post/shared_post.html', context)
+
+### reference by: http://brainstorm.it/snippets/get_object_or_404-for-uuids/
+def get_object_by_uuid_or_404(model, uuid_pk):
+    """
+    Calls get_object_or_404(model, pk=uuid_pk)
+    but also prevents "badly formed hexadecimal UUID string" unhandled exception
+    """
+    try:
+        uuid.UUID(uuid_pk)
+    except Exception, e:
+        raise Http404(str(e))
+    return get_object_or_404(model, pk=uuid_pk)

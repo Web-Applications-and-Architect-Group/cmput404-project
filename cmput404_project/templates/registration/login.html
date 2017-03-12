@@ -11,6 +11,9 @@
     {% endif %}
 {% endif %}
 
+<div style="width:22%;height:25%; position: relative; left: 37%; top:20%;
+            border: 2px solid #ccd8ff; padding:2em;
+            text-align:center; background-color: #e6ecff; font-family: verdana;">
 <form method="post" action="{% url 'auth_login' %}">
 {% csrf_token %}
 <table>
@@ -23,11 +26,12 @@
     <td>{{ form.password }}</td>
 </tr>
 </table>
-
-<input type="submit" value="login" />
+</br>
+<input style="font-size: 150%; width:30%"type="submit" value="login" />
 <input type="hidden" name="next" value="{{ next }}" />
 </form>
 
 {# Assumes you setup the password_reset view in your URLconf #}
 <p><a href="{% url 'auth_password_reset' %}">Lost password?</a></p>
 <p><a href="{% url 'registration_register' %}">Sign Up</a></p>
+</div>
