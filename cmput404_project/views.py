@@ -45,7 +45,6 @@ def view_profile(request, username):
 def profile_edit(request):
     """
     Profile edit view
-
     """
 
     try:
@@ -65,7 +64,6 @@ def profile_edit(request):
 def profile_update(request):
     """
     POST handler for profile update
-
     """
 
     try:
@@ -100,13 +98,13 @@ def view_all_posts(request):
 def create_post(request):
     """
     Create new post view
-
     """
 
     user = User.objects.get(id=request.user.id)
     can_view = request.POST['post_type']
     post_text = request.POST['POST_TEXT']
-    new_post = Post.create(request.user,post_text,can_view)
+    post_type = request.POST['content_type']
+    new_post = Post.create(request.user,post_text,can_view, post_type)
     #==========
        #image = request.FILES['file']
        #new_post = Post.create(request.user,post_text,can_view,image)
@@ -123,7 +121,6 @@ def create_post(request):
 def manage_post(request):
     """
     post edit view
-
     """
 
     post = Post.objects.get(post_id=request.GET['post_id'])
@@ -138,8 +135,10 @@ def update_post(request):
     post = Post.objects.get(post_id=request.POST['post_id'])
     new_post_text = request.POST['post_text']
     new_can_view = request.POST['post_type']
+    new_post_type = request.POST['content_type']
     post.post_text = new_post_text
     post.can_view = new_can_view
+    post.post_type = new_post_type
     post.save()
 
     post_type2 = request.POST['post_type2']

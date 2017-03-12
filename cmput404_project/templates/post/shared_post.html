@@ -1,4 +1,6 @@
 {% load static %}
+{% load markdown_deux_tags %}
+
 <!DOCTYPE html>
 
 <html>
@@ -20,7 +22,11 @@
           <img alt="user photo" src="{% static "../static/images/defaultUserImage.png" %}" width = "30" height = "30">
       {% endif %}
       {{ post.author }}  ({{ post.pub_datetime }})</br></br>
-      {{ post.post_text }}</br></br>
+      {% if post.post_type == 1 %}
+          {{ post.post_text|markdown }}</br></br>
+      {% else %}
+        {{ post.post_text|urlize }}</br></br>
+      {% endif %}
     </div>
   </body>
 </html>

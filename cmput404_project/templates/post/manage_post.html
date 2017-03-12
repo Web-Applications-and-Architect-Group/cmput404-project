@@ -43,42 +43,68 @@
                   <td><h3>NEW POST Content<h3></td>
                   <td>
                     {% if post.post_text %}
-                        <textarea id="Exa" name="post_text" rows="4" cols="50" >
-                          {{ post.post_text }}
-                        </textarea>
+                        <textarea id="Exa" name="post_text" rows="4" cols="50" >{{ post.post_text }}</textarea>
                     {% else %}
                       <input name="post_text" />
                     {% endif %}
                     <input name="post_id" value="{{ post.post_id }}" type = "hidden" />
                     <input hidden="hidden" name="post_type2" value = "{{post_type2}}"/>
+                    <input hidden="hidden" name="type" value = "{{post.can_view}}" id="type"/>
+                    <input hidden="hidden" name="content_type" value = "{{post.post_type}}" id="test"/>
                   </td>
                 <tr>
 
 
             </tbody></table>
 
-              <div class="selection">
+              <div class="selection" >
                 <h4> Change Visibility  </h4>
-                <select name="post_type" >
+                <select name="post_type" id="sel1">
 
                   <option value= 0>public</option>
                   <option value= 1>only friends</option>
                   <option value= 2>Friends of friends</option>
                   <option value= 3>Private</option>
                   <option value= 4>Unlisted</option>
+
+                </select>
+
+                <h4> Change Post Type  </h4>
+                <select name="content_type" id="sel2">
+
+                  <option value= 0>Plain Text</option>
+                  <option value= 1>Markdown</option>
+
                 </select>
               </div>
             <input type="submit"/>
          </form>
 
-
-
-
-
-
-
-
-
+         <script  type = "text/javascript" >
+              var anTest = document.getElementById("type").value;
+              var test = document.getElementById("test").value;
+              if(anTest==='0') {
+                document.getElementById("sel1")[0].selected=true;
+              }
+              if(anTest==='1') {
+                document.getElementById("sel1")[1].selected=true;
+              }
+              if(anTest==='2') {
+                document.getElementById("sel1")[2].selected=true;
+              }
+              if(anTest==='3') {
+                document.getElementById("sel1")[3].selected=true;
+              }
+              if(anTest==='4') {
+                document.getElementById("sel1")[4].selected=true;
+              }
+              if(test==='1') {
+                document.getElementById("sel2")[1].selected=true;
+              }
+              if(test==='0') {
+                document.getElementById("sel2")[0].selected=true;
+              }
+          </script>
 
 
             </li></br>

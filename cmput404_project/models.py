@@ -31,7 +31,14 @@ class Post(models.Model):
         (3, 'Private'),
         (4, 'Unlisted'),
     ]
+
+    content_type = [
+        (0, 'Plain Text'),
+        (1, 'Markdown'),
+    ]
+
     can_view = models.IntegerField(choices=authority, default=0)
+    post_type = models.IntegerField(choices=content_type, default=0)
     #=================
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     post_text = models.CharField(max_length=200)
@@ -45,8 +52,8 @@ class Post(models.Model):
 	# votes = models.IntegerField(default=0)
 
     @classmethod
-    def create(cls, user, post_text,can_view_choice):
-        new_post = cls(author=user, post_text=post_text, pub_datetime=timezone.now(), can_view = can_view_choice)
+    def create(cls, user, post_text,can_view_choice, post_type_choice):
+        new_post = cls(author=user, post_text=post_text, pub_datetime=timezone.now(), can_view = can_view_choice, post_type=post_type_choice)
         return new_post
     #def create(cls, user, post_text,can_view_choice,Image):
         #new_post = cls(author=user, post_text=post_text, pub_datetime=timezone.now(), can_view = can_view_choice,Image = image)
