@@ -9,8 +9,8 @@
 </head>
 
 <body>
-  {% if user.profile %}
-    <!--{# {% user.profile.active == True %} #}-->
+  {% if user.profile.is_active %}
+    <!--{# {% user.profile.is_active == True %} #}-->
     <div class="profile">
 
         {% if profile.photo %}
@@ -66,8 +66,16 @@
 
 
   {% else %}
+    {% if request_by %}
+      {% if request_by.id == user.id %}
+        <p> Your account has not yet been approved by admin. Please wait until you been approved.</p>
+      {% else %}
+        <p> This user haven been approved by admin. </p>
+      {% endif %}
+    {% else %}
 
-    <p> This user haven been approved by admin. </p>
+      <p> This user haven been approved by admin. </p>
+    {% endif %}
 
   {% endif %}
 
