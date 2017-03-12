@@ -10,6 +10,7 @@
 
 <body>
   {% if user.profile.is_active %}
+    <!--{# {% user.profile.is_active == True %} #}-->
     <div class="profile">
 
         {% if profile.photo %}
@@ -40,31 +41,22 @@
     </div>
     <br/>
 
-
     {% if request_by %}
       {% if request_by.id == user.id %}
         <!-- <p> Your account has not yet been approved by admin. Please wait until you been approved.</p> -->
         <!-- <button id="show" class="editProfile"> -->
-         <a class="editProfile" href="{% url 'profile_edit' %}">Edit Profile</a>
-         <!-- </button> -->
-         <button id="show" class="uploadPhoto">Upload Photo</button>
+          <a class="editProfile" href="{% url 'profile_edit' %}">Edit Profile</a>
+        <!-- </button> -->
+        <button id="show" class="uploadPhoto">Upload Photo</button>
 
 
-         <!-- <button id="show" class="write post"> -->
-         <a href="{% url 'create_post_html' %}">Write post</a>
-         <!-- </button> -->
-         <!-- <button id="show" class="editPost"> -->
-         <!-- </button> -->
-
-         <form action="{% url 'ViewMyStream' %}" method="GET">
-           <select name="post_type">
-               <option value="">select posts</option>
-               <option value= "my_post">View My Posts</option>
-               <option value= "public_post">View Public Posts</option>
-            </select>
-             <button name="confirm_post" >confirm</button>
-         </form>
-
+    <!-- <button id="show" class="write post"> -->
+      <a href="{% url 'create_post_html' %}">Write post</a>
+    <!-- </button> -->
+      <!-- <button id="show" class="editPost"> -->
+      <a href="{% url 'ViewMyStream' %}">Edit Posts</a>
+    <!-- </button> -->
+    
       {% else %}
         <!-- <p> This user haven been approved by admin. </p> -->
         <button id="show" class="uploadPhoto">Follow</button>
@@ -89,7 +81,6 @@
     {% endif %}
 
   {% endif %}
-
 
 
 </body>
