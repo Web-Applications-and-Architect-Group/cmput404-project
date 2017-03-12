@@ -13,6 +13,9 @@ class Profile(models.Model):
     bio = models.CharField(max_length=200)
     is_active = models.BooleanField(default=False)
 
+    friends = models.ManyToManyField("self", related_name="friends", blank=True)
+
+
     @classmethod
     def create(cls, user):
         new_profile = cls(user=user, github="n/a", bio="n/a")
@@ -53,3 +56,18 @@ class Post(models.Model):
 
     def __str__(self):
         return self.post_text
+@python_2_unicode_compatible
+class friend_request(models.Model):
+    request_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    request_sender = models.ForeignKey(User,related_name="sender",on_delete=models.CASCADE)
+    request_receiver = models.ForeignKey(User,related_name="receiver",on_delete=models.CASCADE)
+    request_date = models.DateTimeField('date published')
+    status = models.BooleanField(default=False)
+
+    @classmethod
+    def create(cls ,request_sender,request_receiver,status):
+        new_request = cls(request_sender=request_sender,request_receiver=request_receiver,status=status,request_date=timezone.now())
+        return new_request
+
+    def __str__(self):
+        return self.request_sender.username

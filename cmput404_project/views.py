@@ -1,8 +1,8 @@
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect,JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 import os
-from .models import Profile, Post
+from .models import Profile, Post,friend_request
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 import sys
@@ -29,14 +29,19 @@ def profile(request):
         # print profile
         pass
 
-    return render(request,'profile/profile.html',{'user':request.user, 'request_by':request.user})
+    friend_requests = friend_request.objects.filter(request_receiver=request.user)
+    print (friend_requests)
+    return render(request,'profile/profile.html',{'user':request.user, 'request_by':request.user,'friend_request':friend_requests})
 
 def view_profile(request, username):
     user = get_object_or_404(User, username=username)
     # profile = Profile.objects.get(user_id=user.id)
+
+    friend_requests = friend_request.objects.filter(request_receiver=request.user)
+    print (friend_requests)
     print(username)
 
-    return render(request,'profile/profile.html',{'user':user, 'request_by':request.user})
+    return render(request,'profile/profile.html',{'user':user, 'request_by':request.user,'friend_request':friend_requests})
 
 @login_required
 def profile_edit(request):
@@ -154,4 +159,31 @@ def delete_post(request):
         if (str(i.post_id) == str(myPost)):
             i.delete()
     return HttpResponseRedirect(reverse('ViewMyStream'))
+@login_required
+def Add_friend(request):
+    request_sender_id = request.POST['request_sender']
+    request_receiver_id = request.POST['request_receiver']
+    request_sender = User.objects.get(id=request_sender_id)
+    request_receiver = User.objects.get(id=request_receiver_id)
+    status = False
+    new_request = friend_request.create(request_sender,request_receiver,status)
+    new_request.save()
 
+
+    return HttpResponseRedirect(reverse('profile'))
+@login_required
+def list_my_friend_request(request):
+    friend_requests = friend_request.objects.get(request_receiver=request.user)
+    #friend_requests = friend_request.objects.all()
+
+    return JsonResponse(friend_requests,safe=False)
+
+@login_required
+def accept_friend(request):
+    request = friend_request.objects.get(request_id=request.POST['request_id'])
+    request.status = True
+    request.save()
+    #profile = Profile.objects.get(user=request.user)
+    #profile.friends.add(request.request_sender)
+
+    return HttpResponseRedirect(reverse('profile'))

@@ -8,6 +8,11 @@
 
 </head>
 
+
+
+
+
+
 <body>
   {% if user.profile.is_active %}
     <!--{# {% user.profile.is_active == True %} #}-->
@@ -56,11 +61,56 @@
       <!-- <button id="show" class="editPost"> -->
       <a href="{% url 'ViewMyStream' %}">Edit Posts</a>
     <!-- </button> -->
-    
+             <div id="friend_request">
+          <h3>My Friend request</h3>
+
+
+
+                {% if friend_request %}
+                        {% for request in friend_request %}
+                        <div class="double">
+                                <div>
+                                  {% if request.status == False %}
+                                        {{ request.request_sender}} wants to be your friend
+                                        <button id="accept" class="accept_friend">
+                                          <form action="{% url 'accept_friend' %}" method="post">
+                                                        {% csrf_token %}
+                                            <input name="request_id" value="{{ request.request_id }}" type = "hidden" />
+                                            <input type="submit" value="Accept"/>
+                                          </form>
+                                        </button>
+                                  {% endif %}
+                                </div>  
+                        </div>
+                        {% endfor %}
+                {% else %}
+                        <p>No Requests.</p>
+                {% endif %}
+            
+
+
       {% else %}
         <!-- <p> This user haven been approved by admin. </p> -->
+
         <button id="show" class="uploadPhoto">Follow</button>
-        <button id="show" class="uploadPhoto">Add Friend</button>
+
+        <!-- <button id="show" class="Add_friend"><a href="{% url 'Add_friend' %}">Add Friend</a></button> -->
+
+
+        <form action="{% url 'Add_friend' %}" method="post">
+            {% csrf_token %}
+            <input name="request_sender" value="{{ request_by.id }}" type = "hidden" />
+            <input name="request_receiver" value="{{ user.id }}" type = "hidden" />
+
+            <input type="submit" value="Add Friend"/>
+         </form>
+
+
+
+         </div>
+
+
+
       {% endif %}
     {% else %}
     {% endif %}
