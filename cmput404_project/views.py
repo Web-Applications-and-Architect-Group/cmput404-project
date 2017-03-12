@@ -120,8 +120,9 @@ def update_post(request):
     post.can_view = new_can_view
     post.save()
 
-    post_type = request.POST['post_type']
-    context = postContent(post_type, request)
+    post_type2 = request.POST['post_type2']
+    print post_type2
+    context = postContent(post_type2, request)
     return render(request, 'stream/mystream.html', context)
     #return HttpResponseRedirect(reverse('ViewMyStream'))
 

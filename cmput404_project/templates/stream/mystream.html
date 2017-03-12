@@ -16,11 +16,13 @@
       .myStream {
         text-align: center;
       }
+
+
     </style>
     {% if posts %}
       <div class="myStream">
      <button id="show" class="home">
-      <a href="{% url 'profile' %}"><h4>Home</h4></a>
+      <a href="{% url 'profile' %}"><h4>Go Back To Profile</h4></a>
     </button>
       <ul style= "width: 70%; margin-left:12%;  ">
 
@@ -52,28 +54,29 @@
                       {%endif%}
 
                   {% endfor %}
-              </div>
+              </div></br>
 
               <form action="{% url 'comment' %}" method="GET">
                     {% csrf_token %}
-                      <input style= "width:50%" name="comment_text"/>
+                      <input style= "width:50%; margin-left:10%" name="comment_text"/>
                       <input hidden="hidden" name="post_id" value = "{{post.post_id }}"/>
                       <input hidden="hidden" name="post_type" value = "{{post_type}}"/>
                       <input type="submit" value = "comment"/>
               </form></br>
 
               {%if post.author == request.user  %}
-                  <form action="{% url 'delete_post' %}" method="GET">
+              <div class="editPost">
+                  <form style="display: inline-block;" action="{% url 'delete_post' %}" method="GET">
                          {% csrf_token %}
                          <input hidden="hidden" name="post_type" value = "{{post_type}}"/>
-                          <button name="post_id" value="{{ post.post_id }}">Delete Post</button>
-                  </form></br>
-
-                  <form action="{% url 'manage_post' %}" method="GET">
-                          <input hidden="hidden" name="post_type" value = "{{post_type}}"/>
-                          <button name="post_id" value="{{ post.post_id }}">Modiify my Post</button>
+                          <button  name="post_id" value="{{ post.post_id }}">Delete Post</button>
                   </form>
 
+                  <form style="display: inline-block;" action="{% url 'manage_post' %}" method="GET">
+                          <input  hidden="hidden" name="post_type" value = "{{post_type}}"/>
+                          <button  name="post_id" value="{{ post.post_id }}">Modiify Post</button>
+                  </form>
+              </div>
               {%endif%}
             </li></br>
     {% endfor %}</ul>
