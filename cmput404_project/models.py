@@ -8,7 +8,7 @@ import uuid
 @python_2_unicode_compatible
 class Profile(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE,primary_key=True)
-    
+
     github = models.CharField(max_length=200)
     bio = models.CharField(max_length=200)
     is_active = models.BooleanField(default=False)
@@ -30,7 +30,15 @@ class Post(models.Model):
         (2, 'Friends of friends'),
         (3, 'Private'),
     ]
+
+    content_type = [
+        (0, 'Plain Text'),
+        (1, 'Markdown'),
+    ]
+
     can_view = models.IntegerField(choices=authority, default=0)
+    post_type = models.IntegerField(choices=content_type, default=0)
+
     #=================
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     post_text = models.CharField(max_length=200)
