@@ -66,21 +66,21 @@
 
 
 
-                {% if friend_request %}   
+                {% if friend_request %}
                         {% for request in friend_request %}
                         <div class="double">
                                 <div>
                                   {% if request.status == False %}
                                         {{ request.request_sender}} wants to be your friend
-                                        <button id="accept" class="accept_friend">
+                                        <div id="accept" class="accept_friend">
                                           <form action="{% url 'accept_friend' %}" method="post">
                                                         {% csrf_token %}
                                             <input name="request_id" value="{{ request.request_id }}" type = "hidden" />
                                             <input type="submit" value="Accept"/>
                                           </form>
-                                        </button>
+                                        </div>
                                   {% endif %}
-                                </div>  
+                                </div>
                         </div>
                         {% endfor %}
                 {% else %}
@@ -101,7 +101,7 @@
                 {% endif%}
 
 
-            
+
 
 
       {% else %}
@@ -110,7 +110,7 @@
         <!-- <p> This user haven been approved by admin. </p> -->
 <!--         {% if friend_list %}
             {% for friend in friend_list %}
-             
+
              {% if friend.user == user%}
                 <p> You guys are Friend !</p>
 
@@ -118,7 +118,7 @@
               {% else %}
 
              {% endif %}
-             
+
 
              {% endfor %}
 
