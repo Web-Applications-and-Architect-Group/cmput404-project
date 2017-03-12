@@ -67,6 +67,7 @@
                       <input style= "width:50%; margin-left:10%" name="comment_text"/>
                       <input hidden="hidden" name="post_id" value = "{{post.post_id }}"/>
                       <input hidden="hidden" name="post_type" value = "{{post_type}}"/>
+                      <input hidden="hidden" name="content_type" value = "{{content_type}}"/>
                       <input type="submit" value = "comment"/>
               </form></br>
 
@@ -77,15 +78,16 @@
                          <input hidden="hidden" name="post_type" value = "{{post_type}}"/>
                           <button  name="post_id" value="{{ post.post_id }}">Delete Post</button>
                   </form>
-                  {% if post.can_view == 4 %}
-                    <p>This post is publicly shareable by URI only: <a href="{{ STATIC_URL }}/post/{{ post.post_id }}">{{ STATIC_URL }}/{{ post.author }}/{{ post.post_id }}</a></p>
-                  {% endif %}
-
 
                   <form style="display: inline-block;" action="{% url 'manage_post' %}" method="GET">
                           <input  hidden="hidden" name="post_type" value = "{{post_type}}"/>
                           <button  name="post_id" value="{{ post.post_id }}">Modiify Post</button>
                   </form>
+
+                  {% if post.can_view == 4 %}
+                    <p>This post is publicly shareable by URI only: <a href="{{ STATIC_URL }}/post/{{ post.post_id }}">{{ STATIC_URL }}/{{ post.author }}/{{ post.post_id }}</a></p>
+                  {% endif %}
+
               </div>
               {%endif%}
             </li></br>
