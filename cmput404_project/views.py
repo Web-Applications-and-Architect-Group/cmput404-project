@@ -145,9 +145,11 @@ def postContent(post_type,request):
     comments = Comment.objects.all()
 
     if str(post_type)== "my_post":
-            post = Post.objects.filter(author = request.user)
+            post = Post.objects.filter(author = request.user).order_by('-pub_datetime')
     else:
-        post=Post.objects.all()
+        post= Post.objects.filter(can_view=0).order_by('-pub_datetime')
+        #post2=Post.objects.filter(can_view=3).order_by('-pub_datetime')
+        #print post
 
     context = { 'posts': post , 'comments': comments, 'post_type': post_type}
 
