@@ -26,6 +26,7 @@ from rest_framework import routers, serializers, viewsets
 urlpatterns = [
  	url(r'^', include('registration.backends.simple.urls')),
  	url(r'^profile/$', views.profile, name="profile"),
+    url(r'^view_profile/(?P<username>[a-zA-Z0-9]+)$', views.view_profile, name="view_profile"),
     url(r'^profile/edit$', views.profile_edit, name="profile_edit"),
     url(r'^profile/update$', views.profile_update, name="profile_update"),
     url(r'^create_post_html$', views.create_post_html, name="create_post_html"),

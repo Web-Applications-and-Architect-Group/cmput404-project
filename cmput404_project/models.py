@@ -11,10 +11,11 @@ class Profile(models.Model):
 
     github = models.CharField(max_length=200)
     bio = models.CharField(max_length=200)
+    is_active = models.BooleanField(default=False)
 
     @classmethod
     def create(cls, user):
-        new_profile = cls(user=user)
+        new_profile = cls(user=user, github="n/a", bio="n/a")
         return new_profile
 
     def __str__(self):

@@ -9,6 +9,7 @@
 </head>
 
 <body>
+  {% if user.profile.is_active %}
     <div class="profile">
 
         {% if profile.photo %}
@@ -39,19 +40,22 @@
     </div>
     <br/>
 
-    <!-- <button id="show" class="editProfile"> -->
-      <a class="editProfile" href="{% url 'profile_edit' %}">Edit Profile</a>
-    <!-- </button> -->
-    <button id="show" class="uploadPhoto">Upload Photo</button>
+    {% if request_by %}
+      {% if request_by.id == user.id %}
+        <!-- <p> Your account has not yet been approved by admin. Please wait until you been approved.</p> -->
+        <!-- <button id="show" class="editProfile"> -->
+         <a class="editProfile" href="{% url 'profile_edit' %}">Edit Profile</a>
+         <!-- </button> -->
+         <button id="show" class="uploadPhoto">Upload Photo</button>
 
 
-    <!-- <button id="show" class="write post"> -->
-      <a href="{% url 'create_post_html' %}">Write post</a>
-    <!-- </button> -->
-      <!-- <button id="show" class="editPost"> -->
-      <a href="{% url 'ViewMyStream' %}">Edit Posts</a>
-    <!-- </button> -->
-    
+         <!-- <button id="show" class="write post"> -->
+         <a href="{% url 'create_post_html' %}">Write post</a>
+         <!-- </button> -->
+         <!-- <button id="show" class="editPost"> -->
+         <a href="{% url 'ViewMyStream' %}">Edit Posts</a>
+         <!-- </button> -->
+
       {% else %}
         <!-- <p> This user haven been approved by admin. </p> -->
         <button id="show" class="uploadPhoto">Follow</button>
