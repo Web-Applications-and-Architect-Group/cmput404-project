@@ -27,6 +27,7 @@ class Post(models.Model):
         (1, 'Friends'),
         (2, 'Friends of friends'),
         (3, 'Private'),
+        (4, 'Unlisted'),
     ]
     can_view = models.IntegerField(choices=authority, default=0)
     #=================

@@ -31,6 +31,10 @@
                   {{ post.author }}  ({{ post.pub_datetime }})</br></br>
                   {{ post.post_text }}</br></br>
 
+                  {% if post.can_view == 4 %}
+                    <p>This post is publicly shareable by URI only: <a href="{{ STATIC_URL }}/post/{{ post.post_id }}">{{ STATIC_URL }}/{{ post.author }}/{{ post.post_id }}</a></p>
+                  {% endif %}
+
               <form action="{% url 'delete_post' %}" method="GET">
                       <button name="post_id" value="{{ post.post_id }}">Delete Post</button>
               </form>

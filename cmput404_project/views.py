@@ -6,6 +6,7 @@ from .models import Profile, Post
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 import sys
+from django.shortcuts import render, get_object_or_404
 
 '''
 def reg_complete(request):
@@ -112,3 +113,11 @@ def delete_post(request):
         if (str(i.post_id) == str(myPost)):
             i.delete()
     return HttpResponseRedirect(reverse('ViewMyStream'))
+
+def viewUnlistedPost(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
+    # post_id = request.GET['post_id']
+    unlistedPost = Post.objects.get(pk=post_id)
+    context = { 'post': unlistedPost }
+
+    return render(request, 'post/shared_post.html', context)
