@@ -14,7 +14,7 @@ class Profile(models.Model):
     is_active = models.BooleanField(default=False)
 
     friends = models.ManyToManyField("self", related_name="friends", blank=True)
-
+    #friends = models.ManyToManyField("User", related_name="friends", blank=True)
 
     @classmethod
     def create(cls, user):

@@ -30,8 +30,11 @@ def profile(request):
         pass
 
     friend_requests = friend_request.objects.filter(request_receiver=request.user)
-    print (friend_requests)
-    return render(request,'profile/profile.html',{'user':request.user, 'request_by':request.user,'friend_request':friend_requests})
+    
+    friends = Profile.objects.get(user=request.user).friends.all()
+    print (friends)
+    return render(request,'profile/profile.html',{'user':request.user, 'request_by':request.user,
+        'friend_list':friends,'friend_request':friend_requests})
 
 def view_profile(request, username):
     user = get_object_or_404(User, username=username)
@@ -180,10 +183,17 @@ def list_my_friend_request(request):
 
 @login_required
 def accept_friend(request):
-    request = friend_request.objects.get(request_id=request.POST['request_id'])
-    request.status = True
-    request.save()
-    #profile = Profile.objects.get(user=request.user)
+    request_f = friend_request.objects.get(request_id=request.POST['request_id'])
+    request_f.status = True
+    request_f.save()
+    profile_for_requester = Profile.objects.get(user=request_f.request_sender)
+    profile_for_requestee = Profile.objects.get(user=request_f.request_receiver)
+    profile_for_requester.friends.add(profile_for_requestee)
+    profile_for_requestee.friends.add(profile_for_requester)
+    profile_for_requester.save()
+    profile_for_requestee.save()
     #profile.friends.add(request.request_sender)
+
+
 
     return HttpResponseRedirect(reverse('profile'))

@@ -66,7 +66,7 @@
 
 
 
-                {% if friend_request %}
+                {% if friend_request %}   
                         {% for request in friend_request %}
                         <div class="double">
                                 <div>
@@ -86,6 +86,21 @@
                 {% else %}
                         <p>No Requests.</p>
                 {% endif %}
+
+
+
+                <h3>My Friends</h3>
+                {% if friend_list %}
+                    {% for friend in friend_list %}
+                        <div class="double">
+                            {{friend}}
+                        </div>
+                        {% endfor %}
+                {% else %}
+                      <p>You have no friends.</p>
+                {% endif%}
+
+
             
 
 
