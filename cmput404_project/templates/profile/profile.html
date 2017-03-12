@@ -39,18 +39,44 @@
     </div>
     <br/>
 
-    <button id="show" class="editProfile">
-      <a href="{% url 'profile_edit' %}">Edit Profile</a>
-    </button>
+    <!-- <button id="show" class="editProfile"> -->
+      <a class="editProfile" href="{% url 'profile_edit' %}">Edit Profile</a>
+    <!-- </button> -->
     <button id="show" class="uploadPhoto">Upload Photo</button>
 
-    <button id="show" class="write post">
-      <a href="{% url 'create_post_html' %}">Write post</a>
-    </button>
-    <!-- <button id="show" class="write post">
-      <a href="{% url 'create_post' %}">Write post</a>
 
-    </button> -->
+    <!-- <button id="show" class="write post"> -->
+      <a href="{% url 'create_post_html' %}">Write post</a>
+    <!-- </button> -->
+      <!-- <button id="show" class="editPost"> -->
+      <a href="{% url 'ViewMyStream' %}">Edit Posts</a>
+    <!-- </button> -->
+    
+      {% else %}
+        <!-- <p> This user haven been approved by admin. </p> -->
+        <button id="show" class="uploadPhoto">Follow</button>
+        <button id="show" class="uploadPhoto">Add Friend</button>
+      {% endif %}
+    {% else %}
+    {% endif %}
+
+
+
+
+  {% else %}
+    {% if request_by %}
+      {% if request_by.id == user.id %}
+        <p> Your account has not yet been approved by admin. Please wait until you been approved.</p>
+      {% else %}
+        <p> This user haven been approved by admin. </p>
+      {% endif %}
+    {% else %}
+
+      <p> This user haven been approved by admin. </p>
+    {% endif %}
+
+  {% endif %}
+
 
 
 </body>

@@ -68,9 +68,9 @@ def profile_update(request):
 def create_post_html(request):
     return render(request,'post/create_post.html',{'user':request.user})
 
-@login_required
+# @login_required
 def view_all_posts(request):
-    Posts = Post.objects.order_by('-pub_datetime')
+    Posts = Post.objects.filter(can_view=0).order_by('-pub_datetime')
     context = { 'posts':Posts}
     return render(request,'post/view_all_posts.html',context)
 
@@ -97,10 +97,32 @@ def create_post(request):
     # new_post.save()
     #
     # return HttpResponseRedirect(reverse('profile'))
+@login_required
+def manage_post(request):
+    """
+    post edit view
+
+    """
+
+    post = Post.objects.get(post_id=request.GET['post_id'])
+
+
+    return render(request,'post/manage_post.html',{'post':post})
+
+@login_required
+def update_post(request):
+    post = Post.objects.get(post_id=request.POST['post_id'])
+    new_post_text = request.POST['post_text']
+    new_can_view = request.POST['post_type']
+    post.post_text = new_post_text
+    post.can_view = new_can_view
+    post.save()
+
+    return HttpResponseRedirect(reverse('ViewMyStream'))
 
 @login_required
 def ViewMyStream(request):
-    Posts = Post.objects.order_by('-pub_datetime')
+    Posts = Post.objects.filter(author=request.user.id).order_by('-pub_datetime')
     context = { 'posts': Posts }
 
     return render(request, 'stream/mystream.html', context)
