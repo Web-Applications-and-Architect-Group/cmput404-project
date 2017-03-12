@@ -1,5 +1,5 @@
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 import os
 from .models import Profile, Post
@@ -18,7 +18,25 @@ def home(request):
 
 @login_required
 def profile(request):
-    return render(request,'profile/profile.html',{'user':request.user})
+    try:
+        profile = Profile.objects.get(user_id=request.user.id)
+        user = User.objects.get(id=request.user.id)
+    except (KeyError, Profile.DoesNotExist):
+        # profile no found create new
+        profile = Profile.create(request.user)
+        profile.save()
+    else:
+        # print profile
+        pass
+
+    return render(request,'profile/profile.html',{'user':request.user, 'request_by':request.user})
+
+def view_profile(request, username):
+    user = get_object_or_404(User, username=username)
+    # profile = Profile.objects.get(user_id=user.id)
+    print(username)
+
+    return render(request,'profile/profile.html',{'user':user, 'request_by':request.user})
 
 @login_required
 def profile_edit(request):
@@ -34,7 +52,8 @@ def profile_edit(request):
         profile = Profile.create(request.user)
         profile.save()
     else:
-        print profile
+        # print profile
+        pass
 
     return render(request,'profile/profile_edit.html',{'user':request.user})
 
@@ -53,7 +72,8 @@ def profile_update(request):
         # profile no found create new
         profile = Profile.create(request.user)
     else:
-        print profile
+        # print profile
+        pass
 
     user.email = request.POST['user_email']
     user.save()
