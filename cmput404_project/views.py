@@ -1,5 +1,5 @@
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 import os
 from .models import Profile, Post
@@ -18,7 +18,14 @@ def home(request):
 
 @login_required
 def profile(request):
-    return render(request,'profile/profile.html',{'user':request.user})
+    return render(request,'profile/profile.html',{'user':request.user, 'request_by':request.user})
+
+def view_profile(request, username):
+    user = get_object_or_404(User, username=username)
+    # profile = Profile.objects.get(user_id=user.id)
+    print(username)
+
+    return render(request,'profile/profile.html',{'user':user, 'request_by':request.user})
 
 @login_required
 def profile_edit(request):
@@ -67,9 +74,9 @@ def profile_update(request):
 def create_post_html(request):
     return render(request,'post/create_post.html',{'user':request.user})
 
-@login_required
+# @login_required
 def view_all_posts(request):
-    Posts = Post.objects.order_by('-pub_datetime')
+    Posts = Post.objects.filter(can_view=0).order_by('-pub_datetime')
     context = { 'posts':Posts}
     return render(request,'post/view_all_posts.html',context)
 
@@ -121,7 +128,7 @@ def update_post(request):
 
 @login_required
 def ViewMyStream(request):
-    Posts = Post.objects.order_by('-pub_datetime')
+    Posts = Post.objects.filter(author=request.user.id).order_by('-pub_datetime')
     context = { 'posts': Posts }
 
     return render(request, 'stream/mystream.html', context)
