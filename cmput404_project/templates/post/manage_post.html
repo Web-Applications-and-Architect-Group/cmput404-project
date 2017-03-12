@@ -43,9 +43,7 @@
                   <td><h3>NEW POST Content<h3></td>
                   <td>
                     {% if post.post_text %}
-                        <textarea id="Exa" name="post_text" rows="4" cols="50" >
-                          {{ post.post_text }}
-                        </textarea>
+                        <textarea id="Exa" name="post_text" rows="4" cols="50" >{{ post.post_text }}</textarea>
                     {% else %}
                       <input name="post_text" />
                     {% endif %}
