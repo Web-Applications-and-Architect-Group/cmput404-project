@@ -38,7 +38,7 @@
                 			{{ post.post_text|markdown }}</br></br>
             			{% else %}
             				{{ post.post_text|urlize }}</br></br>
-                		{% endif %}
+                	{% endif %}
 
               <form action="{% url 'delete_post' %}" method="GET">
                       <button name="post_id" value="{{ post.post_id }}">Delete Post</button>

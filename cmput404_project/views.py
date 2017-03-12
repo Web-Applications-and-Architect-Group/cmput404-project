@@ -125,7 +125,7 @@ def manage_post(request):
 
     post = Post.objects.get(post_id=request.GET['post_id'])
 
-        
+
     return render(request,'post/manage_post.html',{'post':post})
 
 @login_required
@@ -133,8 +133,10 @@ def update_post(request):
     post = Post.objects.get(post_id=request.POST['post_id'])
     new_post_text = request.POST['post_text']
     new_can_view = request.POST['post_type']
+    new_post_type = request.POST['content_type']
     post.post_text = new_post_text
     post.can_view = new_can_view
+    post.post_type = new_post_type
     post.save()
 
     return HttpResponseRedirect(reverse('ViewMyStream'))
@@ -154,4 +156,3 @@ def delete_post(request):
         if (str(i.post_id) == str(myPost)):
             i.delete()
     return HttpResponseRedirect(reverse('ViewMyStream'))
-
