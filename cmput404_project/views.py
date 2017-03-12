@@ -1,4 +1,4 @@
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 import os
@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 import sys
 from django.shortcuts import render, get_object_or_404
+import uuid
 
 '''
 def reg_complete(request):
@@ -137,9 +138,22 @@ def delete_post(request):
     return HttpResponseRedirect(reverse('ViewMyStream'))
 
 def viewUnlistedPost(request, post_id):
-    post = get_object_or_404(Post, pk=post_id)
+    post = get_object_by_uuid_or_404(Post, post_id)
+
     # post_id = request.GET['post_id']
     unlistedPost = Post.objects.get(pk=post_id)
     context = { 'post': unlistedPost }
 
     return render(request, 'post/shared_post.html', context)
+
+### reference by: http://brainstorm.it/snippets/get_object_or_404-for-uuids/
+def get_object_by_uuid_or_404(model, uuid_pk):
+    """
+    Calls get_object_or_404(model, pk=uuid_pk)
+    but also prevents "badly formed hexadecimal UUID string" unhandled exception
+    """
+    try:
+        uuid.UUID(uuid_pk)
+    except Exception, e:
+        raise Http404(str(e))
+    return get_object_or_404(model, pk=uuid_pk)
