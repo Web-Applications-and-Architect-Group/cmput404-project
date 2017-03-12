@@ -18,6 +18,17 @@ def home(request):
 
 @login_required
 def profile(request):
+    try:
+        profile = Profile.objects.get(user_id=request.user.id)
+        user = User.objects.get(id=request.user.id)
+    except (KeyError, Profile.DoesNotExist):
+        # profile no found create new
+        profile = Profile.create(request.user)
+        profile.save()
+    else:
+        # print profile
+        pass
+
     return render(request,'profile/profile.html',{'user':request.user, 'request_by':request.user})
 
 def view_profile(request, username):
@@ -41,7 +52,8 @@ def profile_edit(request):
         profile = Profile.create(request.user)
         profile.save()
     else:
-        print profile
+        # print profile
+        pass
 
     return render(request,'profile/profile_edit.html',{'user':request.user})
 
@@ -60,7 +72,8 @@ def profile_update(request):
         # profile no found create new
         profile = Profile.create(request.user)
     else:
-        print profile
+        # print profile
+        pass
 
     user.email = request.POST['user_email']
     user.save()
