@@ -8,12 +8,14 @@ import uuid
 @python_2_unicode_compatible
 class Profile(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE,primary_key=True)
+
     github = models.CharField(max_length=200)
     bio = models.CharField(max_length=200)
+    is_active = models.BooleanField(default=False)
 
     @classmethod
     def create(cls, user):
-        new_profile = cls(user=user)
+        new_profile = cls(user=user, github="n/a", bio="n/a")
         return new_profile
 
     def __str__(self):
@@ -27,6 +29,7 @@ class Post(models.Model):
         (1, 'Friends'),
         (2, 'Friends of friends'),
         (3, 'Private'),
+        (4, 'Unlisted'),
     ]
     can_view = models.IntegerField(choices=authority, default=0)
     #=================
@@ -63,6 +66,7 @@ class Comment(models.Model):
     @classmethod
     def create(cls, user, comment_text, post):
         new_comment = cls(author=user, comment_text=comment_text, post_id=post, comment_date=timezone.now())
+
         return new_comment
 
     def __str__(self):

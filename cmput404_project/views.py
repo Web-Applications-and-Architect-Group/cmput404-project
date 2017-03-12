@@ -1,11 +1,13 @@
-from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.http import HttpResponse, HttpResponseRedirect, Http404
+from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 import os
 from .models import Profile, Post, Comment
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 import sys
+from django.shortcuts import render, get_object_or_404
+import uuid
 
 '''
 def reg_complete(request):
@@ -18,7 +20,26 @@ def home(request):
 
 @login_required
 def profile(request):
-    return render(request,'profile/profile.html',{'user':request.user})
+    try:
+        profile = Profile.objects.get(user_id=request.user.id)
+        user = User.objects.get(id=request.user.id)
+    except (KeyError, Profile.DoesNotExist):
+        # profile no found create new
+        profile = Profile.create(request.user)
+        profile.save()
+    else:
+        # print profile
+        pass
+
+    return render(request,'profile/profile.html',{'user':request.user, 'request_by':request.user})
+
+def view_profile(request, username):
+    user = get_object_or_404(User, username=username)
+    # profile = Profile.objects.get(user_id=user.id)
+    print(username)
+
+    return render(request,'profile/profile.html',{'user':user, 'request_by':request.user})
+
 
 @login_required
 def profile_edit(request):
@@ -34,7 +55,8 @@ def profile_edit(request):
         profile = Profile.create(request.user)
         profile.save()
     else:
-        print profile
+        # print profile
+        pass
 
     return render(request,'profile/profile_edit.html',{'user':request.user})
 
@@ -53,7 +75,8 @@ def profile_update(request):
         # profile no found create new
         profile = Profile.create(request.user)
     else:
-        print profile
+        # print profile
+        pass
 
     user.email = request.POST['user_email']
     user.save()
@@ -67,12 +90,10 @@ def profile_update(request):
 def create_post_html(request):
     return render(request,'post/create_post.html',{'user':request.user})
 
-@login_required
+# @login_required
 def view_all_posts(request):
-    Posts = Post.objects.order_by('-pub_datetime')
-    comments = Comment.objects.all()
-    context = { 'posts': Posts , 'comments': comments}
-    #context = { 'posts':Posts}
+    Posts = Post.objects.filter(can_view=0).order_by('-pub_datetime')
+    context = { 'posts':Posts}
     return render(request,'post/view_all_posts.html',context)
 
 @login_required
@@ -110,6 +131,7 @@ def manage_post(request):
     post_type = request.GET['post_type']
 
     return render(request,'post/manage_post.html',{'post':post, 'post_type2':post_type})
+
 
 @login_required
 def update_post(request):
@@ -161,6 +183,7 @@ def ViewMyStream(request):
     Posts = Post.objects.order_by('-pub_datetime')
     comments = Comment.objects.all()
 
+
     post_type = request.GET['post_type']
     context = postContent(post_type,request)
     return render(request, 'stream/mystream.html', context)
@@ -172,7 +195,29 @@ def delete_post(request):
     for i in allPost:
         if (str(i.post_id) == str(myPost)):
             i.delete()
+
     #return HttpResponseRedirect(reverse('ViewMyStream'))
     post_type = request.GET['post_type']
     context = postContent(post_type,request)
     return render(request, 'stream/mystream.html', context)
+
+def viewUnlistedPost(request, post_id):
+    post = get_object_by_uuid_or_404(Post, post_id)
+
+    # post_id = request.GET['post_id']
+    unlistedPost = Post.objects.get(pk=post_id)
+    context = { 'post': unlistedPost }
+
+    return render(request, 'post/shared_post.html', context)
+
+### reference by: http://brainstorm.it/snippets/get_object_or_404-for-uuids/
+def get_object_by_uuid_or_404(model, uuid_pk):
+    """
+    Calls get_object_or_404(model, pk=uuid_pk)
+    but also prevents "badly formed hexadecimal UUID string" unhandled exception
+    """
+    try:
+        uuid.UUID(uuid_pk)
+    except Exception, e:
+        raise Http404(str(e))
+    return get_object_or_404(model, pk=uuid_pk)
