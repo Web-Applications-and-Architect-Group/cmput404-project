@@ -23,9 +23,9 @@
     </style>
     {% if posts %}
       <div class="myStream">
-     <button id="show" class="home">
+     <!-- <button id="show" class="home"> -->
       <a href="{% url 'profile' %}"><h4>Go Back To Profile</h4></a>
-    </button>
+    <!-- </button> -->
       <ul style= "width: 70%; margin-left:12%;  ">
 
 {%for post in posts%}
@@ -39,10 +39,10 @@
 
 
             <li>  </br>
-                  {% if profile.photo %}
+                  {% if post.author.profile.photo %}
                       <img alt="user photo" src="{{ STATIC_URL }}/users/{{user.id}}/{{profile.photo }}" >
                   {% else %}
-                      <img alt="user photo" src="{% static "../static/images/defaultUserImage.png" %}" width = "30" height = "30">
+                      <img alt="user photo" src="{{ post.author.profile.img.url }}" width = "30" height = "30">
                   {% endif %}
 
                   {{ post.author }}  ({{ post.pub_datetime }})</br></br>
