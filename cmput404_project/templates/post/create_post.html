@@ -4,9 +4,11 @@
 <head>
     <title>Write a new POST</title>
 </head>
-<div>
+</br>
+<div style="width:40%; position: relative; left: 27%; top:30%;
+            border: 2px solid	#e9f2fc; padding:2em;
+            text-align:center; background-color: #eaf2fb; font-family: verdana;" >
   <h1>Write A New Post ~</h1>
-</div>
 
 <form method="post" enctype="multipart/form-data" action="{% url 'create_post' %}">
 {% csrf_token %}
@@ -22,7 +24,7 @@
     <select name="content_type">
     <option value= 0>Plain Text</option>
     <option value= 1>Markdown</option>
-    </select>
+  </select></br>
 	</div>
 	<div>
 	<textarea name="POST_TEXT" rows="4" cols="50" ></textarea>
@@ -30,9 +32,10 @@
 
 	<div>
 		<h3>Choose a picture to upload!</h3>
-		<input name="uploadFile" type="file" />
+		<input style="margin-left:20%" name="uploadFile" type="file" />
 	</div>
 
 	<input type="submit" name="create new post" value="Submit">
 
 </form>
+</div>
