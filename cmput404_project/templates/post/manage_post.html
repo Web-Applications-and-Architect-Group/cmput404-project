@@ -23,9 +23,9 @@
 
     {% if post %}
       <div class="myStream">
-     <button id="show" class="home">
+     <!-- <button id="show" class="home"> -->
       <a href="{% url 'profile' %}"><h4>Home</h4></a>
-    </button>
+    <!-- </button> -->
       <ul style= "width: 70%; margin-left:12%;  ">
               {% if post.author == request.user %}
             <li>  </br>
