@@ -67,7 +67,11 @@
             <button name="confirm_post" >confirm</button>
         </form>
 
-             <div id="friend_request">
+        <div class="navigation">
+          <a class="button" href="{% url 'auth_logout' %}">Logout</a>
+        </div>
+
+        <div id="friend_request">
           <h3>My Friend request</h3>
 
 
@@ -107,7 +111,7 @@
                 {% endif%}
 
       {% else %}
-      
+
           {% if  isFriend == True %}
             <p> you guys are friends !</p>
           {% else%}
