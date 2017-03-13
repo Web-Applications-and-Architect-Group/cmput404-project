@@ -16,12 +16,7 @@
 <body>
   {% if user.profile.is_active %}
     <div class="profile">
-
-        {% if profile.photo %}
-            <img alt="user photo" src="{{ STATIC_URL }}/users/{{user.id}}/{{profile.photo }}" >
-        {% else %}
-            <img alt="user photo" src="{% static "/images/defaultUserImage.png" %}" width = "150" height = "150">
-        {% endif %}
+        <img alt="user photo" src={{user.profile.img.url}} height='300' width='300' />
         <br/><br/>
 
 
@@ -53,7 +48,6 @@
 
         <a class="editProfile" href="{% url 'profile_edit' %}">Edit Profile</a>
 
-        <button id="show" class="uploadPhoto">Upload Photo</button>
 
         <a href="{% url 'create_post_html' %}">Write post</a>
 
@@ -68,7 +62,11 @@
             <button name="confirm_post" >confirm</button>
         </form>
 
-             <div id="friend_request">
+        <div class="navigation">
+          <a class="button" href="{% url 'auth_logout' %}">Logout</a>
+        </div>
+
+        <div id="friend_request">
           <h3>My Friend request</h3>
 
 
