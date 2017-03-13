@@ -192,10 +192,22 @@ def postContent(post_type,request):
 
     if str(post_type)== "my_post":
             post = Post.objects.filter(author = request.user).order_by('-pub_datetime')
+
+    elif str(post_type)=="public_post":
+        post= Post.objects.filter(can_view=0).order_by('-pub_datetime')
+
+    elif str(post_type) == "friend_post":
+        myFriends= Profile.objects.get(user = request.user).friends.all()
+        posts = Post.objects.all()
+        post = []
+        for friend in myFriends:
+            friend_instance= User.objects.get(username=friend)
+            friendPost = posts.filter(author = friend_instance)
+            for i in friendPost:
+                if (i.can_view == 0) or (i.can_view==1):
+                    post.append(i)
     else:
         post= Post.objects.filter(can_view=0).order_by('-pub_datetime')
-        #post2=Post.objects.filter(can_view=3).order_by('-pub_datetime')
-        #print post
 
     context = { 'posts': post , 'comments': comments, 'post_type': post_type}
 
@@ -205,7 +217,6 @@ def postContent(post_type,request):
 def ViewMyStream(request):
     Posts = Post.objects.order_by('-pub_datetime')
     comments = Comment.objects.all()
-
 
     post_type = request.GET['post_type']
     context = postContent(post_type,request)
