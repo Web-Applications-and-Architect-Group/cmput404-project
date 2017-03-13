@@ -3,6 +3,7 @@ from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 import os
 from .models import Profile, Post, friend_request, Comment
+from .forms import ImageForm
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 import sys
@@ -99,12 +100,16 @@ def profile_update(request):
     else:
         # print profile
         pass
-
-    user.email = request.POST['user_email']
-    user.save()
-    profile.github = request.POST['github']
-    profile.bio = request.POST['bio']
-    profile.save()
+    if request.method == 'POST':
+        form = ImageForm(request.POST,request.FILES)
+        if form.is_valid():
+            profile.img = form.cleaned_data['image']
+        user.email = request.POST['user_email']
+        user.save()
+        profile.github = request.POST['github']
+        profile.bio = request.POST['bio']
+        profile.save()
+  
 
     return HttpResponseRedirect(reverse('profile'))
 
@@ -123,17 +128,19 @@ def create_post(request):
     """
     Create new post view
     """
-
-    user = User.objects.get(id=request.user.id)
-    can_view = request.POST['post_type']
-    post_text = request.POST['POST_TEXT']
-    post_type = request.POST['content_type']
-    new_post = Post.create(request.user,post_text,can_view, post_type)
-    #==========
-       #image = request.FILES['file']
-       #new_post = Post.create(request.user,post_text,can_view,image)
-    #=========
-    new_post.save()
+    if request.method == "POST":
+        user = User.objects.get(id=request.user.id)
+        can_view = request.POST['post_type']
+        post_text = request.POST['POST_TEXT']
+        post_type = request.POST['content_type']
+        
+        new_post = Post.create(request.user,post_text,can_view, post_type)
+        '''
+        form = ImageForm(request.POST,request.FILES)
+        if form.is_valid():
+            new_post.img = form.cleaned_data['image']
+        '''
+        new_post.save()
 
     return HttpResponseRedirect(reverse('profile'))
 

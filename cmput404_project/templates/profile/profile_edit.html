@@ -11,14 +11,9 @@
 <body>
     <div class="profile">
 
-        {% if profile.photo %}
-            <img alt="user photo" src="{{ STATIC_URL }}/users/{{user.id}}/{{profile.photo }}" >
-        {% else %}
-            <img alt="user photo" src="{% static "/images/defaultUserImage.png" %}" width = "150" height = "150">
-        {% endif %}
-        <br/><br/>
+        <img alt="user photo" src={{user.profile.img.url}} height='300' width='300' />
 
-        <form action="{% url 'profile_update' %}" method="post">
+        <form action="{% url 'profile_update' %}" method="post" enctype="multipart/form-data">
             {% csrf_token %}
             <table><tbody>
                 <tr>
@@ -58,13 +53,12 @@
                 </td>
               <tr>
             </tbody></table>
-
+            <input name="image" id="id_image" type="file" accept="image/*">
 
             <input type="submit"/>
          </form>
     </div>
     <br/>
-    <button id="show" class="uploadPhoto">Upload Photo</button>
 
 
 </body>
