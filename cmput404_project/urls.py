@@ -41,5 +41,7 @@ urlpatterns = [
     url(r'^post/(?P<post_id>[a-zA-z0-9-_]+)$', views.viewUnlistedPost, name="viewUnlistedPost"),
     url(r'^manage_post/$', views.manage_post, name="manage_post"),
     url(r'^update_post/$', views.update_post, name="update_post"),
-
+    url(r'^Add_friend/$', views.Add_friend, name="Add_friend"),
+    url(r'^accept_friend/$', views.accept_friend, name="accept_friend"),
+    url(r'^api_list_my_friend_request/$', views.list_my_friend_request, name="list_my_friend_request"),
 ]

@@ -1,12 +1,11 @@
-from django.http import HttpResponse, HttpResponseRedirect, Http404
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, Http404
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 import os
-from .models import Profile, Post, Comment
+from .models import Profile, Post, friend_request, Comment
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 import sys
-from django.shortcuts import render, get_object_or_404
 import uuid
 
 '''
@@ -31,14 +30,39 @@ def profile(request):
         # print profile
         pass
 
-    return render(request,'profile/profile.html',{'user':request.user, 'request_by':request.user})
+    friend_requests = friend_request.objects.filter(request_receiver=request.user)
+
+    friends = Profile.objects.get(user=request.user).friends.all()
+    # print (friends)
+    return render(request,'profile/profile.html',{'user':request.user, 'request_by':request.user,
+        'friend_list':friends,'friend_request':friend_requests})
 
 def view_profile(request, username):
+
     user = get_object_or_404(User, username=username)
     # profile = Profile.objects.get(user_id=user.id)
-    print(username)
 
-    return render(request,'profile/profile.html',{'user':user, 'request_by':request.user})
+    # check if is anonymouse user request
+    # print "\nDebug:", request.user.is_authenticated==False, "\n"
+    if (request.user.is_authenticated==False):
+        return render(request,'profile/profile.html', {'user':user})
+
+    # is a logged in user
+    else:
+        friend_requests = friend_request.objects.filter(request_receiver=request.user)
+        friends = Profile.objects.get(user=request.user).friends.all()
+        isfriend = False
+        for friend in friends:
+            if (friend.user == user):
+                isfriend = True
+
+        return render(request,'profile/profile.html',
+                        {
+                            'user':user,
+                            'isFriend':isfriend,
+                            'request_by':request.user,
+                            'friend_request':friend_requests
+                        })
 
 
 @login_required
@@ -142,7 +166,7 @@ def update_post(request):
     post.save()
 
     post_type2 = request.POST['post_type2']
-    print post_type2
+    # print post_type2
     context = postContent(post_type2, request)
     return render(request, 'stream/mystream.html', context)
     #return HttpResponseRedirect(reverse('ViewMyStream'))
@@ -194,11 +218,48 @@ def delete_post(request):
     for i in allPost:
         if (str(i.post_id) == str(myPost)):
             i.delete()
-
     #return HttpResponseRedirect(reverse('ViewMyStream'))
     post_type = request.GET['post_type']
     context = postContent(post_type,request)
     return render(request, 'stream/mystream.html', context)
+
+
+@login_required
+def Add_friend(request):
+    request_sender_id = request.POST['request_sender']
+    request_receiver_id = request.POST['request_receiver']
+    request_sender = User.objects.get(id=request_sender_id)
+    request_receiver = User.objects.get(id=request_receiver_id)
+    status = False
+    new_request = friend_request.create(request_sender,request_receiver,status)
+    new_request.save()
+
+
+    return HttpResponseRedirect(reverse('profile'))
+@login_required
+def list_my_friend_request(request):
+    friend_requests = friend_request.objects.get(request_receiver=request.user)
+    #friend_requests = friend_request.objects.all()
+
+    return JsonResponse(friend_requests,safe=False)
+
+@login_required
+def accept_friend(request):
+    request_f = friend_request.objects.get(request_id=request.POST['request_id'])
+    request_f.status = True
+    request_f.save()
+    profile_for_requester = Profile.objects.get(user=request_f.request_sender)
+    profile_for_requestee = Profile.objects.get(user=request_f.request_receiver)
+    profile_for_requester.friends.add(profile_for_requestee)
+    profile_for_requestee.friends.add(profile_for_requester)
+    profile_for_requester.save()
+    profile_for_requestee.save()
+    #profile.friends.add(request.request_sender)
+
+
+
+    return HttpResponseRedirect(reverse('profile'))
+
 
 def viewUnlistedPost(request, post_id):
     post = get_object_by_uuid_or_404(Post, post_id)
