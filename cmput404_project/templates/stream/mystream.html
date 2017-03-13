@@ -48,7 +48,7 @@
                       <img alt="user photo" src="{{ post.author.profile.img.url }}" width = "30" height = "30">
                   {% endif %}
 
-                  {{ post.author }}  ({{ post.pub_datetime }})</br></br>
+                  <a herf="{% url 'view_profile' post.author.username %}">{{ post.author }}</a>  ({{ post.pub_datetime }})</br></br>
                   {% if post.post_type == 1 %}
                 			{{ post.post_text|markdown }}</br></br>
             			{% else %}
