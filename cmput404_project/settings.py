@@ -150,6 +150,7 @@ STATICFILES_STORAGE =  'whitenoise.django.GzipManifestSaticFilesStorage'\
 # for login required decorator
 # https://docs.djangoproject.com/en/1.10/topics/auth/default/#django.contrib.auth.decorators.login_required
 LOGIN_URL = "/login/"
+LOGIN_REDIRECT_URL = "/"
 
 # Update database configuration with $DATABASE_URL.
 import dj_database_url

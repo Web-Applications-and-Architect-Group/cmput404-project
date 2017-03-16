@@ -25,13 +25,11 @@ from rest_framework import routers, serializers, viewsets
 
 urlpatterns = [
  	url(r'^', include('registration.backends.simple.urls')),
- 	url(r'^profile/$', views.profile, name="profile"),
-    url(r'^view_profile/(?P<username>[a-zA-Z0-9]+)$', views.view_profile, name="view_profile"),
-    url(r'^profile/edit$', views.profile_edit, name="profile_edit"),
-    url(r'^profile/update$', views.profile_update, name="profile_update"),
+ 	url(r'^(?P<username>[a-zA-Z0-9]+)/profile', views.profile, name="profile"),
+    #url(r'^view_profile/(?P<username>[a-zA-Z0-9]+)$', views.view_profile, name="view_profile"),
+    url(r'^profile_old', views.profile_old, name="profile_old"),
     url(r'^create_post_html$', views.create_post_html, name="create_post_html"),
     url(r'^create_post$', views.create_post, name="create_post"),
-    url(r'^view_all_posts$', views.view_all_posts, name="view_all_posts"),
     url(r'^create_post$', views.create_post, name="create_post"),
     url(r'^$', views.home ,name="home"),
     url(r'^admin/', admin.site.urls),

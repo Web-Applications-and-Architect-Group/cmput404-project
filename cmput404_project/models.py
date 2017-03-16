@@ -3,52 +3,64 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.contrib.auth.models import User
 import datetime
 from django.utils import timezone
+from django.db.models.signals import post_save
 import uuid
 
 @python_2_unicode_compatible
 class Profile(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE,primary_key=True)
     img = models.ImageField(upload_to= 'images/', default = 'images/defaultUserImage.png')
-    github = models.CharField(max_length=200)
-    bio = models.CharField(max_length=200)
+    github = models.CharField(max_length=200,default="",blank=True)
+    bio = models.CharField(max_length=200,default="",blank=True)
     is_active = models.BooleanField(default=False)
 
-    friends = models.ManyToManyField("self", related_name="friends", blank=True)
-    #friends = models.ManyToManyField("User", related_name="friends", blank=True)
-
-    @classmethod
-    def create(cls, user):
-        new_profile = cls(user=user, github="n/a", bio="n/a")
-        return new_profile
-
+    follows = models.ManyToManyField("self", related_name="followed_by", blank=True,symmetrical=False)
+    
+    def get_friends(self):
+        return self.follows.all() & self.followed_by.all()
+    
+    def get_FOF(self):
+        result = self.get_friends()
+        friends = list(result)
+        for friend in friends:
+            result |= friend.get_friends()
+        return result
+        
     def __str__(self):
         return self.user.username
+        
+def create_profile(sender,instance,created,**kwargs):
+    if created:
+        Profile.objects.create(user=instance)
 
+post_save.connect(create_profile,sender=User)
 @python_2_unicode_compatible
 class Post(models.Model):
     #================  https://docs.djangoproject.com/en/1.10/ref/models/fields/    idea from this page
     authority = [
-        (0, 'Public'),
-        (1, 'Friends'),
-        (2, 'Friends of friends'),
-        (3, 'Private'),
-        (4, 'Unlisted'),
+        (0, 'PUBLIC'),
+        (1, 'FOAF'),
+        (2, 'FRIENDS'),
+        (3, 'PRIVATE'),
+        (4, 'SERVERONLY'),
     ]
 
-    content_type = [
-        (0, 'Plain Text'),
-        (1, 'Markdown'),
+    accept = [
+        (0, 'text/plaintext'),
+        (1, 'text/markdown'),
+        (2, 'image/*')
     ]
 
-    can_view = models.IntegerField(choices=authority, default=0)
-    post_type = models.IntegerField(choices=content_type, default=0)
+    visibility = models.IntegerField(choices=authority, default=0)
+    contentType = models.IntegerField(choices=accept, default=0)
     #=================
+    title = models.CharField(max_length=50)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     post_text = models.CharField(max_length=200)
-    pub_datetime = models.DateTimeField('date published')
+    published = models.DateTimeField('date published')
     #Extra material :  https://docs.djangoproject.com/en/1.10/ref/models/fields/UUIDField
-    post_id=models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-
+    id=models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    unlisted = models.BooleanField(default=False)
     #=====================
     #image =  models.FileField(default =)
     #======================
@@ -58,9 +70,6 @@ class Post(models.Model):
     def create(cls, user, post_text,can_view_choice, post_type_choice):
         new_post = cls(author=user, post_text=post_text, pub_datetime=timezone.now(), can_view = can_view_choice, post_type=post_type_choice)
         return new_post
-    #def create(cls, user, post_text,can_view_choice,Image):
-        #new_post = cls(author=user, post_text=post_text, pub_datetime=timezone.now(), can_view = can_view_choice,Image = image)
-        #return new_post
 
     def __str__(self):
         return self.post_text
@@ -99,5 +108,3 @@ class Comment(models.Model):
     def __str__(self):
         return self.comment_text
 
-class temp(models.Model):
-    name = "hahah"

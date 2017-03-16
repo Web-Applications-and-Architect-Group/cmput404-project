@@ -3,23 +3,44 @@ from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 import os
 from .models import Profile, Post, friend_request, Comment
-from .forms import ImageForm
+from .forms import ProfileForm,ImageForm
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 import sys
 import uuid
 
-'''
-def reg_complete(request):
-    return render(request, 'registration/registration_complete.html' ,{'what':'Reg Completed!'})
-'''
-
-@login_required
 def home(request):
-    return HttpResponseRedirect(reverse('profile'))
+    posts = Post.objects.filter(can_view=0)#.order_by('-pub_datetime')
+    if request.user.is_authenticated:
+        user = request.user
+        friends = user.get_friends()
+        
+    context = { 'posts':Posts}
+    return render(request,'stream/main_stream.html',context)
 
 @login_required
-def profile(request):
+def profile(request,username):
+    user = get_object_or_404(User, username=username)
+    viewer = request.user
+    if request.method == 'POST' and viewer.id == user.id:
+        profile_form = ProfileForm(request.POST)
+        image_form = ImageForm(request.POST,request.FILES)
+        if profile_form.is_valid():
+            user.email = profile_form.cleaned_data['email']
+            user.profile.github = profile_form.cleaned_data['github']
+            user.profile.bio = profile_form.cleaned_data['bio']
+        else:
+            print(profile_form.errors)
+        if image_form.is_valid():
+            user.profile.img = image_form.cleaned_data['image']
+        user.profile.save()
+        user.save()
+    else:
+        profile_form = ProfileForm()
+    return render(request,'profile/profile.html',{'profile_form':profile_form,'viewer':viewer,'user':user})
+
+
+def profile_old(request):
     try:
         profile = Profile.objects.get(user_id=request.user.id)
         user = User.objects.get(id=request.user.id)
@@ -35,93 +56,13 @@ def profile(request):
 
     friends = Profile.objects.get(user=request.user).friends.all()
     # print (friends)
-    return render(request,'profile/profile.html',{'user':request.user, 'request_by':request.user,
+    return render(request,'profile/profile_old.html',{'user':request.user, 'request_by':request.user,
         'friend_list':friends,'friend_request':friend_requests})
-
-def view_profile(request, username):
-
-    user = get_object_or_404(User, username=username)
-    # profile = Profile.objects.get(user_id=user.id)
-
-    # check if is anonymouse user request
-    # print "\nDebug:", request.user.is_authenticated==False, "\n"
-    if (request.user.is_authenticated==False):
-        return render(request,'profile/profile.html', {'user':user})
-
-    # is a logged in user
-    else:
-        friend_requests = friend_request.objects.filter(request_receiver=request.user)
-        friends = Profile.objects.get(user=request.user).friends.all()
-        isfriend = False
-        for friend in friends:
-            if (friend.user == user):
-                isfriend = True
-
-        return render(request,'profile/profile.html',
-                        {
-                            'user':user,
-                            'isFriend':isfriend,
-                            'request_by':request.user,
-                            'friend_request':friend_requests
-                        })
-
-
-@login_required
-def profile_edit(request):
-    """
-    Profile edit view
-    """
-
-    try:
-        profile = Profile.objects.get(user_id=request.user.id)
-    except (KeyError, Profile.DoesNotExist):
-        # profile no found create new
-        profile = Profile.create(request.user)
-        profile.save()
-    else:
-        # print profile
-        pass
-
-    return render(request,'profile/profile_edit.html',{'user':request.user})
-
-
-@login_required
-def profile_update(request):
-    """
-    POST handler for profile update
-    """
-
-    try:
-        profile = Profile.objects.get(user_id=request.user.id)
-        user = User.objects.get(id=request.user.id)
-    except (KeyError, Profile.DoesNotExist):
-        # profile no found create new
-        profile = Profile.create(request.user)
-    else:
-        # print profile
-        pass
-    if request.method == 'POST':
-        form = ImageForm(request.POST,request.FILES)
-        if form.is_valid():
-            profile.img = form.cleaned_data['image']
-        user.email = request.POST['user_email']
-        user.save()
-        profile.github = request.POST['github']
-        profile.bio = request.POST['bio']
-        profile.save()
-  
-
-    return HttpResponseRedirect(reverse('profile'))
-
 @login_required
 def create_post_html(request):
     return render(request,'post/create_post.html',{'user':request.user})
 
-# @login_required
-def view_all_posts(request):
-    Posts = Post.objects.filter(can_view=0).order_by('-pub_datetime')
-    context = { 'posts':Posts}
-    return render(request,'post/view_all_posts.html',context)
+
 
 @login_required
 def create_post(request):
@@ -216,7 +157,7 @@ def ViewMyStream(request):
 
     post_type = request.GET['post_type']
     context = postContent(post_type,request)
-    return render(request, 'stream/mystream.html', context)
+    return render(request, 'stream/user_stream.html', context)
 
 @login_required
 def delete_post(request):
