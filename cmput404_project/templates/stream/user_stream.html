@@ -5,6 +5,8 @@
 <html>
   <head>
     <title>{{ user.username }}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/octicons/2.0.2/octicons.min.css">
+	  <link rel="stylesheet" href="{% static 'js/github-activity-0.1.4.min.css' %}" rel="stylesheet">
   </head>
 
   <body>
@@ -12,7 +14,7 @@
       ul {
         list-style-type: none;
       }
-      li {
+      li#post {
         border-style: solid;
       }
       .myStream {
@@ -23,9 +25,11 @@
     </style>
     {% if posts %}
       <div class="myStream">
-     <button id="show" class="home">
-      <a href="{% url 'profile' user.username %}"><h4>Go Back To Profile</h4></a>
-    </button>
+
+     <!-- <button id="show" class="home"> -->
+      <a href="{% url 'profile' %}"><h4>Go Back To Profile</h4></a>
+    <!-- </button> -->
+
       <ul style= "width: 70%; margin-left:12%;  ">
 
 {%for post in posts%}
@@ -39,13 +43,14 @@
 
 
             <li>  </br>
-                  {% if profile.photo %}
+                  {% if post.author.profile.photo %}
+
                       <img alt="user photo" src="{{ STATIC_URL }}/users/{{user.id}}/{{profile.photo }}" >
                   {% else %}
-                      <img alt="user photo" src="{% static "../static/images/defaultUserImage.png" %}" width = "30" height = "30">
+                      <img alt="user photo" src="{{ post.author.profile.img.url }}" width = "30" height = "30">
                   {% endif %}
 
-                  {{ post.author }}  ({{ post.pub_datetime }})</br></br>
+                  <a herf="{% url 'view_profile' post.author.username %}">{{ post.author }}</a>  ({{ post.pub_datetime }})</br></br>
                   {% if post.post_type == 1 %}
                 			{{ post.post_text|markdown }}</br></br>
             			{% else %}
@@ -63,10 +68,11 @@
               </div></br>
 
               <form action="{% url 'comment' %}" method="GET">
+                <input hidden="hidden" name="github" value = "{{user.profile.github}}" id="githubID"/>
                     {% csrf_token %}
                       <input style= "width:50%; margin-left:10%" name="comment_text"/>
                       <input hidden="hidden" name="post_id" value = "{{post.post_id }}"/>
-                      <input hidden="hidden" name="post_type" value = "{{post_type}}"/>
+                      <input hidden="hidden" name="post_type" value = "{{post_type}}" id="type"/>
                       <input hidden="hidden" name="content_type" value = "{{content_type}}"/>
                       <input type="submit" value = "comment"/>
               </form></br>
@@ -96,6 +102,54 @@
       <p>You do no have any stream to show yet.</p>
     </div>
     {% endif %}
+
+    <!-- ==== GITHUB ==== -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/0.7.2/mustache.min.js">
+    </script>
+    <script type="text/javascript" src="{% static 'js/github-activity-0.1.4.min.js' %}"></script>
+    <div id="github" class="content-section-a">
+      <div class="container">
+            <div class="row" >
+        <div class="col-md-6 col-md-offset-3 text-center wrap_title ">
+          <script type="text/javascript">
+            var visiblity = document.getElementById("type").value;
+            var parent = document.getElementsByClassName("col-md-6 col-md-offset-3 text-center wrap_title ")[0];
+            //alert(visiblity);
+            if(visiblity==="my_post") {
+                var elm = document.createElement("h2");
+                elm.textContent = "Github"
+                parent.appendChild(elm);
+            }
+          </script>
+        </div>
+        <div class="col-lg-8 col-lg-offset-2 centered">
+              <div id="feed" style="width: 100%; text-align: left;"></div>
+        </div>
+      </div>
+      </div>
+    </div>
+
+
+    <!-- GitHub activity -->
+    <script>
+      var gitAccount = document.getElementById("githubID").value;
+      var visiblity = document.getElementById("type").value;
+      //alert(gitAccount);
+      if(!gitAccount && visiblity==="my_post"){
+        //alert(gitAccount);
+        document.write("To view your github activity, please add github account.");
+      }
+      var visiblity = document.getElementById("type").value;
+      if(visiblity==="my_post") {
+        GitHubActivity.feed({
+            username: gitAccount,
+            //repository: "your-repo", // optional
+            selector: "#feed",
+            limit: 6 // optional
+        });
+      }
+    </script>
+
   </body>
 
 </html>

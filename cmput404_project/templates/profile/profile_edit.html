@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>My Profile</title>
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{%static 'css/profile.css' %}">
+
+</head>
+
+<body>
+    <div class="profile">
+
+        <img alt="user photo" src={{user.profile.img.url}} height='300' width='300' />
+
+        <form action="{% url 'profile_update' %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <table><tbody>
+                <tr>
+                  <td>Username</td>
+                  <td>{{ user.username }}</td>
+                <tr>
+                <tr>
+                  <td>Email</td>
+                  <td>
+                    {% if user.email %}
+                      <input name="user_email" value="{{ user.email }}" />
+                    {% else %}
+                      <input name="user_email" />
+                    {% endif %}
+                  </td>
+                <tr>
+
+                <tr>
+                  <td>Github</td>
+                  <td>
+                    {% if user.profile.github %}
+                      <input name="github" value="{{ user.profile.github }}" />
+                    {% else %}
+                      <input name="github" />
+                    {% endif %}
+                  </td>
+                <tr>
+
+              <tr>
+                <td>Bio</td>
+                <td>
+                  {% if user.profile.bio %}
+                    <input name="bio" value="{{ user.profile.bio }}" />
+                  {% else %}
+                    <input name="bio" />
+                  {% endif %}
+                </td>
+              <tr>
+            </tbody></table>
+            <input name="image" id="id_image" type="file" accept="image/*">
+
+            <input type="submit" value="submit"/>
+
+         </form>
+    </div>
+    <br/>
+
+
+</body>
