@@ -18,18 +18,17 @@ from .permissions import IsOwnerOrReadOnly
 class AuthorView(APIView):
 
     queryset = Author.objects.all()
-    #permission_classes = (permissions.IsAuthenticatedOrReadOnly,IsOwnerOrReadOnly,)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,IsOwnerOrReadOnly,)
     def get_object(self, pk):
         try:
             author =  Author.objects.get(pk=pk)
         except User.DoesNotExist:
             raise Http404
         return author
-        
     def get(self, request, pk, format=None):
+        print(format)
         author = self.get_object(pk)
         serializer = AuthorSerializer(author)
-        print(serializer.displayname)
         return Response(serializer.data)
 
     def post(self,request,pk,format=None):
@@ -44,7 +43,7 @@ class AuthorView(APIView):
         return self.post(request,pk,format)
 
 
-class Posts(APIView):
+class Post_list(APIView):
 
     """
     List all posts, or create a new post.
@@ -55,15 +54,38 @@ class Posts(APIView):
         serializer = PostSerializer(Posts,many=True)
         return Response(serializer.data)
     def post(self,request,format=None):
-
         serializer = PostSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class Post_detail(APIView):
 
-
+    """
+    List single posts, or create a new post.
+    """
+    queryset = Post.objects.all()
+    def get_object(self, pk):
+        try:
+            post =  Post.objects.get(pk=pk)
+        except User.DoesNotExist:
+            raise Http404
+        return post
+    
+    def get(self,request,pk,format=None):
+        Post = self.get_object(pk)
+        serializer = PostSerializer(Post)
+        return Response(serializer.data)
+    def post(self,request,pk,format=None):
+        Post = Post.objects.get(pk)
+        serializer = PostSerializer(Post,data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def put(self,request,pk,format=None):
+        return self.post(request,pk,format) 
 
 def home(request):
     posts = Post.objects.filter(visibility=0)#.order_by('-pub_datetime')

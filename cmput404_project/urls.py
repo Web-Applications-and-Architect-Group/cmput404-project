@@ -27,8 +27,10 @@ urlpatterns = [
  	url(r'^', include('registration.backends.simple.urls')),
  	url(r'^(?P<username>[a-zA-Z0-9]+)/profile', views.profile, name="profile"),
     #url(r'^view_profile/(?P<username>[a-zA-Z0-9]+)$', views.view_profile, name="view_profile"),
-    url(r'^author/posts$',views.Posts.as_view(),name='Posts'),
-    url(r'^author/(?P<pk>[a-zA-Z0-9]+)',views.AuthorView.as_view(),name='author'),
+    url(r'^author/posts/(?P<pk>[a-zA-Z0-9-_]+)$',views.Post_detail.as_view(),name='Post_detail'),
+    url(r'^author/posts$',views.Post_list.as_view(),name='Post_list'),
+    url(r'^author/(?P<pk>[a-zA-Z0-9]+)$',views.AuthorView.as_view(),name='author'),
+
     url(r'^profile_old', views.profile_old, name="profile_old"),
     url(r'^create_post_html$', views.create_post_html, name="create_post_html"),
     url(r'^create_post$', views.create_post, name="create_post"),

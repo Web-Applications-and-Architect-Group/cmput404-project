@@ -42,10 +42,12 @@ class Post(models.Model):
     ]
 
     accept = [
-        (0, 'text/plaintext'),
+        (0, 'text/plain'),
         (1, 'text/markdown'),
-        (2, 'image/*'),
-        (3, 'github_activity'),
+        (2, 'application/base64'),
+        (3, 'image/png;base64'),
+        (4, 'image/jpeg;base64'),
+        (5, 'github-activity'),
     ]
 
     id=models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -56,7 +58,7 @@ class Post(models.Model):
     title = models.CharField(max_length=50)
     source = models.URLField()
     origin = models.URLField()
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    author = models.ForeignKey(Author, on_delete=models.CASCADE)
     content = models.CharField(max_length=200)
     published = models.DateTimeField(auto_now =True)
     categories = models.TextField(null=True)
