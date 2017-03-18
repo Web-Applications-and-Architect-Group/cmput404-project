@@ -11,7 +11,7 @@ import uuid
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import mixins,generics, status,permissions
-from .serializers import AuthorSerializer
+from .serializers import AuthorSerializer,PostSerializer
 from rest_framework.decorators import api_view
 from .permissions import IsOwnerOrReadOnly
 
@@ -24,7 +24,8 @@ class AuthorView(APIView):
             author =  Author.objects.get(pk=pk)
         except User.DoesNotExist:
             raise Http404
-    
+        return author
+        
     def get(self, request, pk, format=None):
         author = self.get_object(pk)
         serializer = AuthorSerializer(author)
@@ -33,7 +34,7 @@ class AuthorView(APIView):
 
     def post(self,request,pk,format=None):
         author = self.get_object(pk)
-        serializer = AuthorSerializer(data=request.data)
+        serializer = AuthorSerializer(author,data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -41,10 +42,31 @@ class AuthorView(APIView):
         
     def put(self,request,pk,format=None):
         return self.post(request,pk,format)
-    
+
+
+class Posts(APIView):
+
+    """
+    List all posts, or create a new post.
+    """
+    queryset = Post.objects.all()
+    def get(self,request,format=None):
+        Posts = Post.objects.all()
+        serializer = PostSerializer(Posts,many=True)
+        return Response(serializer.data)
+    def post(self,request,format=None):
+
+        serializer = PostSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
 
 def home(request):
-    posts = Post.objects.filter(can_view=0)#.order_by('-pub_datetime')
+    posts = Post.objects.filter(visibility=0)#.order_by('-pub_datetime')
     if request.user.is_authenticated:
         user = request.user
         friends = user.get_friends()
@@ -105,7 +127,7 @@ def create_post(request):
     """
     if request.method == "POST":
         user = User.objects.get(id=request.user.id)
-        can_view = request.POST['post_type']
+        visibility = request.POST['post_type']
         post_text = request.POST['POST_TEXT']
         post_type = request.POST['content_type']
         
