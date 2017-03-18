@@ -21,12 +21,13 @@ from . import views
 
 from django.contrib.auth.models import User
 from rest_framework import routers, serializers, viewsets
-
+from rest_framework.urlpatterns import format_suffix_patterns
 
 urlpatterns = [
  	url(r'^', include('registration.backends.simple.urls')),
  	url(r'^(?P<username>[a-zA-Z0-9]+)/profile', views.profile, name="profile"),
     #url(r'^view_profile/(?P<username>[a-zA-Z0-9]+)$', views.view_profile, name="view_profile"),
+    url(r'^author/(?P<pk>[a-zA-Z0-9]+)',views.AuthorView.as_view(),name='author'),
     url(r'^profile_old', views.profile_old, name="profile_old"),
     url(r'^create_post_html$', views.create_post_html, name="create_post_html"),
     url(r'^create_post$', views.create_post, name="create_post"),
@@ -42,4 +43,6 @@ urlpatterns = [
     url(r'^Add_friend/$', views.Add_friend, name="Add_friend"),
     url(r'^accept_friend/$', views.accept_friend, name="accept_friend"),
     url(r'^api_list_my_friend_request/$', views.list_my_friend_request, name="list_my_friend_request"),
+     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]
+urlpatterns = format_suffix_patterns(urlpatterns)

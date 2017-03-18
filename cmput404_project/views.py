@@ -2,12 +2,46 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, Http40
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 import os
-from .models import Profile, Post, friend_request, Comment
+from .models import  Author,Post, friend_request, Comment
 from .forms import ProfileForm,ImageForm
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 import sys
 import uuid
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import mixins,generics, status,permissions
+from .serializers import AuthorSerializer
+from rest_framework.decorators import api_view
+from .permissions import IsOwnerOrReadOnly
+
+class AuthorView(APIView):
+
+    queryset = Author.objects.all()
+    #permission_classes = (permissions.IsAuthenticatedOrReadOnly,IsOwnerOrReadOnly,)
+    def get_object(self, pk):
+        try:
+            author =  Author.objects.get(pk=pk)
+        except User.DoesNotExist:
+            raise Http404
+    
+    def get(self, request, pk, format=None):
+        author = self.get_object(pk)
+        serializer = AuthorSerializer(author)
+        print(serializer.displayname)
+        return Response(serializer.data)
+
+    def post(self,request,pk,format=None):
+        author = self.get_object(pk)
+        serializer = AuthorSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+    def put(self,request,pk,format=None):
+        return self.post(request,pk,format)
+    
 
 def home(request):
     posts = Post.objects.filter(can_view=0)#.order_by('-pub_datetime')
@@ -15,7 +49,7 @@ def home(request):
         user = request.user
         friends = user.get_friends()
         
-    context = { 'posts':Posts}
+    context = { 'posts':posts}
     return render(request,'stream/main_stream.html',context)
 
 @login_required
@@ -240,3 +274,5 @@ def get_object_by_uuid_or_404(model, uuid_pk):
     except Exception, e:
         raise Http404(str(e))
     return get_object_or_404(model, pk=uuid_pk)
+
+

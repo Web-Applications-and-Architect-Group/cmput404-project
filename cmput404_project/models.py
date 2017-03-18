@@ -5,35 +5,31 @@ import datetime
 from django.utils import timezone
 from django.db.models.signals import post_save
 import uuid
+from .settings import HOST_NAME
 
+ 
 @python_2_unicode_compatible
-class Profile(models.Model):
-    user = models.OneToOneField(User,on_delete=models.CASCADE,primary_key=True)
+class Author(models.Model):
     img = models.ImageField(upload_to= 'images/', default = 'images/defaultUserImage.png')
     github = models.CharField(max_length=200,default="",blank=True)
     bio = models.CharField(max_length=200,default="",blank=True)
     is_active = models.BooleanField(default=False)
+    host = models.URLField(default=HOST_NAME)
+    displayName = models.CharField(max_length=200)
+    id = models.CharField(max_length=200,primary_key=True)
+    url = models.URLField()
+    user = models.ForeignKey(User,on_delete=models.CASCADE,related_name='profile')
+    
 
-    follows = models.ManyToManyField("self", related_name="followed_by", blank=True,symmetrical=False)
-    
-    def get_friends(self):
-        return self.follows.all() & self.followed_by.all()
-    
-    def get_FOF(self):
-        result = self.get_friends()
-        friends = list(result)
-        for friend in friends:
-            result |= friend.get_friends()
-        return result
-        
     def __str__(self):
-        return self.user.username
+        return self.id
         
-def create_profile(sender,instance,created,**kwargs):
+def create_author(sender,instance,created,**kwargs):
     if created:
-        Profile.objects.create(user=instance)
+        Author.objects.create(user=instance,displayName=instance.username,id=instance.username,url=HOST_NAME+instance.username);
 
-post_save.connect(create_profile,sender=User)
+post_save.connect(create_author,sender=User)
+
 @python_2_unicode_compatible
 class Post(models.Model):
     #================  https://docs.djangoproject.com/en/1.10/ref/models/fields/    idea from this page
@@ -48,13 +44,16 @@ class Post(models.Model):
     accept = [
         (0, 'text/plaintext'),
         (1, 'text/markdown'),
-        (2, 'image/*')
+        (2, 'image/*'),
+        (3, 'github_activity'),
     ]
 
     visibility = models.IntegerField(choices=authority, default=0)
     contentType = models.IntegerField(choices=accept, default=0)
     #=================
     title = models.CharField(max_length=50)
+    source = models.URLField()
+    origin = models.URLField()
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     post_text = models.CharField(max_length=200)
     published = models.DateTimeField('date published')
