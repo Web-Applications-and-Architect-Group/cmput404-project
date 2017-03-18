@@ -18,22 +18,23 @@ from .permissions import IsOwnerOrReadOnly
 class AuthorView(APIView):
 
     queryset = Author.objects.all()
-    #permission_classes = (permissions.IsAuthenticatedOrReadOnly,IsOwnerOrReadOnly,)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,IsOwnerOrReadOnly,)
     def get_object(self, pk):
         try:
             author =  Author.objects.get(pk=pk)
         except User.DoesNotExist:
             raise Http404
+        return author
     
     def get(self, request, pk, format=None):
+        print(format)
         author = self.get_object(pk)
         serializer = AuthorSerializer(author)
-        print(serializer.displayname)
         return Response(serializer.data)
 
     def post(self,request,pk,format=None):
         author = self.get_object(pk)
-        serializer = AuthorSerializer(data=request.data)
+        serializer = AuthorSerializer(author,data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)

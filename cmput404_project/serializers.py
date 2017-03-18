@@ -6,5 +6,5 @@ class AuthorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Author
         fields = ('id', 'host','displayName','url','bio')
-        #read_only_fields=('id','host','url')
+        read_only_fields=('id','host','url')
         
