@@ -7,11 +7,12 @@ from .forms import ProfileForm,ImageForm
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 import sys
+import json
 import uuid
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import mixins,generics, status,permissions
-from .serializers import AuthorSerializer,PostSerializer
+from .serializers import AuthorSerializer,PostSerializer,CommentSerializer
 from rest_framework.decorators import api_view
 from .permissions import IsOwnerOrReadOnly
 
@@ -22,7 +23,7 @@ class AuthorView(APIView):
     def get_object(self, pk):
         try:
             author =  Author.objects.get(pk=pk)
-        except User.DoesNotExist:
+        except Author.DoesNotExist:
             raise Http404
         return author
     def get(self, request, pk, format=None):
@@ -48,6 +49,7 @@ class Post_list(APIView):
     """
     List all posts, or create a new post.
     """
+
     queryset = Post.objects.all()
     def get(self,request,format=None):
         Posts = Post.objects.all()
@@ -69,7 +71,7 @@ class Post_detail(APIView):
     def get_object(self, pk):
         try:
             post =  Post.objects.get(pk=pk)
-        except User.DoesNotExist:
+        except Post.DoesNotExist:
             raise Http404
         return post
     
@@ -86,6 +88,52 @@ class Post_detail(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     def put(self,request,pk,format=None):
         return self.post(request,pk,format) 
+class Comment_list(APIView):
+
+    """
+    List all comments, or create a new comment.
+    """
+    queryset = Comment.objects.all()
+    def get_object(self, pk):
+        try:
+            post =  Post.objects.get(pk=pk)
+        except Post.DoesNotExist:
+            raise Http404
+        return post.comments
+    def get(self,request,pk,format=None):
+        Comments = self.get_object(pk)
+        serializer = CommentSerializer(Comments,many=True)
+        return Response(serializer.data)
+    def post(self,request,format=None):
+        serializer = CommentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def handle_friendrequest(request,format=None):
+    queryset = Notify.objects.all()
+    if (request.method == 'POST'):
+        data = request.data
+        if not (data[query] == "friendrequest"):
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        try:
+            friend =  Author.objects.get(data[friend][id])
+        except Author.DoesNotExist:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        new_notify = Notify.objects.create(friend,data[author][url])
+        new_notify.save()
+
+class handle_friendrequest(APIView):
+        def post(self,request,format=None):
+        serializer = CommentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 def home(request):
     posts = Post.objects.filter(visibility=0)#.order_by('-pub_datetime')
