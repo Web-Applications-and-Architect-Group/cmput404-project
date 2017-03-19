@@ -24,7 +24,7 @@ class AuthorView(APIView):
             author =  Author.objects.get(pk=pk)
         except User.DoesNotExist:
             raise Http404
-    
+
     def get(self, request, pk, format=None):
         author = self.get_object(pk)
         serializer = AuthorSerializer(author)
@@ -38,19 +38,13 @@ class AuthorView(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+
     def put(self,request,pk,format=None):
         return self.post(request,pk,format)
-    
+
 
 def home(request):
-    posts = Post.objects.filter(can_view=0)#.order_by('-pub_datetime')
-    if request.user.is_authenticated:
-        user = request.user
-        friends = user.get_friends()
-        
-    context = { 'posts':posts}
-    return render(request,'stream/main_stream.html',context)
+    return render(request,'home.html')
 
 @login_required
 def profile(request,username):
@@ -108,7 +102,7 @@ def create_post(request):
         can_view = request.POST['post_type']
         post_text = request.POST['POST_TEXT']
         post_type = request.POST['content_type']
-        
+
         new_post = Post.create(request.user,post_text,can_view, post_type)
         '''
         form = ImageForm(request.POST,request.FILES)
@@ -274,5 +268,3 @@ def get_object_by_uuid_or_404(model, uuid_pk):
     except Exception, e:
         raise Http404(str(e))
     return get_object_or_404(model, pk=uuid_pk)
-
-
