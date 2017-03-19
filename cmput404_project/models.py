@@ -19,7 +19,7 @@ accept = [
     (5, 'github-activity'),
     ]
 
- 
+
 @python_2_unicode_compatible
 class Author(models.Model):
     img = models.ImageField(upload_to= 'images/', default = 'images/defaultUserImage.png')
@@ -31,11 +31,11 @@ class Author(models.Model):
     id = models.CharField(max_length=200,primary_key=True)
     url = models.URLField()
     user = models.ForeignKey(User,on_delete=models.CASCADE,related_name='profile')
-    
+
 
     def __str__(self):
         return self.id
-        
+
 def create_author(sender,instance,created,**kwargs):
     if created:
         Author.objects.create(user=instance,displayName=instance.username,id=instance.username,url=HOST_NAME+"author/"+instance.username);
@@ -79,7 +79,7 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
-        
+
     def __setitem__(self, key, data):
         return setattr(self, key, data)
 
@@ -119,7 +119,7 @@ class Notify(models.Model):
     requester = models.URLField()
     def __str__(self):
         return self.requestee.username
-        
+
 @python_2_unicode_compatible
 class VisibileTo(models.Model):
     post = models.ForeignKey(Post,on_delete=models.CASCADE,related_name="visibileTo")
@@ -132,7 +132,7 @@ class VisibileTo(models.Model):
 
 @python_2_unicode_compatible
 class Category(models.Model):
-    post = models.ForeignKey(Post,on_delete=models.CASCADE,related_name='categories') 
+    post = models.ForeignKey(Post,on_delete=models.CASCADE,related_name='categories')
     category = models.CharField(max_length=20)
     def __str__(self):
         return self.category
@@ -173,6 +173,5 @@ class Comment(models.Model):
         return new_comment
 
     def __str__(self):
+
         return self.comment
-
-

@@ -25,6 +25,7 @@ class AuthorView(APIView):
         except Author.DoesNotExist:
             raise Http404
         return author
+
     def get(self, request, pk, format=None):
         print(format)
         author = self.get_object(pk)
@@ -38,10 +39,28 @@ class AuthorView(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+
     def put(self,request,pk,format=None):
         return self.post(request,pk,format)
 
+
+
+def home(request):
+    comments = Comment.objects.all()
+
+    #post = Post.objects.filter(author = request.user).order_by('-pub_datetime')
+    post= Post.objects.filter(visibility=0).order_by('published')
+    context = { 'posts': post , 'comments': comments}
+    return render(request,'home.html',context)
+
+def selfPage(request):
+    comments = Comment.objects.all()
+
+    #post = Post.objects.filter(author = request.user).order_by('-pub_datetime')
+    post =Post.objects.all()
+
+    context = { 'posts': post , 'comments': comments}
+    return render(request, 'self.html', context)
 
 class Post_list(APIView):
 
@@ -64,7 +83,7 @@ class Post_list(APIView):
             post['next'] = post.origin + '/posts/' + str(post.id) + '/comments'
         serializer = PostSerializer(result_posts, many=True)
         return paginator.get_paginated_response(serializer.data, size)
-        
+
     def post(self,request,format=None):
         serializer = PostSerializer(data=request.data)
         if serializer.is_valid():
@@ -84,7 +103,7 @@ class Post_detail(APIView):
         except Post.DoesNotExist:
             raise Http404
         return post
-    
+
     def get(self,request,pk,format=None):
         Post = self.get_object(pk)
         serializer = PostSerializer(Post)
@@ -97,7 +116,8 @@ class Post_detail(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     def put(self,request,pk,format=None):
-        return self.post(request,pk,format) 
+
+        return self.post(request,pk,format)
 class Comment_list(APIView):
 
     """
@@ -159,14 +179,6 @@ def send_friendrequest(request):
 
 
 
-def home(request):
-    posts = Post.objects.filter(visibility=0)#.order_by('-pub_datetime')
-    if request.user.is_authenticated:
-        user = request.user
-        friends = user.get_friends()
-        
-    context = { 'posts':posts}
-    return render(request,'stream/main_stream.html',context)
 
 @login_required
 def profile(request,username):
@@ -224,7 +236,7 @@ def create_post(request):
         visibility = request.POST['post_type']
         post_text = request.POST['POST_TEXT']
         post_type = request.POST['content_type']
-        
+
         new_post = Post.create(request.user,post_text,can_view, post_type)
         '''
         form = ImageForm(request.POST,request.FILES)
@@ -390,5 +402,3 @@ def get_object_by_uuid_or_404(model, uuid_pk):
     except Exception, e:
         raise Http404(str(e))
     return get_object_or_404(model, pk=uuid_pk)
-
-
