@@ -79,7 +79,12 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+        
+    def __setitem__(self, key, data):
+        return setattr(self, key, data)
 
+    def __getitem__(self, key):
+        return getattr(self, key)
 
 # Ask if 2 authors are friends
 # GET http://service/author/<authorid>/friends/<authorid2>
@@ -114,7 +119,13 @@ class Notify(models.Model):
     requester = models.URLField()
     def __str__(self):
         return self.requestee.username
-
+        
+@python_2_unicode_compatible
+class VisibileTo(models.Model):
+    post = models.ForeignKey(Post,on_delete=models.CASCADE,related_name="visibileTo")
+    visibileTo = models.URLField()
+    def __str__(self):
+        return self.requestee.username
 
 
 @python_2_unicode_compatible

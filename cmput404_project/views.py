@@ -12,12 +12,11 @@ import uuid
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import mixins,generics, status,permissions
-from .serializers import AuthorSerializer,PostSerializer,CommentSerializer
+from .serializers import AuthorSerializer,PostSerializer,CommentSerializer,PostPagination
 from rest_framework.decorators import api_view
 from .permissions import IsOwnerOrReadOnly
 
 class AuthorView(APIView):
-
     queryset = Author.objects.all()
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,IsOwnerOrReadOnly,)
     def get_object(self, pk):
@@ -52,9 +51,20 @@ class Post_list(APIView):
 
     queryset = Post.objects.all()
     def get(self,request,format=None):
-        Posts = Post.objects.all()
-        serializer = PostSerializer(Posts,many=True)
-        return Response(serializer.data)
+        size = int(request.GET.get('size', 1))
+        paginator = PostPagination()
+        paginator.page_size = size
+        posts = Post.objects.all()
+        result_posts = paginator.paginate_queryset(posts, request)
+        for post in result_posts:
+            comments = Comment.objects.filter(post=post).order_by('-published')[:5]
+            post['comments'] = comments
+            post['count'] = comments.count()
+            post['size'] = size
+            post['next'] = post.origin + '/posts/' + str(post.id) + '/comments'
+        serializer = PostSerializer(result_posts, many=True)
+        return paginator.get_paginated_response(serializer.data, size)
+        
     def post(self,request,format=None):
         serializer = PostSerializer(data=request.data)
         if serializer.is_valid():
@@ -126,7 +136,7 @@ def handle_friendrequest(request,format=None):
         new_notify.save()
 
 class handle_friendrequest(APIView):
-        def post(self,request,format=None):
+    def post(self,request,format=None):
         serializer = CommentSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
