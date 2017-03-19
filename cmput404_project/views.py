@@ -147,14 +147,14 @@ class handle_friendrequest(APIView):
         except Author.DoesNotExist:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
+@login_required
+def send_friendrequest(request):
+    data=request.data
+    author = data["author"]
+    friend = data["friend"]
+    author_seri
 
-class handle_friendrequest(APIView):
-    def post(self,request,format=None):
-        serializer = CommentSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 
