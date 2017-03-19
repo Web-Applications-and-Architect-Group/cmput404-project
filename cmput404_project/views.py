@@ -67,13 +67,13 @@ class Post_list(APIView):
     """
     List all posts, or create a new post.
     """
+    queryset = Post.objects.filter(visibility=0)
 
-    queryset = Post.objects.all()
     def get(self,request,format=None):
         size = int(request.GET.get('size', 1))
         paginator = PostPagination()
         paginator.page_size = size
-        posts = Post.objects.all() #TODO
+        posts = self.queryset
         result_posts = paginator.paginate_queryset(posts, request)
         for post in result_posts:
             comments = Comment.objects.filter(post=post).order_by('-published')[:5]
@@ -90,6 +90,78 @@ class Post_list(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class All_Visible_Post_List_From_An_Author_To_User(APIView):
+    """
+    List all posts from an author that visible to an authenticated user.
+    """
+    queryset = Post.objects.all()
+
+    def get(self,request, author_id, format=None):
+        size = int(request.GET.get('size', 1))
+        paginator = PostPagination()
+        paginator.page_size = size
+
+        """
+        author = Author.objects.get(pk=author_id)
+        all_posts = Post.objects.filter(author=author)
+        #TODO check if they are friend
+        is_friend = False
+        is_FOAF = False
+        if (is_friend):
+            posts = all_posts.filter(visibility=0, visibility=1, visibility=2)
+        elif (is_FOAF):
+            posts = all_posts.filter(visibility=0, visibility=2)
+        else:
+            posts = all_posts.filter(visibility=0)
+        """
+        
+        result_posts = paginator.paginate_queryset(posts, request)
+        for post in result_posts:
+            comments = Comment.objects.filter(post=post).order_by('-published')[:5]
+            post['comments'] = comments
+            post['count'] = comments.count()
+            post['size'] = size
+            post['next'] = post.origin + 'service/posts/' + str(post.id) + '/comments'
+        serializer = PostSerializer(result_posts, many=True)
+        return paginator.get_paginated_response(serializer.data, size)
+
+class All_Visible_Post_List_To_User(APIView):
+    """
+    List all posts from an author that visible to an authenticated user.
+    """
+    queryset = Post.objects.all()
+
+    def get(self,request, format=None):
+        size = int(request.GET.get('size', 1))
+        paginator = PostPagination()
+        paginator.page_size = size
+
+        """
+        myself_user = User.objects.get(pk=request.user.id)
+        myself = Author.objects.get(pk=myself_user)
+        author = Author.objects.get(pk=author_id)
+        all_posts = Post.objects.filter(author=author)
+        #TODO check if they are friend one by one
+        is_friend = False
+        is_FOAF = False
+        if (is_friend):
+            posts = all_posts.filter(visibility=0, visibility=1, visibility=2)
+        elif (is_FOAF):
+            posts = all_posts.filter(visibility=0, visibility=2)
+        else:
+            posts = all_posts.filter(visibility=0)
+        """
+
+        result_posts = paginator.paginate_queryset(posts, request)
+        for post in result_posts:
+            comments = Comment.objects.filter(post=post).order_by('-published')[:5]
+            post['comments'] = comments
+            post['count'] = comments.count()
+            post['size'] = size
+            post['next'] = post.origin + 'service/posts/' + str(post.id) + '/comments'
+        serializer = PostSerializer(result_posts, many=True)
+        return paginator.get_paginated_response(serializer.data, size)
 
 class Post_detail(APIView):
 
@@ -145,11 +217,11 @@ class Comment_list(APIView):
         except Post.DoesNotExist:
             raise Http404
         return post
-        
+
     def get(self,request,post_id,format=None):
         post = self.get_object(post_id)
 
-        size = int(request.GET.get('size', 1))
+        size = int(request.GET.get('size', 5))
         paginator = CommentPagination()
         paginator.page_size = size
 
