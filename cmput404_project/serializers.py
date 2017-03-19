@@ -6,7 +6,22 @@ class AuthorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Author
         fields = ('id', 'host','displayName','url','bio')
-        read_only_fields=('id','host','url')
+
+class RespondSerializer(serializers.Serializer):
+    query = serializers.CharField(max_length=20)
+    count = serializers.IntegerField(required=False)
+    size = serializers.IntegerField(required=False)
+    next = serializers.IntegerField(required=False)
+    previous = serializers.IntegerField(required=False)
+    #postid = serializers. 
+    posts = PostSerializer(many=True,required = False)
+    #comments
+    #author
+    #authors
+    #success
+    #message
+    #friends
+    
 
 class PostSerializer(serializers.ModelSerializer):
 

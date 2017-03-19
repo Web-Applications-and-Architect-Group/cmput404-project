@@ -22,7 +22,7 @@ class AuthorView(APIView):
     def get_object(self, pk):
         try:
             author =  Author.objects.get(pk=pk)
-        except User.DoesNotExist:
+        except Author.DoesNotExist:
             raise Http404
         return author
     def get(self, request, pk, format=None):
