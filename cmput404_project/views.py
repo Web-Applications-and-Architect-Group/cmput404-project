@@ -46,8 +46,21 @@ class AuthorView(APIView):
 
 
 def home(request):
-    return render(request,'home.html')
+    comments = Comment.objects.all()
 
+    #post = Post.objects.filter(author = request.user).order_by('-pub_datetime')
+    post= Post.objects.filter(visibility=0).order_by('published')
+    context = { 'posts': post , 'comments': comments}
+    return render(request,'home.html',context)
+
+def selfPage(request):
+    comments = Comment.objects.all()
+
+    #post = Post.objects.filter(author = request.user).order_by('-pub_datetime')
+    post =Post.objects.all()
+
+    context = { 'posts': post , 'comments': comments}
+    return render(request, 'self.html', context)
 
 class Post_list(APIView):
 

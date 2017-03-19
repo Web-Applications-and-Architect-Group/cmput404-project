@@ -7,7 +7,7 @@ from django.db.models.signals import post_save
 import uuid
 from .settings import HOST_NAME
 
- 
+
 @python_2_unicode_compatible
 class Author(models.Model):
     img = models.ImageField(upload_to= 'images/', default = 'images/defaultUserImage.png')
@@ -19,11 +19,11 @@ class Author(models.Model):
     id = models.CharField(max_length=200,primary_key=True)
     url = models.URLField()
     user = models.ForeignKey(User,on_delete=models.CASCADE,related_name='profile')
-    
+
 
     def __str__(self):
         return self.id
-        
+
 def create_author(sender,instance,created,**kwargs):
     if created:
         Author.objects.create(user=instance,displayName=instance.username,id=instance.username,url=HOST_NAME+instance.username);
@@ -110,4 +110,3 @@ class Comment(models.Model):
 
     def __str__(self):
         return self.comment_text
-

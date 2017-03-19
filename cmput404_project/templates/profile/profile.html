@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
+
 <div class="container clearfix">
   <div class="col-md-2 float-left">
     <div class="panel panel-default">
@@ -10,53 +11,75 @@
       <div class="btn-group-vertical center-block" role="group">
          <a href="" class="btn btn-primary"><strong>Profile</strong></a>
          <a href="" class="btn btn-default">Friendship</a>
-         <a href="" class="btn btn-default">Github</a>
+         <a href="" class="btn btn-default">Followers</a>
       </div>
     </div>
   </div>
   <div class="col-md-10 float-right">
     <div class="Subhead">
       <span class="col-md-10 float-left">
-        <h2 class="Subhead-heading"> Profile </h2>
+        <h2 class="Subhead-heading"> Profile </h2><br>
       </span>
+
       <span class="col-md-2 float-right">
         <button type="button" class="btn btn-default">Follow</button>
       </span>
-      <hr>
-    <div/>
+    </div>
     <form action="{% url 'profile' user.username %}" method="post" enctype="multipart/form-data">
+      <input type="hidden" value="{{ request.user.id }}" id="viewer">
       <div class="col-md-6 float-left">
         <div class="form-group">
           <label >User name</label>
-          <input type="text" class="form-control" value="{{ user.username }}" readonly>
+          <input type="text" class="form-control" value="{{ user.username }}" id="isUser">
+          <input type="hidden" class="form-control" value="{{ user.id }}" id="User">
+          <p>@{{ user.id }}</p>
         </div>
         {% csrf_token %}
         <div class="form-group">
           <label >Email address</label>
-          <input type="email" name="email" class="form-control" value="{{ user.email }}">
+          <input type="email" name="email" class="form-control" value="{{ user.email }}" id="isUser">
         </div>
         <div class="form-group">
           <label >Github</label>
-          <input type="text" name="github" class="form-control" value="{{ user.profile.github }}">
+          <input type="text" name="github" class="form-control" value="{{ user.profile.github }}" id="isUser">
         </div>
         <div class="form-group">
           <label >Bio</label>
-          <input type="text" name="bio" class="form-control" value="{{ user.profile.bio }}">
+          <textarea rows="4" cols="50" name="bio" class="form-control" value="{{ user.profile.bio }}" id="isUser"></textarea>
         </div>
         <p>
-          <button type="submit" class="btn btn-default">Update Profile</button>
+          <button type="submit" class="btn btn-default setBtn">Update Profile</button>
         </p>
       </div>
 
       <div class="col-md-4 float-right">
         <img class = "img-rounded center-block" alt="user photo" src={{user.profile.img.url}} height=300px width=300px/>
         <hr>
-        <label class="btn btn-default btn-file center-block">
-          Uploade new picture <input name="image" class="hidden" type="file" accept="image/*">
+        <label class="btn btn-default btn-file center-block setBtn">
+          Upload new picture <input name="image" class="hidden" type="file" accept="image/*">
         </label>
       </div>
     </form>
   </div>
+
+<script>
+  var user = document.getElementById("User").value;
+  var viewer = document.getElementById("viewer").value;
+  var readable = document.getElementsByClassName("form-control");
+  var visibility = document.getElementsByClassName("setBtn");
+  //alert(visibility.length);
+  //alert(user);
+  //alert(viewer);
+  if(user!=viewer) {
+    for(i=0;i<readable.length;i++) {
+      readable[i].readOnly = true;
+    }
+    for(i=0;i<visibility.length;i++) {
+      visibility[i].style.visibility = "hidden";
+    }
+  }
+</script>
+
 
 {% endblock %}
 {% block javascript %}
