@@ -163,4 +163,4 @@ DATABASES['default'].update(db_from_env)
 
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
-HOST_NAME = "http://127.0.0.1/"
+HOST_NAME = "http://127.0.0.1:8000/"

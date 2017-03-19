@@ -105,7 +105,7 @@ class Friend(models.Model):
     requester = models.ForeignKey(Author,on_delete=models.CASCADE,related_name="follow")
     requestee = models.URLField()
     def __str__(self):
-        return self.requester.username
+        return self.requester.url
 
 
 @python_2_unicode_compatible
@@ -113,7 +113,7 @@ class Notify(models.Model):
     requestee = models.ForeignKey(Author,on_delete=models.CASCADE,related_name="notify")
     requester = models.URLField()
     def __str__(self):
-        return self.requestee.username
+        return self.requestee.url
 
 
 
