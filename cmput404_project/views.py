@@ -2,27 +2,27 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, Http40
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 import os
-from .models import  Author,Post, friend_request, Comment
+from .models import  Author,Post, friend_request, Comment,Notify,Friend
 from .forms import ProfileForm,ImageForm
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 import sys
+import json
 import uuid
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import mixins,generics, status,permissions
-from .serializers import AuthorSerializer,PostSerializer
+from .serializers import AuthorSerializer,PostSerializer,CommentSerializer,PostPagination
 from rest_framework.decorators import api_view
 from .permissions import IsOwnerOrReadOnly
 
 class AuthorView(APIView):
-
     queryset = Author.objects.all()
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,IsOwnerOrReadOnly,)
     def get_object(self, pk):
         try:
             author =  Author.objects.get(pk=pk)
-        except User.DoesNotExist:
+        except Author.DoesNotExist:
             raise Http404
         return author
 
@@ -67,11 +67,23 @@ class Post_list(APIView):
     """
     List all posts, or create a new post.
     """
+
     queryset = Post.objects.all()
     def get(self,request,format=None):
-        Posts = Post.objects.all()
-        serializer = PostSerializer(Posts,many=True)
-        return Response(serializer.data)
+        size = int(request.GET.get('size', 1))
+        paginator = PostPagination()
+        paginator.page_size = size
+        posts = Post.objects.all()
+        result_posts = paginator.paginate_queryset(posts, request)
+        for post in result_posts:
+            comments = Comment.objects.filter(post=post).order_by('-published')[:5]
+            post['comments'] = comments
+            post['count'] = comments.count()
+            post['size'] = size
+            post['next'] = post.origin + '/posts/' + str(post.id) + '/comments'
+        serializer = PostSerializer(result_posts, many=True)
+        return paginator.get_paginated_response(serializer.data, size)
+
     def post(self,request,format=None):
         serializer = PostSerializer(data=request.data)
         if serializer.is_valid():
@@ -88,7 +100,7 @@ class Post_detail(APIView):
     def get_object(self, pk):
         try:
             post =  Post.objects.get(pk=pk)
-        except User.DoesNotExist:
+        except Post.DoesNotExist:
             raise Http404
         return post
 
@@ -104,7 +116,68 @@ class Post_detail(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     def put(self,request,pk,format=None):
+
         return self.post(request,pk,format)
+class Comment_list(APIView):
+
+    """
+    List all comments, or create a new comment.
+    """
+    queryset = Comment.objects.all()
+    def get_object(self, pk):
+        try:
+            post =  Post.objects.get(pk=pk)
+        except Post.DoesNotExist:
+            raise Http404
+        return post.comments
+    def get(self,request,pk,format=None):
+        Comments = self.get_object(pk)
+        serializer = CommentSerializer(Comments,many=True)
+        return Response(serializer.data)
+    def post(self,request,format=None):
+        serializer = CommentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#@api_view(['POST'])
+#def handle_friendrequest(request,format=None):
+#    queryset = Notify.objects.all()
+#    if (request.method == 'POST'):
+#        data = request.data
+#        if not (data[query] == "friendrequest"):
+#            return Response(status=status.HTTP_400_BAD_REQUEST)
+#        try:
+#            friend =  Author.objects.get(data[friend][id])
+#        except Author.DoesNotExist:
+#            return Response(status=status.HTTP_400_BAD_REQUEST)
+#        new_notify = Notify.objects.create(friend,data[author][url])
+#        new_notify.save()
+
+class handle_friendrequest(APIView):
+    queryset = Notify.objects.all()
+    def post(self,request,format=None):
+        data = request.data
+        if not (data["query"] == "friendrequest"):
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        try:
+            friend =  Author.objects.get(id=data["friend"]["id"])
+            new_notify = Notify.objects.create(requestee=friend,requester=data["author"]["url"])
+            new_notify.save()
+        except Author.DoesNotExist:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class handle_friendrequest(APIView):
+    def post(self,request,format=None):
+        serializer = CommentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
 
 
 @login_required

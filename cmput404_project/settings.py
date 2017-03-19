@@ -114,7 +114,8 @@ REST_FRAMEWORK = {
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
-    ]
+    ],
+    'PAGE_SIZE': 20,
 }
 
 
@@ -163,4 +164,4 @@ DATABASES['default'].update(db_from_env)
 
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
-HOST_NAME = "http://127.0.0.1/"
+HOST_NAME = "http://127.0.0.1:8000/"
