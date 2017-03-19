@@ -42,23 +42,27 @@ class Post(models.Model):
     ]
 
     accept = [
-        (0, 'text/plaintext'),
+        (0, 'text/plain'),
         (1, 'text/markdown'),
-        (2, 'image/*'),
-        (3, 'github_activity'),
+        (2, 'application/base64'),
+        (3, 'image/png;base64'),
+        (4, 'image/jpeg;base64'),
+        (5, 'github-activity'),
     ]
 
+    id=models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     visibility = models.IntegerField(choices=authority, default=0)
     contentType = models.IntegerField(choices=accept, default=0)
+    description = models.CharField(max_length=100)
     #=================
     title = models.CharField(max_length=50)
     source = models.URLField()
     origin = models.URLField()
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
-    post_text = models.CharField(max_length=200)
-    published = models.DateTimeField('date published')
+    author = models.ForeignKey(Author, on_delete=models.CASCADE)
+    content = models.CharField(max_length=200)
+    published = models.DateTimeField(auto_now =True)
+    categories = models.TextField(null=True)
     #Extra material :  https://docs.djangoproject.com/en/1.10/ref/models/fields/UUIDField
-    id=models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     unlisted = models.BooleanField(default=False)
     #=====================
     #image =  models.FileField(default =)
@@ -66,12 +70,12 @@ class Post(models.Model):
 	# votes = models.IntegerField(default=0)
 
     @classmethod
-    def create(cls, user, post_text,can_view_choice, post_type_choice):
-        new_post = cls(author=user, post_text=post_text, pub_datetime=timezone.now(), can_view = can_view_choice, post_type=post_type_choice)
+    def create(cls, user, content,can_view_choice, post_type_choice):
+        new_post = cls(author=user, content=content, published=timezone.now(), visibility = can_view_choice, contentType=post_type_choice)
         return new_post
 
     def __str__(self):
-        return self.post_text
+        return self.title
 
 @python_2_unicode_compatible
 class friend_request(models.Model):
