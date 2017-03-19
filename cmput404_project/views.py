@@ -15,6 +15,7 @@ from rest_framework import mixins,generics, status,permissions
 from .serializers import AuthorSerializer,PostSerializer,CommentSerializer,PostPagination,CommentPagination
 from rest_framework.decorators import api_view
 from .permissions import IsOwnerOrReadOnly
+from collections import OrderedDict
 
 class AuthorView(APIView):
     queryset = Author.objects.all()
@@ -115,7 +116,7 @@ class All_Visible_Post_List_From_An_Author_To_User(APIView):
         else:
             posts = all_posts.filter(visibility=0)
         """
-        
+
         result_posts = paginator.paginate_queryset(posts, request)
         for post in result_posts:
             comments = Comment.objects.filter(post=post).order_by('-published')[:5]
@@ -265,7 +266,13 @@ class handle_friendrequest(APIView):
             new_notify = Notify.objects.create(requestee=friend,requester=data["author"]["url"])
             new_notify.save()
         except Author.DoesNotExist:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            raise Http404
+        else:
+            response = OrderedDict()
+            response["query"] = "friendrequest"
+            response["success"] = True
+            response["message"] = "Friend request sent"
+            return Response(response, status=status.HTTP_200_OK)
 
 @login_required
 def send_friendrequest(request):

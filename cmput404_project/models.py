@@ -109,6 +109,12 @@ class Post(models.Model):
 class Friend(models.Model):
     requester = models.ForeignKey(Author,on_delete=models.CASCADE,related_name="follow")
     requestee = models.URLField()
+
+    @classmethod
+    def create(cls, requester, requestee):
+        new_post = cls(requester=requester, requestee=requestee)
+        return new_post
+
     def __str__(self):
         return self.requester.url
 
@@ -117,8 +123,14 @@ class Friend(models.Model):
 class Notify(models.Model):
     requestee = models.ForeignKey(Author,on_delete=models.CASCADE,related_name="notify")
     requester = models.URLField()
+
+    @classmethod
+    def create(cls, requester, requestee):
+        new_post = cls(requester=requester, requestee=requestee)
+        return new_post
+
     def __str__(self):
-        return self.requestee.username
+        return self.requestee.displayName
 
 @python_2_unicode_compatible
 class VisibileTo(models.Model):
