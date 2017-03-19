@@ -118,6 +118,8 @@ class Post_detail(APIView):
     def put(self,request,pk,format=None):
 
         return self.post(request,pk,format)
+
+
 class Comment_list(APIView):
 
     """
@@ -140,6 +142,7 @@ class Comment_list(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
 #@api_view(['POST'])
 #def handle_friendrequest(request,format=None):
 #    queryset = Notify.objects.all()

@@ -27,14 +27,44 @@ urlpatterns = [
  	url(r'^', include('registration.backends.simple.urls')),
  	url(r'^(?P<username>[a-zA-Z0-9]+)/profile', views.profile, name="profile"),
 
-    url(r'^send_friendrequest$',views.send_friendrequest.as_view(),name='send_friendrequest'),
+    # url(r'^send_friendrequest$',views.send_friendrequest.as_view(),name='send_friendrequest'),
     #url(r'^view_profile/(?P<username>[a-zA-Z0-9]+)$', views.view_profile, name="view_profile"),
-    url(r'^posts/(?P<pk>[a-zA-Z0-9-_]+)/comments$',views.Comment_list.as_view(),name='comments'),
-    url(r'^author/posts/(?P<pk>[a-zA-Z0-9-_]+)$',views.Post_detail.as_view(),name='Post_detail'),
-    url(r'^author/posts$',views.Post_list.as_view(),name='Post_list'),
-    url(r'^author/(?P<pk>[a-zA-Z0-9]+)$',views.AuthorView.as_view(),name='author'),
 
-    url(r'^friendrequest$', views.handle_friendrequest.as_view(), name="handle_friendrequest"),
+
+    ### (START) APIspecify by
+    # https://github.com/Web-Applications-and-Architect-Group/CMPUT404-project-socialdistribution/blob/master/example-article.json
+    # --------------------------------
+
+    url(r'^service/posts$',
+        views.Post_list.as_view(), name='public_post_list'),
+    url(r'^service/posts/(?P<pk>[a-zA-Z0-9-_]+)$',
+        views.Post_detail.as_view(),name='a_single_post_detail'),
+    url(r'^service/posts/(?P<pk>[a-zA-Z0-9-_]+)/comments$',
+        views.Comment_list.as_view(),name='comments_in_a_post'),
+    url(r'^service/author/(?P<author_id>[a-zA-Z0-9-_]+)/posts$',
+        views.Post_list.as_view(), name='authenticated_user_visible_post_list_from_an_author'),
+    url(r'^service/author/posts$',
+        views.Post_list.as_view(), name='authenticated_user_visible_post_list'),
+
+    url(r'^service/author/(?P<author_id>[a-zA-Z0-9-_]+)/friends/$',
+        views.Post_list.as_view(), name='friend_inquiry'), #TODO
+    # url(r'^service/author/(?P<author_id1>[a-zA-Z0-9-_]+)/friends/<service2>/author/(?P<author_id2>[a-zA-Z0-9-_]+)$',
+    #     views.Post_list.as_view(), name='friend_inquiry_by_ids'), #TODO? Optional
+
+    url(r'^service/author/(?P<pk>[a-zA-Z0-9]+)$',
+        views.AuthorView.as_view(), name='author_profile'),
+    url(r'^service/friendrequest$',
+        views.handle_friendrequest.as_view(), name="make_friendrequest"),
+
+
+    # url(r'^author/posts/(?P<pk>[a-zA-Z0-9-_]+)$',views.Post_detail.as_view(),name='Post_detail'),
+    # url(r'^author/posts$',views.Post_list.as_view(),name='Post_list'),
+
+    ### (END) APIspecify by
+    # https://github.com/Web-Applications-and-Architect-Group/CMPUT404-project-socialdistribution/blob/master/example-article.json
+    # --------------------------------
+
+    # url(r'^friendrequest$', views.handle_friendrequest.as_view(), name="make_friendrequest"),
 
     url(r'^profile_old', views.profile_old, name="profile_old"),
     url(r'^create_post_html$', views.create_post_html, name="create_post_html"),
