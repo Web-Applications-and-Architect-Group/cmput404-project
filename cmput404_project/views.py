@@ -12,7 +12,7 @@ import uuid
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import mixins,generics, status,permissions
-from .serializers import AuthorSerializer,PostSerializer,CommentSerializer,PostPagination
+from .serializers import AuthorSerializer,PostSerializer,CommentSerializer,PostPagination,CommentPagination
 from rest_framework.decorators import api_view
 from .permissions import IsOwnerOrReadOnly
 
@@ -73,14 +73,14 @@ class Post_list(APIView):
         size = int(request.GET.get('size', 1))
         paginator = PostPagination()
         paginator.page_size = size
-        posts = Post.objects.all()
+        posts = Post.objects.all() #TODO
         result_posts = paginator.paginate_queryset(posts, request)
         for post in result_posts:
             comments = Comment.objects.filter(post=post).order_by('-published')[:5]
             post['comments'] = comments
             post['count'] = comments.count()
             post['size'] = size
-            post['next'] = post.origin + '/posts/' + str(post.id) + '/comments'
+            post['next'] = post.origin + 'service/posts/' + str(post.id) + '/comments'
         serializer = PostSerializer(result_posts, many=True)
         return paginator.get_paginated_response(serializer.data, size)
 
@@ -104,10 +104,23 @@ class Post_detail(APIView):
             raise Http404
         return post
 
-    def get(self,request,pk,format=None):
-        Post = self.get_object(pk)
-        serializer = PostSerializer(Post)
-        return Response(serializer.data)
+    def get(self,request,post_id,format=None):
+        size = 1
+        paginator = PostPagination()
+        paginator.page_size = size
+        posts = Post.objects.filter(pk=post_id)
+        result_posts = paginator.paginate_queryset(posts, request)
+        for post in result_posts:
+            comments = Comment.objects.filter(post=post).order_by('-published')[:5]
+            post['comments'] = comments
+            post['count'] = comments.count()
+            post['size'] = size
+            post['next'] = post.origin + 'service/posts/' + str(post.id) + '/comments'
+        serializer = PostSerializer(result_posts, many=True)
+        return paginator.get_paginated_response(serializer.data, size)
+        # Post = self.get_object(pk)
+        # serializer = PostSerializer(Post)
+        # return Response(serializer.data)
     def post(self,request,pk,format=None):
         Post = Post.objects.get(pk)
         serializer = PostSerializer(Post,data=request.data)
@@ -131,18 +144,30 @@ class Comment_list(APIView):
             post =  Post.objects.get(pk=pk)
         except Post.DoesNotExist:
             raise Http404
-        return post.comments
-    def get(self,request,pk,format=None):
-        Comments = self.get_object(pk)
-        serializer = CommentSerializer(Comments,many=True)
-        return Response(serializer.data)
+        return post
+        
+    def get(self,request,post_id,format=None):
+        post = self.get_object(post_id)
+
+        size = int(request.GET.get('size', 1))
+        paginator = CommentPagination()
+        paginator.page_size = size
+
+        Comments = Comment.objects.filter(post=post_id)
+        result_comments = paginator.paginate_queryset(Comments, request)
+
+        serializer = CommentSerializer(result_comments, many=True)
+        return paginator.get_paginated_response(serializer.data, size)
+        # Comments = self.get_object(pk)
+        # serializer = CommentSerializer(result_posts,many=True)
+        # return Response(serializer.data)
     def post(self,request,format=None):
         serializer = CommentSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+
 #@api_view(['POST'])
 #def handle_friendrequest(request,format=None):
 #    queryset = Notify.objects.all()

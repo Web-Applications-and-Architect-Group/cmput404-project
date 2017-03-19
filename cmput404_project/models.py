@@ -38,7 +38,7 @@ class Author(models.Model):
 
 def create_author(sender,instance,created,**kwargs):
     if created:
-        Author.objects.create(user=instance,displayName=instance.username,id=instance.username,url=HOST_NAME+"author/"+instance.username);
+        Author.objects.create(user=instance,displayName=instance.username,id=instance.username,url=HOST_NAME+"service/author/"+instance.username);
 
 post_save.connect(create_author,sender=User)
 
