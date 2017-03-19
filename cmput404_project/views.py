@@ -8,6 +8,8 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 import sys
 import json
+import httplib2
+import urllib
 import uuid
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -272,7 +274,20 @@ def send_friendrequest(request):
     data=request.data
     author = data["author"]
     friend = data["friend"]
-    author_seri
+    author_serializer = AuthorSerializer(author)
+    friend_serializer = AuthorSerializer(friend)
+    try:
+        requester = Author.objects.get(id=data["auhtor"]["id"])
+        new_friend = Friend.objects.create(requester=requester,requestee=data["friend"]["url"])
+        new_friend.save()
+
+        data["query"]="friendrequest"
+        body = urllib.urlencode(data)
+        h=httplib2.Http()
+        link = friend["url"]
+        respon,content = h.request(link,method="POST",body=body)
+    except Author.DoesNotExist:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 
