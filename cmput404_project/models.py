@@ -110,7 +110,7 @@ class Friend(models.Model):
     requester = models.ForeignKey(Author,on_delete=models.CASCADE,related_name="follow")
     requestee = models.URLField()
     def __str__(self):
-        return self.requester.username
+        return self.requester.url
 
 
 @python_2_unicode_compatible
@@ -126,6 +126,8 @@ class VisibileTo(models.Model):
     visibileTo = models.URLField()
     def __str__(self):
         return self.requestee.username
+
+
 
 
 @python_2_unicode_compatible
