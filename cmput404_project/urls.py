@@ -27,6 +27,8 @@ urlpatterns = [
  	url(r'^', include('registration.backends.simple.urls')),
  	url(r'^(?P<username>[a-zA-Z0-9]+)/profile', views.profile, name="profile"),
 	url(r'^(?P<username>[a-zA-Z0-9]+)/friendList', views.friendList, name="friendList"),
+	#url(r'^onePost',views.onePost, name="onePost"),
+	url(r'^(?P<post_id>[a-zA-Z0-9-]+)/onePost', views.onePost, name="onePost"),
 
 	#url(r'^friendList', views.friendList, name="friendList"),
 

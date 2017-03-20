@@ -514,3 +514,17 @@ def get_object_by_uuid_or_404(model, uuid_pk):
 def friendList(request,username):
 	context={'username':username}
 	return render(request,'friend/friendList.html',context)
+
+def onePost(request,post_id):
+	post = Post.objects.get(id = post_id)
+	user = post.author.user
+	result = ""	
+	for category in post.categories.all():
+		result += "#"+ category.category + "  "
+	context = {'post':post, 'user': user, 'category':result}
+	return render(request,'post/onePost.html',context)
+
+
+
+
+

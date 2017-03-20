@@ -33,7 +33,7 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Open Sans", sans-serif}
     <button class="w3-button w3-padding-large" title="Edit Profile"><i class="fa fa-user"></i><span class="w3-badge w3-right w3-small w3-green"></span></button>
     <div class="w3-dropdown-content w3-card-4 w3-bar-block" style="width:180px;font-size:80%">
       <a href="{% url 'self' %}" class="w3-bar-item w3-button">My Page</a>
-      <a href="#" class="w3-bar-item w3-button">Edit Profile</a>
+      <a href=" {% url 'profile' request.user.username %} " class="w3-bar-item w3-button">Edit Profile</a>
     </div>
   </div>
 
