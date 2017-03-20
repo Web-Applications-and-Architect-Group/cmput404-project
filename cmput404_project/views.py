@@ -280,28 +280,6 @@ class handle_friendrequest(APIView):
             response["message"] = "Friend request sent"
             return Response(response, status=status.HTTP_200_OK)
 
-<<<<<<< HEAD
-# @login_required
-# def send_friendrequest(request):
-#     data=request.data
-#     author = data["author"]
-#     friend = data["friend"]
-#     author_serializer = AuthorSerializer(author)
-#     friend_serializer = AuthorSerializer(friend)
-#     try:
-#         requester = Author.objects.get(id=data["auhtor"]["id"])
-#         new_friend = Friend.objects.create(requester=requester,requestee=data["friend"]["url"])
-#         new_friend.save()
-
-#         data["query"]="friendrequest"
-#         body = urllib.urlencode(data)
-#         h=httplib2.Http()
-#         link = friend["url"]
-#         respon,content = h.request(link,method="POST",body=body)
-#     except Author.DoesNotExist:
-#         return Response(status=status.HTTP_400_BAD_REQUEST)
-=======
-
 class Send_Friendrequest(LoginRequiredMixin, View):
     queryset = Notify.objects.all()
 
@@ -344,7 +322,7 @@ class Send_Friendrequest(LoginRequiredMixin, View):
         return HttpResponse(r, status=r.status_code)
 
 
->>>>>>> f3b100884c7892ca6bbb1ad1c2423f25b5a9d720
+
 
 
 
