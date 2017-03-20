@@ -3,10 +3,12 @@
 <html>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="{% static 'css/bootstrap-theme.min.css' %}">
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/3/w3.css">
 <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-blue-grey.css">
 <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Open+Sans'>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
 
 <!-- Trigger Modal for post -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -16,6 +18,10 @@
 <style>
 html,body,h1,h2,h3,h4,h5 {font-family: "Open Sans", sans-serif}
 </style>
+<head>
+<title>White Board</title>
+</head>
+
 <body class="w3-theme-l5">
 
 <!-- Navbar -->
@@ -48,29 +54,8 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Open Sans", sans-serif}
 
 <!-- Navbar on small screens -->
 
-
-<!-- Page Container -->
-<div class="w3-container w3-content" style="max-width:1400px;margin-top:80px;margin-left:10em">
-  <!-- The Grid -->
-  <div class="w3-row">
-    <!-- Left Column -->
-
-
-    <!-- Middle Column -->
-    <div class="w3-col m7" style="width:55em; margin-top:-1em">
-
-
-    <!-- End Middle Column -->
-    </div>
-
-    <!-- Right Column -->
-
-
-  <!-- End Grid -->
-  </div>
-
-<!-- End Page Container -->
-</div>
+{% block content %}
+{% endblock %}
 
 
 <!-- Trigger the modal with a button -->
@@ -125,18 +110,12 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Open Sans", sans-serif}
 
   </div>
 </div>
-<br>
+
 
 <!-- Footer -->
-
-
-<footer class="w3-container w3-theme-d5" style="position:relative; bottom:0; width:100%">
+<footer class="footer w3-container w3-theme-d5">
   <p>Powered by <a href="https://github.com/Web-Applications-and-Architect-Group/cmput404-project" target="_blank">CMPUT404W17T04</a></p>
 </footer>
-
-
-{% block content %}
-{% endblock %}
 <script>
 // Accordion
 function myFunction(id) {

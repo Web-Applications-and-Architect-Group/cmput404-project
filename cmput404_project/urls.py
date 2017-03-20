@@ -26,6 +26,9 @@ from rest_framework.urlpatterns import format_suffix_patterns
 urlpatterns = [
  	url(r'^', include('registration.backends.simple.urls')),
  	url(r'^(?P<username>[a-zA-Z0-9]+)/profile', views.profile, name="profile"),
+	url(r'^(?P<username>[a-zA-Z0-9]+)/friendList', views.friendList, name="friendList"),
+
+	#url(r'^friendList', views.friendList, name="friendList"),
 
     url(r'^send_friendrequest$',views.Send_Friendrequest.as_view(),name='send_friendrequest'),  # TODO need to add authetication
     #url(r'^view_profile/(?P<username>[a-zA-Z0-9]+)$', views.view_profile, name="view_profile"),
@@ -76,7 +79,7 @@ urlpatterns = [
     url(r'^accept_friend/$', views.accept_friend, name="accept_friend"),
     url(r'^api_list_my_friend_request/$', views.list_my_friend_request, name="list_my_friend_request"),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-
+    
     url(r'^self$', views.selfPage, name="self"),
 
 ]

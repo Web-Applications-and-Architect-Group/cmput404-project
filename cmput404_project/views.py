@@ -381,11 +381,12 @@ def create_post(request):
     """
     if request.method == "POST":
         user = User.objects.get(id=request.user.id)
+	author = Author.objects.get(user = user)
         visibility = request.POST['post_type']
         post_text = request.POST['POST_TEXT']
         post_type = request.POST['content_type']
 
-        new_post = Post.create(request.user,post_text,can_view, post_type)
+        new_post = Post.create(author, post_text, visibility, post_type)
         '''
         form = ImageForm(request.POST,request.FILES)
         if form.is_valid():
@@ -393,7 +394,7 @@ def create_post(request):
         '''
         new_post.save()
 
-    return HttpResponseRedirect(reverse('profile'))
+    return HttpResponseRedirect(reverse('home'))
 
     # new_post = Post.create(request.user,"a new one")
     # new_post.save()
@@ -550,3 +551,7 @@ def get_object_by_uuid_or_404(model, uuid_pk):
     except Exception, e:
         raise Http404(str(e))
     return get_object_or_404(model, pk=uuid_pk)
+
+def friendList(request,username):
+	context={'username':username}
+	return render(request,'friend/friendList.html',context)
