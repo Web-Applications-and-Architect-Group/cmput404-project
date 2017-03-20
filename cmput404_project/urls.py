@@ -43,7 +43,7 @@ urlpatterns = [
         views.Public_Post_List.as_view(), name='public_post_list'),        # Allow [GET]. GET Done
 
     url(r'^service/posts/(?P<post_id>[a-zA-Z0-9-_]+)$',
-        views.Post_detail.as_view(),name='a_single_post_detail'),   # Allow [GET]. GET Done # TODO need to add authetication check?
+        views.Post_Detail.as_view(),name='a_single_post_detail'),   # Allow [GET]. GET Done # TODO need to add authetication check?
 
     url(r'^service/posts/(?P<post_id>[a-zA-Z0-9-_]+)/comments$',
         views.Comment_list.as_view(),name='comments_in_a_post'),    # Allow [GET, POST, PUT]. GET Done # TODO need to add authetication check?
