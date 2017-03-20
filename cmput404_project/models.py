@@ -30,7 +30,7 @@ class Author(models.Model):
     displayName = models.CharField(max_length=200)
     id = models.CharField(max_length=200,primary_key=True)
     url = models.URLField()
-    user = models.ForeignKey(User,on_delete=models.CASCADE,related_name='profile')
+    user = models.OneToOneField(User,on_delete=models.CASCADE,related_name='profile',blank=True)
 
 
     def __str__(self):
@@ -41,7 +41,7 @@ def create_author(sender,instance,created,**kwargs):
         Author.objects.create(user=instance,displayName=instance.username,id=instance.username,url=HOST_NAME+"service/author/"+instance.username);
 
 post_save.connect(create_author,sender=User)
-
+    
 @python_2_unicode_compatible
 class Post(models.Model):
     #================  https://docs.djangoproject.com/en/1.10/ref/models/fields/    idea from this page
@@ -53,7 +53,7 @@ class Post(models.Model):
         (4, 'SERVERONLY'),
     ]
 
-    id=models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id=models.UUIDField(primary_key=True, default=uuid.uuid4)
     visibility = models.IntegerField(choices=authority, default=0)
     contentType = models.IntegerField(choices=accept, default=0)
     description = models.CharField(max_length=100)

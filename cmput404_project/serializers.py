@@ -41,6 +41,7 @@ class PostSerializer(serializers.ModelSerializer):
         model = Post
         fields = ('title','source','origin','description','contentType','content','author','categories','count','size','next','comments','published','id','visibility','visibileTo','unlisted')
 
+    
     def get_contentType(self,obj):
     	return obj.get_contentType_display()
 
