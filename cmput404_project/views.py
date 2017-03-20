@@ -1,6 +1,8 @@
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, Http404
+from django.views import View
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 import os
 from .models import  Author,Post, friend_request, Comment,Notify,Friend
 from .forms import ProfileForm,ImageForm
@@ -9,9 +11,10 @@ from django.core.urlresolvers import reverse
 import sys
 import json
 import uuid
+import requests
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import mixins,generics, status,permissions
+from rest_framework import mixins,generics, status, permissions
 from .serializers import AuthorSerializer,PostSerializer,CommentSerializer,PostPagination,CommentPagination
 from rest_framework.decorators import api_view
 from .permissions import IsOwnerOrReadOnly
@@ -256,6 +259,7 @@ class Comment_list(APIView):
 #        new_notify.save()
 
 class handle_friendrequest(APIView):
+    #TODO get rid of redundent Notify
     queryset = Notify.objects.all()
     def post(self,request,format=None):
         data = request.data
@@ -274,12 +278,49 @@ class handle_friendrequest(APIView):
             response["message"] = "Friend request sent"
             return Response(response, status=status.HTTP_200_OK)
 
-@login_required
-def send_friendrequest(request):
-    data=request.data
-    author = data["author"]
-    friend = data["friend"]
-    author_seri
+
+class Send_Friendrequest(LoginRequiredMixin, View):
+    queryset = Notify.objects.all()
+
+    def get_object(self, model, pk):
+        try:
+            result =  model.objects.get(pk=pk)
+        except model.DoesNotExist:
+            raise Http404
+        return result
+
+    def post(self, request):
+        # get the friend on remote server
+        r = requests.get('http://127.0.0.1:8000/service/author/diqiu') # for test
+        # r = requests.get(request.friend_url)
+        remote_friend = r.json()
+
+        # get the author on our server
+        user = self.get_object(User, request.user.id)
+        author = Author.objects.get(id=user.username)
+        serializer = AuthorSerializer(author)
+
+        # combines the info
+        remote_request = OrderedDict()
+        remote_request["query"] = "friendrequest"
+        remote_request["author"] = serializer.data
+        remote_request["friend"] = r.json()
+
+        # send friend request to remote server
+        # r = requests.post(remote_friend["host"]+'service/friendrequest', data = remote_request)
+        r = requests.post(remote_friend["host"]+'service/friendrequest', data = remote_request)
+
+        # store the follow relationship if success
+        # print(r.status_code)
+        if (r.status_code==200):
+            new_friend = Notify.objects.create(requestee=remote_friend["url"],requester=author)
+            new_friend.save()
+
+        # return HttpResponse(json.dumps(serializer.data), status=status.HTTP_200_OK)
+        # return HttpResponse(json.dumps(remote_request), status=status.HTTP_200_OK)
+        return HttpResponse(r, status=r.status_code)
+
+
 
 
 
