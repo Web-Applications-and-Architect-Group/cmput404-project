@@ -62,7 +62,7 @@ class Post(models.Model):
     source = models.URLField()
     origin = models.URLField()
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
-    content = models.CharField(max_length=200)
+    content = models.TextField(max_length=200)
     published = models.DateTimeField(auto_now =True)
     #categories = models.TextField(null=True)
     #Extra material :  https://docs.djangoproject.com/en/1.10/ref/models/fields/UUIDField
@@ -109,6 +109,12 @@ class Post(models.Model):
 class Friend(models.Model):
     requester = models.ForeignKey(Author,on_delete=models.CASCADE,related_name="follow")
     requestee = models.URLField()
+
+    @classmethod
+    def create(cls, requester, requestee):
+        new_post = cls(requester=requester, requestee=requestee)
+        return new_post
+
     def __str__(self):
         return self.requester.url
 
@@ -117,8 +123,14 @@ class Friend(models.Model):
 class Notify(models.Model):
     requestee = models.ForeignKey(Author,on_delete=models.CASCADE,related_name="notify")
     requester = models.URLField()
+
+    @classmethod
+    def create(cls, requester, requestee):
+        new_post = cls(requester=requester, requestee=requestee)
+        return new_post
+
     def __str__(self):
-        return self.requestee.username
+        return self.requestee.displayName
 
 @python_2_unicode_compatible
 class VisibileTo(models.Model):

@@ -52,7 +52,7 @@ urlpatterns = [
 
     url(r'^service/author/(?P<pk>[a-zA-Z0-9]+)$',                   # Allow [GET]. GET partial Done
         views.AuthorView.as_view(), name='author_profile'),
-    url(r'^service/friendrequest$',                                 # Allow [POST, PUT].
+    url(r'^service/friendrequest$',                                 # Allow [POST]. POST Done
         views.handle_friendrequest.as_view(), name="make_friendrequest"),
     ### (END) API specify by
     # https://github.com/Web-Applications-and-Architect-Group/CMPUT404-project-socialdistribution/blob/master/example-article.json

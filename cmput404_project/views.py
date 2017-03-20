@@ -3,7 +3,7 @@ from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 import os
 from .models import  Author,Post, friend_request, Comment,Notify,Friend
-from .forms import ProfileForm,ImageForm
+from .forms import ProfileForm,ImageForm,PostForm
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 import sys
@@ -17,6 +17,7 @@ from rest_framework import mixins,generics, status,permissions
 from .serializers import AuthorSerializer,PostSerializer,CommentSerializer,PostPagination,CommentPagination
 from rest_framework.decorators import api_view
 from .permissions import IsOwnerOrReadOnly
+from collections import OrderedDict
 
 class AuthorView(APIView):
     queryset = Author.objects.all()
@@ -117,7 +118,7 @@ class All_Visible_Post_List_From_An_Author_To_User(APIView):
         else:
             posts = all_posts.filter(visibility=0)
         """
-        
+
         result_posts = paginator.paginate_queryset(posts, request)
         for post in result_posts:
             comments = Comment.objects.filter(post=post).order_by('-published')[:5]
@@ -267,27 +268,33 @@ class handle_friendrequest(APIView):
             new_notify = Notify.objects.create(requestee=friend,requester=data["author"]["url"])
             new_notify.save()
         except Author.DoesNotExist:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            raise Http404
+        else:
+            response = OrderedDict()
+            response["query"] = "friendrequest"
+            response["success"] = True
+            response["message"] = "Friend request sent"
+            return Response(response, status=status.HTTP_200_OK)
 
-@login_required
-def send_friendrequest(request):
-    data=request.data
-    author = data["author"]
-    friend = data["friend"]
-    author_serializer = AuthorSerializer(author)
-    friend_serializer = AuthorSerializer(friend)
-    try:
-        requester = Author.objects.get(id=data["auhtor"]["id"])
-        new_friend = Friend.objects.create(requester=requester,requestee=data["friend"]["url"])
-        new_friend.save()
+# @login_required
+# def send_friendrequest(request):
+#     data=request.data
+#     author = data["author"]
+#     friend = data["friend"]
+#     author_serializer = AuthorSerializer(author)
+#     friend_serializer = AuthorSerializer(friend)
+#     try:
+#         requester = Author.objects.get(id=data["auhtor"]["id"])
+#         new_friend = Friend.objects.create(requester=requester,requestee=data["friend"]["url"])
+#         new_friend.save()
 
-        data["query"]="friendrequest"
-        body = urllib.urlencode(data)
-        h=httplib2.Http()
-        link = friend["url"]
-        respon,content = h.request(link,method="POST",body=body)
-    except Author.DoesNotExist:
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+#         data["query"]="friendrequest"
+#         body = urllib.urlencode(data)
+#         h=httplib2.Http()
+#         link = friend["url"]
+#         respon,content = h.request(link,method="POST",body=body)
+#     except Author.DoesNotExist:
+#         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 
@@ -341,31 +348,47 @@ def create_post_html(request):
 
 
 
+# @login_required
+# def create_post(request):
+#     """
+#     Create new post view
+#     """
+#     if request.method == "POST":
+#         user = User.objects.get(id=request.user.id)
+#         visibility = request.POST['post_type']
+#         post_text = request.POST['POST_TEXT']
+#         post_type = request.POST['content_type']
+
+#         new_post = Post.create(request.user,post_text,can_view, post_type)
+#         '''
+#         form = ImageForm(request.POST,request.FILES)
+#         if form.is_valid():
+#             new_post.img = form.cleaned_data['image']
+#         '''
+#         new_post.save()
+
+#     return HttpResponseRedirect(reverse('profile'))
+
 @login_required
 def create_post(request):
     """
     Create new post view
     """
     if request.method == "POST":
-        user = User.objects.get(id=request.user.id)
-        visibility = request.POST['post_type']
-        post_text = request.POST['POST_TEXT']
-        post_type = request.POST['content_type']
-
-        new_post = Post.create(request.user,post_text,can_view, post_type)
-        '''
-        form = ImageForm(request.POST,request.FILES)
+        form = PostForm(request.POST)
         if form.is_valid():
-            new_post.img = form.cleaned_data['image']
-        '''
-        new_post.save()
+            new_post = form.save(commit=False)
+            author_X = Author.objects.get(user=request.user)
+            new_post.author = author_X
+            new_post.save()
+            new_post.source = "http://http://127.0.0.1:8000/service/posts/%s" %(new_post.id)
+            new_post.origin = "http://http://127.0.0.1:8000/service/posts/%s" %(new_post.id)
+            new_post.save()
+            return HttpResponseRedirect(reverse('home'))
+        else:
+            form = PostForm()
+    return render(request,'/',{'form': form})
 
-    return HttpResponseRedirect(reverse('profile'))
-
-    # new_post = Post.create(request.user,"a new one")
-    # new_post.save()
-
-    # return HttpResponseRedirect(reverse('profile'))
 @login_required
 def manage_post(request):
     """
@@ -378,23 +401,35 @@ def manage_post(request):
 
     return render(request,'post/manage_post.html',{'post':post, 'post_type2':post_type})
 
-
 @login_required
-def update_post(request):
-    post = Post.objects.get(post_id=request.POST['post_id'])
-    new_post_text = request.POST['post_text']
-    new_can_view = request.POST['post_type']
-    new_post_type = request.POST['content_type']
-    post.post_text = new_post_text
-    post.can_view = new_can_view
-    post.post_type = new_post_type
-    post.save()
+def update_post(request, pk):
+    post = get_object_or_404(Post, pk=pk)
+    if request.method == "POST":
+        form = PostForm(request.POST, instance=post)
+        if form.is_valid():
+            post = form.save(commit=False)
+            post.save()
+            return HttpResponseRedirect(reverse('home'))
+    else:
+        form = PostForm(instance=post)
+    return render(request,'/',{'form': form})
 
-    post_type2 = request.POST['post_type2']
-    # print post_type2
-    context = postContent(post_type2, request)
-    return render(request, 'stream/mystream.html', context)
-    #return HttpResponseRedirect(reverse('ViewMyStream'))
+# @login_required
+# def update_post(request):
+#     post = Post.objects.get(post_id=request.POST['post_id'])
+#     new_post_text = request.POST['post_text']
+#     new_can_view = request.POST['post_type']
+#     new_post_type = request.POST['content_type']
+#     post.post_text = new_post_text
+#     post.can_view = new_can_view
+#     post.post_type = new_post_type
+#     post.save()
+
+#     post_type2 = request.POST['post_type2']
+#     # print post_type2
+#     context = postContent(post_type2, request)
+#     return render(request, 'stream/mystream.html', context)
+#     #return HttpResponseRedirect(reverse('ViewMyStream'))
 
 @login_required
 def comment(request):
