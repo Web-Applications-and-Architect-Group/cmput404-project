@@ -180,7 +180,7 @@ class Comment(models.Model):
 
     @classmethod
     def create(cls, user, comment_text, post):
-        new_comment = cls(author=user, comment_text=comment_text, post_id=post, comment_date=timezone.now())
+        new_comment = cls(author=user, comment=comment_text, post=post)
 
         return new_comment
 

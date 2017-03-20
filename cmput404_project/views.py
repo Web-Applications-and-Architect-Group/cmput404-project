@@ -56,16 +56,31 @@ def home(request):
     form = PostForm()
     #post = Post.objects.filter(author = request.user).order_by('-pub_datetime')
     post= Post.objects.filter(visibility=0).order_by('-published')
-    context = { 'posts': post , 'comments': comments,'form': form}
+    if(request.user):
+        try:
+            author = Author.objects.get(id=request.user.username)
+        except Author.DoesNotExist:
+            author=None
+    else:
+        author = None
+    context = { 'posts': post , 'comments': comments,'form': form,'author':author}
     return render(request,'home.html',context)
 
 def selfPage(request):
     comments = Comment.objects.all()
 
     #post = Post.objects.filter(author = request.user).order_by('-pub_datetime')
-    post =Post.objects.all()
-
-    context = { 'posts': post , 'comments': comments}
+    post_author = Author.objects.get(id=request.user.username)
+    post =Post.objects.filter(author=post_author).order_by('-published')
+    if(request.user):
+        try:
+            author = Author.objects.get(id=request.user.username)
+        except Author.DoesNotExist:
+            author=None
+    else:
+        author = None
+    form = PostForm()
+    context = { 'posts': post , 'comments': comments,'author':author,'form':form}
     return render(request, 'self.html', context)
 
 class Post_list(APIView):
@@ -463,7 +478,7 @@ def update_post(request, pk):
 
 @login_required
 def comment(request):
-    author = User.objects.get(id = request.user.id)
+    author = Author.objects.get(displayName = request.user.username)
     comment_text = request.GET['comment_text']
     post_id= request.GET['post_id']
     post = Post.objects.get(id = post_id)
@@ -471,20 +486,21 @@ def comment(request):
     new_comment = Comment.create(author, comment_text, post)
     new_comment.save()
 
-    post_type = request.GET['post_type']
+    #post_type = request.GET['post_type']
+    post_type = post.contentType
     context= postContent(post_type,request)
 
-    return render(request, 'stream/mystream.html', context)
+    return render(request, 'home.html', context)
     #return HttpResponseRedirect(reverse('ViewMyStream'), kwargs={'post_type':post_type})
 
 def postContent(post_type,request):
     comments = Comment.objects.all()
 
     if str(post_type)== "my_post":
-            post = Post.objects.filter(author = request.user).order_by('-pub_datetime')
+            post = Post.objects.filter(author = request.user).order_by('-published')
 
     elif str(post_type)=="public_post":
-        post= Post.objects.filter(can_view=0).order_by('-pub_datetime')
+        post= Post.objects.filter(visibility=0).order_by('-published')
 
     elif str(post_type) == "friend_post":
         myFriends= Profile.objects.get(user = request.user).friends.all()
@@ -494,10 +510,10 @@ def postContent(post_type,request):
             friend_instance= User.objects.get(username=friend)
             friendPost = posts.filter(author = friend_instance)
             for i in friendPost:
-                if (i.can_view == 0) or (i.can_view==1):
+                if (i.visibility == 0) or (i.visibility==1):
                     post.append(i)
     else:
-        post= Post.objects.filter(can_view=0).order_by('-pub_datetime')
+        post= Post.objects.filter(visibility=0).order_by('-published')
 
     context = { 'posts': post , 'comments': comments, 'post_type': post_type}
 
@@ -505,7 +521,7 @@ def postContent(post_type,request):
 
 @login_required
 def ViewMyStream(request):
-    Posts = Post.objects.order_by('-pub_datetime')
+    Posts = Post.objects.order_by('-published')
     comments = Comment.objects.all()
 
     post_type = request.GET['post_type']
