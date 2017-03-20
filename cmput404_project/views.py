@@ -10,8 +10,8 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 import sys
 import json
-import httplib2
-import urllib
+# import httplib2
+# import urllib
 import uuid
 import requests
 from rest_framework.views import APIView
@@ -49,39 +49,6 @@ class AuthorView(APIView):
     def put(self,request,pk,format=None):
         return self.post(request,pk,format)
 
-
-
-def home(request):
-    comments = Comment.objects.all()
-    form = PostForm()
-    #post = Post.objects.filter(author = request.user).order_by('-pub_datetime')
-    post= Post.objects.filter(visibility=0).order_by('-published')
-    if(request.user):
-        try:
-            author = Author.objects.get(id=request.user.username)
-        except Author.DoesNotExist:
-            author=None
-    else:
-        author = None
-    context = { 'posts': post , 'comments': comments,'form': form,'author':author}
-    return render(request,'home.html',context)
-
-def selfPage(request):
-    comments = Comment.objects.all()
-
-    #post = Post.objects.filter(author = request.user).order_by('-pub_datetime')
-    post_author = Author.objects.get(id=request.user.username)
-    post =Post.objects.filter(author=post_author).order_by('-published')
-    if(request.user):
-        try:
-            author = Author.objects.get(id=request.user.username)
-        except Author.DoesNotExist:
-            author=None
-    else:
-        author = None
-    form = PostForm()
-    context = { 'posts': post , 'comments': comments,'author':author,'form':form}
-    return render(request, 'self.html', context)
 
 class Post_list(APIView):
 
@@ -275,7 +242,7 @@ class Comment_list(APIView):
 #        new_notify = Notify.objects.create(friend,data[author][url])
 #        new_notify.save()
 
-class handle_friendrequest(APIView):
+class Friendrequest_Handler(APIView):
     #TODO get rid of redundent Notify
     queryset = Notify.objects.all()
     def post(self,request,format=None):
@@ -295,7 +262,45 @@ class handle_friendrequest(APIView):
             response["message"] = "Friend request sent"
             return Response(response, status=status.HTTP_200_OK)
 
+
+class Friend_Inquiry_Handler(APIView):
+    """
+    return all friends with a given author.
+    """
+    queryset = Friend.objects.all()
+
+    def post(self,request, author_id, format=None):
+        data = request.data
+
+        if not (data["query"] == "friends"):
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        if not (data["author"] == author_id):
+            return Response({
+                "success": False,
+                "message":"author id in body is different then author id in url"
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        inquiry_friend_list = data["authors"]
+        result = []
+        for friend_id in inquiry_friend_list:
+            try:
+                queryset = Friend.objects.filter(requester=author_id)
+                queryset.get(requestee_id=friend_id)
+            except Friend.DoesNotExist:
+                continue
+            else:
+                result.append(friend_id)
+
+        response = data
+        response["authors"] = result
+
+        return Response(response, status=status.HTTP_200_OK)
+
+
 class Send_Friendrequest(LoginRequiredMixin, View):
+    """
+    send friend request to remote server or our own server
+    """
     queryset = Notify.objects.all()
 
     def get_object(self, model, pk):
@@ -329,7 +334,7 @@ class Send_Friendrequest(LoginRequiredMixin, View):
         # store the follow relationship if success
         # print(r.status_code)
         if (r.status_code==200):
-            new_friend = Notify.objects.create(requestee=remote_friend["url"],requester=author)
+            new_friend = Friend.objects.create(requestee=remote_friend["url"], requestee_id=remote_friend["id"], requester=author)
             new_friend.save()
 
         # return HttpResponse(json.dumps(serializer.data), status=status.HTTP_200_OK)
@@ -343,6 +348,37 @@ class Send_Friendrequest(LoginRequiredMixin, View):
 
 
 
+def home(request):
+    comments = Comment.objects.all()
+    form = PostForm()
+    #post = Post.objects.filter(author = request.user).order_by('-pub_datetime')
+    post= Post.objects.filter(visibility=0).order_by('-published')
+    if(request.user):
+        try:
+            author = Author.objects.get(id=request.user.username)
+        except Author.DoesNotExist:
+            author=None
+    else:
+        author = None
+    context = { 'posts': post , 'comments': comments,'form': form,'author':author}
+    return render(request,'home.html',context)
+
+def selfPage(request):
+    comments = Comment.objects.all()
+
+    #post = Post.objects.filter(author = request.user).order_by('-pub_datetime')
+    post_author = Author.objects.get(id=request.user.username)
+    post =Post.objects.filter(author=post_author).order_by('-published')
+    if(request.user):
+        try:
+            author = Author.objects.get(id=request.user.username)
+        except Author.DoesNotExist:
+            author=None
+    else:
+        author = None
+    form = PostForm()
+    context = { 'posts': post , 'comments': comments,'author':author,'form':form}
+    return render(request, 'self.html', context)
 
 
 @login_required
@@ -606,13 +642,8 @@ def friendList(request,username):
 def onePost(request,post_id):
 	post = Post.objects.get(id = post_id)
 	user = post.author.user
-	result = ""	
+	result = ""
 	for category in post.categories.all():
 		result += "#"+ category.category + "  "
 	context = {'post':post, 'user': user, 'category':result}
 	return render(request,'post/onePost.html',context)
-
-
-
-
-

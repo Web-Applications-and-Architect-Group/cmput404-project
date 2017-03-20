@@ -109,10 +109,11 @@ class Post(models.Model):
 class Friend(models.Model):
     requester = models.ForeignKey(Author,on_delete=models.CASCADE,related_name="follow")
     requestee = models.URLField()
+    requestee_id = models.CharField(max_length=200)
 
     @classmethod
-    def create(cls, requester, requestee):
-        new_post = cls(requester=requester, requestee=requestee)
+    def create(cls, requester, requestee, requestee_id):
+        new_post = cls(requester=requester, requestee=requestee, requestee_id=requestee_id)
         return new_post
 
     def __str__(self):
