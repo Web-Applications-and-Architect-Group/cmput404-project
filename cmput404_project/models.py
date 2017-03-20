@@ -62,7 +62,7 @@ class Post(models.Model):
     source = models.URLField()
     origin = models.URLField()
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
-    content = models.CharField(max_length=200)
+    content = models.TextField(max_length=200)
     published = models.DateTimeField(auto_now =True)
     #categories = models.TextField(null=True)
     #Extra material :  https://docs.djangoproject.com/en/1.10/ref/models/fields/UUIDField
@@ -180,7 +180,7 @@ class Comment(models.Model):
 
     @classmethod
     def create(cls, user, comment_text, post):
-        new_comment = cls(author=user, comment_text=comment_text, post_id=post, comment_date=timezone.now())
+        new_comment = cls(author=user, comment=comment_text, post=post)
 
         return new_comment
 

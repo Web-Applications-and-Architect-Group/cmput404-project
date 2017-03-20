@@ -1,13 +1,43 @@
 {%extends 'base.html' %}
 {% block content %}
 
-<div class="list-group">
-  <a href="#" class="list-group-item active">Cras justo odio
-  </a>
-  <a href="#" class="list-group-item">Dapibus ac facilisis in</a>
-  <a href="#" class="list-group-item">Morbi leo risus</a>
-  <a href="#" class="list-group-item">Porta ac consectetur ac</a>
-  <a href="#" class="list-group-item">Vestibulum at eros</a>
+<div class= "pull-center">
+<div class="list-group col-md-2">
+</div>
+<div class="list-group col-md-3">
+  <h3 class="text-center"> Friends</h3>
+  <a href="#" class="list-group-item ">Cras justo odio 
+	<button type="button" class="btn btn-primary btn-xs pull-right">
+	<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Followed</button></a>
+
+    <a href="#" class="list-group-item ">Cras justo odio 
+	<button type="button" class="btn btn-success btn-xs pull-right">
+	<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>Follow</button></a>
+</div>
+   
+<div class="list-group col-md-3">
+  <h3 class="text-center"> Friend Request</h3>
+  <a href="#" class="list-group-item ">Cras justo odio 
+
+	<button type="button" class="btn btn-success btn-xs pull-right">
+	<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Accept</button></a>
+
+
+
+</div>
+
+<div class="list-group col-md-3">
+  <h3 class="text-center"> Followed</h3>
+  <a href="#" class="list-group-item ">Cras justo odio 
+	<button type="button" class="btn btn-primary btn-xs pull-right">
+	<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Followed</button></a>
+
+    <a href="#" class="list-group-item ">Cras justo odio 
+	<button type="button" class="btn btn-success btn-xs pull-right">
+	<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>Follow</button></a>
+
+</div>
+
 </div>
 
 {% endblock %}

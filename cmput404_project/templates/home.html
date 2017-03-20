@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 
+
 {% block content %}
 <!-- Page Container -->
 <div class="w3-container w3-content" style="max-width:1400px;margin-top:80px;margin-left:10em">
@@ -11,18 +12,18 @@
       <div class="w3-card-2 w3-round w3-white">
         <div class="w3-container">
          <h4 class="w3-center">My Profile</h4>
-         <p class="w3-center"><img src="/w3images/avatar3.png" class="w3-circle" style="height:106px;width:106px" alt="Avatar"></p>
+         <p class="w3-center"><img src="{{author.img.url}}" class="w3-circle" style="height:106px;width:106px" alt="Avatar"></p>
          <hr>
-         <p><i class="fa fa-envelope fa-fw w3-margin-right w3-text-theme"></i>aaa@ualberta.ca</p>
-         <p><i class="fa fa-github fa-fw w3-margin-right w3-text-theme"></i>aaaa</p>
-         <p><i class="fa fa-pencil fa-fw w3-margin-right w3-text-theme"></i>bio</p>
+         <p><i class="fa fa-envelope fa-fw w3-margin-right w3-text-theme"></i>{{author.displayName}}</p>
+         <p><i class="fa fa-github fa-fw w3-margin-right w3-text-theme"></i>{{author.github}}</p>
+         <p><i class="fa fa-pencil fa-fw w3-margin-right w3-text-theme"></i>{{author.bio}}</p>
         </div>
       </div>
       <br>
       <div class="w3-card-2 w3-round w3-white w3-center">
         <div class="w3-container">
           <p>Friend Request</p>
-          <img src="/w3images/avatar6.png" alt="Avatar" style="width:50%"><br>
+          <img  src="{{ post.author.profile.img.url }}" alt="Avatar" style="width:50%"><br>
           <span>Jane Doe</span>
           <div class="w3-row w3-opacity">
             <div class="w3-half">
@@ -51,21 +52,13 @@
       <div class="w3-container w3-card-2 w3-white w3-round w3-margin"><br>
         <span class="w3-right w3-opacity">{{post.published}}</span>
         <h3>
-        {% if post.author.profile.photo %}
-
-            <img alt="user photo" src="{{ STATIC_URL }}/users/{{user.id}}/{{profile.photo }}" >
-        {% else %}
-            <img alt="user photo" src="{{ post.author.profile.img.url }}" width = "40" height = "40">
-        {% endif %}
-
-        {{ post.author }}</h3>
+        <img alt="user photo" class="img-rounded" height=48 width=48 src="{{ post.author.img.url }}" >
+        <a href="{% url 'profile' post.author.user.username %}" >{{ post.author }}</a></h3>
+        <span>Title:    </span><a href="{% url 'onePost' post.id %}" > {{ post.title }}</a></br></br>
+        <span>Description:    </span>{{ post.description }}
         <hr class="w3-clear">
-
-
         <li>  </br>
-
-              {{ post.description }}</br></br>
-
+        <span>Content:    </span>{{ post.content }}</br></br>
         <div class="w3-row-padding" style="margin:0 -16px">
           <div class="w3-half">
             <img src="/w3images/lights.jpg" style="width:100%" alt="Northern Lights" class="w3-margin-bottom">
@@ -78,8 +71,8 @@
       <div style="text-align:left">
           {% for comment in comments %}
 
-              {% if comment.post_id == post%}
-                  comment by {{comment.author}}: {{comment.comment_text}} ({{comment.comment_date}})</br>
+              {% if comment.post == post%}
+                  comment by {{comment.author}}: {{comment.comment}} ({{comment.published}})</br>
               {%endif%}
 
           {% endfor %}
@@ -89,24 +82,24 @@
           <input hidden="hidden" name="github" value = "{{user.profile.github}}" id="githubID"/>
               {% csrf_token %}
                 <input style= "width:80%" name="comment_text"/>
-                <input hidden="hidden" name="post_id" value = "{{post.post_id }}"/>
-                <input hidden="hidden" name="content_type" value = "{{content_type}}"/>
+                <input hidden="hidden" name="post_id" value = "{{post.id }}"/>
+                <input hidden="hidden" name="content_type" value = "{{contentType}}"/>
                 <input type="submit" value = "comment"/>
         </form></br>
 
-        {%if post.author == request.user  %}
+        {%if post.author.displayName == request.user.username  %}
         <div class="editPost">
             <form style="display: inline-block;" action="{% url 'delete_post' %}" method="GET">
                    {% csrf_token %}
-                    <button  name="post_id" value="{{ post.post_id }}">Delete Post</button>
+                    <button  name="post_id" value="{{ post.id }}">Delete Post</button>
             </form>
 
             <form style="display: inline-block;" action="{% url 'manage_post' %}" method="GET">
-                    <button  name="post_id" value="{{ post.post_id }}">Modiify Post</button>
+                    <button  name="post_id" value="{{ post.id }}">Modiify Post</button>
             </form>
 
-            {% if post.can_view == 4 %}
-              <p>This post is publicly shareable by URI only: <a href="{{ STATIC_URL }}/post/{{ post.post_id }}">{{ STATIC_URL }}/{{ post.author }}/{{ post.post_id }}</a></p>
+            {% if post.visibility == 4 %}
+              <p>This post is publicly shareable by URI only: <a href="{{ STATIC_URL }}/post/{{ post.id }}">{{ STATIC_URL }}/{{ post.author }}/{{ post.id }}</a></p>
             {% endif %}
 
         </div>

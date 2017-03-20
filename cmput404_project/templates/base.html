@@ -38,7 +38,7 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Open Sans", sans-serif}
     <button class="w3-button w3-padding-large" title="Edit Profile"><i class="fa fa-user"></i><span class="w3-badge w3-right w3-small w3-green"></span></button>
     <div class="w3-dropdown-content w3-card-4 w3-bar-block" style="width:180px;font-size:80%">
       <a href="{% url 'self' %}" class="w3-bar-item w3-button">My Page</a>
-      <a href="#" class="w3-bar-item w3-button">Edit Profile</a>
+      <a href=" {% url 'profile' request.user.username %} " class="w3-bar-item w3-button">Edit Profile</a>
     </div>
   </div>
 
@@ -76,7 +76,7 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Open Sans", sans-serif}
         <form method="post" enctype="multipart/form-data" action="{% url 'create_post' %}">
         {% csrf_token %}
         	<div class="selection">
-        		<select name="post_type">
+<!--         		<select name="post_type">
         		<option value= 0>public</option>
         		<option value= 1>only friends</option>
         		<option value= 2>Friends of friends</option>
@@ -98,7 +98,15 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Open Sans", sans-serif}
         		<input style="margin-left:40%" name="uploadFile" type="file" />
         	</div>
 
-        	<input type="submit" name="create new post" value="Submit">
+        	<input type="submit" name="create new post" value="Submit"> -->
+
+          {% block Post %}
+              <h1>New post</h1>
+            <form method="POST" class="post-form">{% csrf_token %}
+              {{ form.as_p }}
+            <button type="submit" class="save btn btn-default">Save</button>
+           </form>
+          {% endblock %}
 
         </form>
         </div>

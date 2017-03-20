@@ -30,22 +30,22 @@
       <div class="col-md-6 float-left">
         <div class="form-group">
           <label >User name</label>
-          <input type="text" class="form-control" value="{{ user.username }}" id="isUser">
+          <input type="text" class="form-control view" value="{{ user.username }}" id="isUser" >
           <input type="hidden" class="form-control" value="{{ user.id }}" id="User">
           <p>@{{ user.id }}</p>
         </div>
         {% csrf_token %}
         <div class="form-group">
           <label >Email address</label>
-          <input type="email" name="email" class="form-control" value="{{ user.email }}" id="isUser">
+          <input type="email" name="email" class="form-control view" value="{{ user.email }}" id="isUser">
         </div>
         <div class="form-group">
           <label >Github</label>
-          <input type="text" name="github" class="form-control" value="{{ user.profile.github }}" id="isUser">
+          <input type="text" name="github" class="form-control view" value="{{ user.profile.github }}" id="isUser">
         </div>
         <div class="form-group">
           <label >Bio</label>
-          <textarea rows="4" cols="50" name="bio" class="form-control" value="{{ user.profile.bio }}" id="isUser"></textarea>
+          <textarea rows="4" cols="50" name="bio" class="form-control view" value="{{ user.profile.bio }}" id="isUser"></textarea>
         </div>
         <p>
           <button type="submit" class="btn btn-default setBtn">Update Profile</button>
@@ -62,15 +62,13 @@
     </form>
   </div>
 
-
-
-
 {% endblock %}
+
 {% block javascript %}
 <script>
   var user = document.getElementById("User").value;
   var viewer = document.getElementById("viewer").value;
-  var readable = document.getElementsByClassName("form-control");
+  var readable = document.getElementsByClassName("view");
   var visibility = document.getElementsByClassName("setBtn");
   //alert(visibility.length);
   //alert(user);
