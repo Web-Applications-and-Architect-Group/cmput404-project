@@ -30,7 +30,7 @@ urlpatterns = [
 
 	#url(r'^friendList', views.friendList, name="friendList"),
 
-    # url(r'^send_friendrequest$',views.send_friendrequest.as_view(),name='send_friendrequest'),
+    url(r'^send_friendrequest$',views.Send_Friendrequest.as_view(),name='send_friendrequest'),  # TODO need to add authetication
     #url(r'^view_profile/(?P<username>[a-zA-Z0-9]+)$', views.view_profile, name="view_profile"),
 
 
