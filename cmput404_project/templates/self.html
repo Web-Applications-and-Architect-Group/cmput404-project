@@ -115,12 +115,14 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Open Sans", sans-serif}
         {% endif %}
 
         {{ post.author }}</h3>
+        <span>Title:    </span>{{ post.title }}</br>
+        <span>Description:    </span>{{ post.description }}</br>
         <hr class="w3-clear">
 
 
         <li>  </br>
 
-              {{ post.description }}</br></br>
+              {{ post.content }}</br></br>
 
         <div class="w3-row-padding" style="margin:0 -16px">
           <div class="w3-half">
@@ -134,8 +136,8 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Open Sans", sans-serif}
       <div style="text-align:left">
           {% for comment in comments %}
 
-              {% if comment.post_id == post%}
-                  comment by {{comment.author}}: {{comment.comment_text}} ({{comment.comment_date}})</br>
+              {% if comment.post == post%}
+                  comment by {{comment.author}}: {{comment.comment}} ({{comment.published}})</br>
               {%endif%}
 
           {% endfor %}

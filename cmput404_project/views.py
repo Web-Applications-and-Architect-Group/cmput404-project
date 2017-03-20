@@ -50,10 +50,10 @@ class AuthorView(APIView):
 
 def home(request):
     comments = Comment.objects.all()
-
+    form = PostForm()
     #post = Post.objects.filter(author = request.user).order_by('-pub_datetime')
-    post= Post.objects.filter(visibility=0).order_by('published')
-    context = { 'posts': post , 'comments': comments}
+    post= Post.objects.filter(visibility=0).order_by('-published')
+    context = { 'posts': post , 'comments': comments,'form': form}
     return render(request,'home.html',context)
 
 def selfPage(request):
@@ -387,7 +387,9 @@ def create_post(request):
             return HttpResponseRedirect(reverse('home'))
         else:
             form = PostForm()
-    return render(request,'/',{'form': form})
+            return render(request,'/',{'form': form})
+    return HttpResponseRedirect(reverse('home'))
+
 
 @login_required
 def manage_post(request):
@@ -436,7 +438,7 @@ def comment(request):
     author = User.objects.get(id = request.user.id)
     comment_text = request.GET['comment_text']
     post_id= request.GET['post_id']
-    post = Post.objects.get(post_id = post_id)
+    post = Post.objects.get(id = post_id)
 
     new_comment = Comment.create(author, comment_text, post)
     new_comment.save()
@@ -552,3 +554,7 @@ def get_object_by_uuid_or_404(model, uuid_pk):
     except Exception, e:
         raise Http404(str(e))
     return get_object_or_404(model, pk=uuid_pk)
+
+def friendList(request,username):
+	context={'username':username}
+	return render(request,'friend/friendList.html',context)
