@@ -1,62 +1,7 @@
-<!DOCTYPE html>
-<html>
-<title>{{user.username}}</title>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="https://www.w3schools.com/w3css/3/w3.css">
-<link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-blue-grey.css">
-<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Open+Sans'>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+{% extends 'base.html' %}
 
-<!-- Trigger Modal for post -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
-<style>
-html,body,h1,h2,h3,h4,h5 {font-family: "Open Sans", sans-serif}
-
-  ul {
-    list-style-type: none;
-  }
-
-</style>
-<body class="w3-theme-l5">
-
-<!-- Navbar -->
-<div class="w3-top">
- <div class="w3-bar w3-theme-d2 w3-left-align w3-large">
-  <a class="w3-bar-item w3-button w3-hide-medium w3-hide-large w3-right w3-padding-large w3-hover-white w3-large w3-theme-d2" href="javascript:void(0);" onclick="openNav()"><i class="fa fa-bars"></i></a>
-  <a href="{% url 'home' %}" class="w3-bar-item w3-button w3-padding-large w3-theme-d4"><i class="fa fa-home w3-margin-right"></i>Home</a>
-  <button type="button" class="w3-bar-item w3-button w3-padding-large w3-theme-d4" data-toggle="modal" data-target="#myModal"><i class="fa fa-pencil"></i> Post</button>
-  <a href="/logout/" class="w3-bar-item w3-button w3-hide-small w3-right w3-padding-large w3-hover-white" title="My Account">Log out</a>
-  <div class="w3-dropdown-hover w3-hide-small w3-right">
-    <button class="w3-button w3-padding-large" title="Edit Profile"><i class="fa fa-user"></i><span class="w3-badge w3-right w3-small w3-green"></span></button>
-    <div class="w3-dropdown-content w3-card-4 w3-bar-block" style="width:180px;font-size:80%">
-      <a href="{% url 'self' %}" class="w3-bar-item w3-button">My Page</a>
-      <a href=" {% url 'profile' request.user.username %} " class="w3-bar-item w3-button">Edit Profile</a>
-
-    </div>
-  </div>
-
-  <div class="w3-dropdown-hover w3-hide-small w3-right">
-    <button class="w3-button w3-padding-large" title="Notifications"><i class="fa fa-bell"></i><span class="w3-badge w3-right w3-small w3-green"></span></button>
-    <div class="w3-dropdown-content w3-card-4 w3-bar-block" style="width:180px;font-size:80%">
-      <a href="#" class="w3-bar-item w3-button">New friend request</a>
-      <a href="#" class="w3-bar-item w3-button">New followers</a>
-    </div>
-  </div>
- </div>
-</div>
-
-<!-- Navbar on small screens -->
-<div id="navDemo" class="w3-bar-block w3-theme-d2 w3-hide w3-hide-large w3-hide-medium w3-large">
-  <a href="#" class="w3-bar-item w3-button w3-padding-large">Link 1</a>
-  <a href="#" class="w3-bar-item w3-button w3-padding-large">Link 2</a>
-  <a href="#" class="w3-bar-item w3-button w3-padding-large">Link 3</a>
-  <a href="#" class="w3-bar-item w3-button w3-padding-large">My Profile</a>
-</div>
-
+{% block content %}
 <!-- Page Container -->
 <div class="w3-container w3-content" style="max-width:1400px;margin-top:80px;margin-left:10em">
   <!-- The Grid -->
@@ -67,18 +12,18 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Open Sans", sans-serif}
       <div class="w3-card-2 w3-round w3-white">
         <div class="w3-container">
          <h4 class="w3-center">My Profile</h4>
-         <p class="w3-center"><img src="/w3images/avatar3.png" class="w3-circle" style="height:106px;width:106px" alt="Avatar"></p>
+         <p class="w3-center"><img src="{{author.img.url}}" class="w3-circle" style="height:106px;width:106px" alt="Avatar"></p>
          <hr>
-         <p><i class="fa fa-envelope fa-fw w3-margin-right w3-text-theme"></i>aaa@ualberta.ca</p>
-         <p><i class="fa fa-github fa-fw w3-margin-right w3-text-theme"></i>aaaa</p>
-         <p><i class="fa fa-pencil fa-fw w3-margin-right w3-text-theme"></i>bio</p>
+         <p><i class="fa fa-envelope fa-fw w3-margin-right w3-text-theme"></i>{{author.displayName}}</p>
+         <p><i class="fa fa-github fa-fw w3-margin-right w3-text-theme"></i>{{author.github}}</p>
+         <p><i class="fa fa-pencil fa-fw w3-margin-right w3-text-theme"></i>{{author.bio}}</p>
         </div>
       </div>
       <br>
       <div class="w3-card-2 w3-round w3-white w3-center">
         <div class="w3-container">
           <p>Friend Request</p>
-          <img src="/w3images/avatar6.png" alt="Avatar" style="width:50%"><br>
+          <img  src="{{ post.author.profile.img.url }}" alt="Avatar" style="width:50%"><br>
           <span>Jane Doe</span>
           <div class="w3-row w3-opacity">
             <div class="w3-half">
@@ -107,21 +52,13 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Open Sans", sans-serif}
       <div class="w3-container w3-card-2 w3-white w3-round w3-margin"><br>
         <span class="w3-right w3-opacity">{{post.published}}</span>
         <h3>
-        {% if post.author.profile.photo %}
-
-            <img alt="user photo" src="{{ STATIC_URL }}/users/{{user.id}}/{{profile.photo }}" >
-        {% else %}
-            <img alt="user photo" src="{{ post.author.profile.img.url }}" width = "40" height = "40">
-        {% endif %}
-	<a href="{% url 'profile' post.author.user.username %}" >{{ post.author }}</a>
-        </h3>
+        <img alt="user photo" class="img-rounded" height=48 width=48 src="{{ post.author.img.url }}" >
+        <a href="{% url 'profile' post.author.user.username %}" >{{ post.author }}</a></h3>
+        <span>Title:    </span><a href="{% url 'onePost' post.id %}" > {{ post.title }}</a></br></br>
+        <span>Description:    </span>{{ post.description }}
         <hr class="w3-clear">
-
-
         <li>  </br>
-
-             <a href="{% url 'onePost' post.id %}" > {{ post.description }}</a></br></br>
-
+        <span>Content:    </span>{{ post.content }}</br></br>
         <div class="w3-row-padding" style="margin:0 -16px">
           <div class="w3-half">
             <img src="/w3images/lights.jpg" style="width:100%" alt="Northern Lights" class="w3-margin-bottom">
@@ -134,8 +71,8 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Open Sans", sans-serif}
       <div style="text-align:left">
           {% for comment in comments %}
 
-              {% if comment.post_id == post%}
-                  comment by {{comment.author}}: {{comment.comment_text}} ({{comment.comment_date}})</br>
+              {% if comment.post == post%}
+                  comment by {{comment.author}}: {{comment.comment}} ({{comment.published}})</br>
               {%endif%}
 
           {% endfor %}
@@ -145,24 +82,24 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Open Sans", sans-serif}
           <input hidden="hidden" name="github" value = "{{user.profile.github}}" id="githubID"/>
               {% csrf_token %}
                 <input style= "width:80%" name="comment_text"/>
-                <input hidden="hidden" name="post_id" value = "{{post.post_id }}"/>
-                <input hidden="hidden" name="content_type" value = "{{content_type}}"/>
+                <input hidden="hidden" name="post_id" value = "{{post.id }}"/>
+                <input hidden="hidden" name="content_type" value = "{{contentType}}"/>
                 <input type="submit" value = "comment"/>
         </form></br>
 
-        {%if post.author == request.user  %}
+        {%if post.author.displayName == request.user.username  %}
         <div class="editPost">
             <form style="display: inline-block;" action="{% url 'delete_post' %}" method="GET">
                    {% csrf_token %}
-                    <button  name="post_id" value="{{ post.post_id }}">Delete Post</button>
+                    <button  name="post_id" value="{{ post.id }}">Delete Post</button>
             </form>
 
             <form style="display: inline-block;" action="{% url 'manage_post' %}" method="GET">
-                    <button  name="post_id" value="{{ post.post_id }}">Modiify Post</button>
+                    <button  name="post_id" value="{{ post.id }}">Modiify Post</button>
             </form>
 
-            {% if post.can_view == 4 %}
-              <p>This post is publicly shareable by URI only: <a href="{{ STATIC_URL }}/post/{{ post.post_id }}">{{ STATIC_URL }}/{{ post.author }}/{{ post.post_id }}</a></p>
+            {% if post.visibility == 4 %}
+              <p>This post is publicly shareable by URI only: <a href="{{ STATIC_URL }}/post/{{ post.id }}">{{ STATIC_URL }}/{{ post.author }}/{{ post.id }}</a></p>
             {% endif %}
 
         </div>
@@ -213,98 +150,5 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Open Sans", sans-serif}
 
 <!-- End Page Container -->
 </div>
-<!-- Trigger the modal with a button -->
-<!-- Modal -->
-<div class="modal fade" id="myModal" role="dialog">
-  <div class="modal-dialog">
 
-    <!-- Modal content-->
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h2 class="modal-title" style="text-align:center">Write A New Post</h2>
-      </div>
-      <div class="modal-body">
-        <div style="border: 2px solid	#e9f2fc; padding:2em;
-                    text-align:center; background-color: #eaf2fb; font-family: verdana;" >
-
-        <form method="post" enctype="multipart/form-data" action="{% url 'create_post' %}">
-        {% csrf_token %}
-        	<div class="selection">
-        		<select name="post_type">
-        		<option value= 0>public</option>
-        		<option value= 1>only friends</option>
-        		<option value= 2>Friends of friends</option>
-        		<option value= 3>Private</option>
-            <option value= 4>Unlisted</option>
-        		</select>
-
-            <select name="content_type">
-            <option value= 0>Plain Text</option>
-            <option value= 1>Markdown</option>
-          </select></br>
-        	</div>
-        	<div>
-        	<textarea name="POST_TEXT" rows="4" cols="50" ></textarea>
-        	</div>
-
-        	<div>
-        		<h4>Choose a picture to upload!</h4>
-        		<input style="margin-left:40%" name="uploadFile" type="file" />
-        	</div>
-
-        	<input type="submit" name="create new post" value="Submit">
-
-        </form>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-
-
-
-
-
-
-
-
-<!-- Footer -->
-
-
-<footer class="w3-container w3-theme-d5" style="position:relative; bottom:0; width:100%">
-  <p>Powered by <a href="https://github.com/Web-Applications-and-Architect-Group/cmput404-project" target="_blank">CMPUT404W17T04</a></p>
-</footer>
-
-<script>
-// Accordion
-function myFunction(id) {
-    var x = document.getElementById(id);
-    if (x.className.indexOf("w3-show") == -1) {
-        x.className += " w3-show";
-        x.previousElementSibling.className += " w3-theme-d1";
-    } else {
-        x.className = x.className.replace("w3-show", "");
-        x.previousElementSibling.className =
-        x.previousElementSibling.className.replace(" w3-theme-d1", "");
-    }
-}
-
-// Used to toggle the menu on smaller screens when clicking on the menu button
-function openNav() {
-    var x = document.getElementById("navDemo");
-    if (x.className.indexOf("w3-show") == -1) {
-        x.className += " w3-show";
-    } else {
-        x.className = x.className.replace(" w3-show", "");
-    }
-}
-</script>
-
-</body>
-</html>
+{% endblock %}
