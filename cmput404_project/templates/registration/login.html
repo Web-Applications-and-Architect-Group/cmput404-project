@@ -1,5 +1,3 @@
-{% extends 'base.html' %}
-
 
 {% block content %}
     {% if form.errors %}
@@ -8,7 +6,7 @@
 {% endif %}
 
 {% if next %}
-    {% if user.is_authenticated %}
+    {% if user.is_active %}
 
 <p>Your account doesn't have access to this page. To proceed,
     please login with an account that has access.</p>
@@ -17,7 +15,7 @@
 <p>Please login to see this page.</p>
     {% endif %}
 {% endif %}
-
+<!--
 <div class="container">
     <div class="row">
         <div class="col-md-4 col-md-offset-4">
@@ -53,6 +51,41 @@
         </div>
     </div>
 </div>
+-->
+<head>
+  <title>Log In</title>
+</head>
+<div style="margin-top:5em">
+<link rel="stylesheet" type="text/css" href="../static/css/login.css">
+<div class="login-page">
+  <div class="form">
+
+    <form method="post" action="{% url 'auth_login' %}" class="login-form">
+      {% csrf_token %}
+
+      <table>
+<tr>
+    <td>{{ form.username.label_tag }}</td>
+    <td>{{ form.username }}</td>
+</tr>
+<tr>
+    <td>{{ form.password.label_tag }}</td>
+    <td>{{ form.password }}</td>
+</tr>
+</table>
+
+      <input class="btn btn-success btn-sm" id="button" type="submit" value="login" />
+      <input type="hidden" name="next" value="{{ next }}" />
+      <p class="message">Lost password? <a href="{% url 'auth_password_reset' %}">Reset password</a></p>
+      <p class="message">Not registered? <a href="{% url 'registration_register' %}">Create an account</a></p>
+    </form>
+
+  </div>
+</div>
+</div>
+
+
+
 
 {% endblock %}
 
