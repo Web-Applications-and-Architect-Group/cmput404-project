@@ -1,3 +1,4 @@
+{% load static %}
 
 {% block content %}
     {% if form.errors %}
@@ -15,48 +16,12 @@
 <p>Please login to see this page.</p>
     {% endif %}
 {% endif %}
-<!--
-<div class="container">
-    <div class="row">
-        <div class="col-md-4 col-md-offset-4">
-            <div class="login-panel panel panel-default">
-                <div class="panel-heading">
-                    <h3 class="panel-title">Please Sign In</h3>
-                </div>
-                <div class="panel-body">
-                    <form method="post" action="{% url 'auth_login' %}">
-{% csrf_token %}
 
-                        <p class="bs-component">
-                            <table>
-                                <tr>
-                                    <td>{{ form.username.label_tag }}</td>
-                                    <td>{{ form.username }}</td>
-                                </tr>
-                                <tr>
-                                    <td>{{ form.password.label_tag }}</td>
-                                    <td>{{ form.password }}</td>
-                                </tr>
-                            </table>
-                        </p>
-                        <p class="bs-component">
-                            <center>
-                                <input class="btn btn-success btn-sm" type="submit" value="login" />
-                            </center>
-                        </p>
-                        <input type="hidden" name="next" value="{{ next }}" />
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
--->
 <head>
   <title>Log In</title>
 </head>
 <div style="margin-top:5em">
-<link rel="stylesheet" type="text/css" href="../static/css/login.css">
+<link rel="stylesheet" type="text/css" href="{% static 'css/login.css' %}">
 <div class="login-page">
   <div class="form">
 
