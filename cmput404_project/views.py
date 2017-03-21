@@ -606,6 +606,7 @@ def friendList(request,username):
 
 def onePost(request,post_id):
 	post = Post.objects.get(id = post_id)
+
 	user = post.author.user
 	result = ""
 	for category in post.categories.all():
