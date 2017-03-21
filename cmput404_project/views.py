@@ -25,7 +25,8 @@ from .settings import MAXIMUM_PAGE_SIZE
 
 class AuthorView(APIView):
     queryset = Author.objects.all()
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly)
+    # permission_classes = (permissions.IsAuthenticatedOrReadOnly)
+    permission_classes = (IsAuthenticatedNodeOrAdmin,)
     def get(self, request, pk, format=None):
         try:
             author =  Author.objects.get(pk=pk)
