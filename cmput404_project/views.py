@@ -267,6 +267,7 @@ def home(request):
     form = PostForm()
     #post = Post.objects.filter(author = request.user).order_by('-pub_datetime')
     post= Post.objects.filter(visibility=0).order_by('-published')
+    author = None
     if(request.user):
         try:
             author = Author.objects.get(id=request.user.username)
@@ -555,6 +556,7 @@ def friendList(request,username):
 
 def onePost(request,post_id):
 	post = Post.objects.get(id = post_id)
+
 	user = post.author.user
 	result = ""
 	for category in post.categories.all():
