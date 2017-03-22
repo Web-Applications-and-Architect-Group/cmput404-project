@@ -480,16 +480,25 @@ def ViewMyStream(request):
     return render(request, 'stream/user_stream.html', context)
 
 @login_required
-def delete_post(request):
-    myPost = request.GET['post_id']
-    allPost = Post.objects.all()
-    for i in allPost:
-        if (str(i.post_id) == str(myPost)):
-            i.delete()
-    #return HttpResponseRedirect(reverse('ViewMyStream'))
-    post_type = request.GET['post_type']
-    context = postContent(post_type,request)
-    return render(request, 'stream/mystream.html', context)
+def delete_post(request,post_id):
+    post = Post.objects.get(id = post_id)
+    post.delete()
+    
+    comments = Comment.objects.all()
+
+    #post = Post.objects.filter(author = request.user).order_by('-pub_datetime')
+    post_author = Author.objects.get(id=request.user.username)
+    post =Post.objects.filter(author=post_author).order_by('-published')
+    if(request.user):
+        try:
+            author = Author.objects.get(id=request.user.username)
+        except Author.DoesNotExist:
+            author=None
+    else:
+        author = None
+    form = PostForm()
+    context = { 'posts': post , 'comments': comments,'author':author,'form':form}
+    return render(request, 'self.html', context)
 
 
 @login_required
