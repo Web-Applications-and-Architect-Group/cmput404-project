@@ -4,11 +4,16 @@ import json
 from rest_framework.response import Response
 from collections import OrderedDict
 
+
 class AuthorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Author
-        fields = ('id', 'host','displayName','url','bio')
+        fields = ('id', 'host','displayName','url','github','bio')
+        extra_kwargs = {
+            'id': {'validators':[]},
+        }
+        
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -18,15 +23,14 @@ class CommentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = ('id','contentType','author',
-        	'comment', 'published')
-
-       	read_only_fields = ('id','published','origin','source','author')
+        fields = ('author','comment', 'contentType','published','id')
+       	#read_only_fields = ('id','contentType','author')
 
     def get_contentType(self,obj):
     	return obj.get_contentType_display()
 
 
+    
 class PostSerializer(serializers.ModelSerializer):
 
     author = AuthorSerializer()
@@ -101,3 +105,40 @@ class CommentPagination(pagination.PageNumberPagination):
             response['previous'] = previous_link
 
         return Response(response)
+        
+class AddCommentQuerySerializer(serializers.Serializer):
+    query = serializers.CharField(max_length=10)
+    post = serializers.URLField()
+    comment = CommentSerializer()
+    post_id = serializers.CharField(max_length=100)
+    
+    def create(self,validated_data):
+        comment_data = validated_data.pop('comment')
+        comment_data['post'] = Post.objects.get(pk=validated_data.pop('post_id'))
+        author_data = comment_data.pop('author')
+        print author_data
+        try:
+            author = Author.objects.get(pk=author_data['id'])
+        except Author.DoesNotExist:
+            author = Author.objects.create(**author_data)
+        comment = Comment.objects.create(author=author, **comment_data)
+        return comment
+    
+    def validate_post_id(self,value):
+        """
+        Check that the post_id exist
+        """
+        try:
+            post = Post.objects.get(pk=value)
+        except Post.DoesNotExist:
+            raise serializers.ValidationError("Post with id"+value+" does not exist")
+        return value
+    
+    def validate_query(self,value):
+        """
+        Check that the query is addComment
+        """
+        if value != 'addComment':
+            raise serializers.ValidationError("only accept query addComment")
+        return value
+        

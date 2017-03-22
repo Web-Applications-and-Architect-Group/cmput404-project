@@ -109,14 +109,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-REST_FRAMEWORK = {
-    # Use Django's standard `django.contrib.auth` permissions,
-    # or allow read-only access for unauthenticated users.
-    'DEFAULT_PERMISSION_CLASSES': 
-        'rest_framework.permissions.IsAuthenticated',
- 
-}
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
@@ -166,4 +158,4 @@ STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
 # change those settings before put on herok
 HOST_NAME = "http://127.0.0.1:8000/"
-MAXIMUM_PAGE_SIZE = 1
+MAXIMUM_PAGE_SIZE = 50

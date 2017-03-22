@@ -10,188 +10,26 @@ from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 import sys
 import json
-# import httplib2
-# import urllib
 import uuid
 import requests
+
 from rest_framework.views import APIView
+
 from rest_framework.response import Response
 from rest_framework import mixins,generics, status, permissions
+
 from .serializers import AuthorSerializer,PostSerializer,CommentSerializer,PostPagination,CommentPagination
 from rest_framework.decorators import api_view
 from .permissions import IsAuthenticatedNodeOrAdmin
 from collections import OrderedDict
 from .settings import MAXIMUM_PAGE_SIZE
 
-class AuthorView(APIView):
-    queryset = Author.objects.all()
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly)
-    def get(self, request, pk, format=None):
-        try:
-            author =  Author.objects.get(pk=pk)
-        except Author.DoesNotExist:
-            raise Http404
-        serializer = AuthorSerializer(author)
-        return Response(serializer.data)
-
-    def post(self,request,pk,format=None):
-        author = self.get_object(pk)
-        serializer = AuthorSerializer(author,data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def put(self,request,pk,format=None):
-        return self.post(request,pk,format)
-
-
-
-
-def handle_posts(posts,request):
-    size = int(request.GET.get('size', MAXIMUM_PAGE_SIZE))
-    paginator = PostPagination()
-    paginator.page_size = size
-    result_posts = paginator.paginate_queryset(posts, request)
-    for post in result_posts:
-        comments = Comment.objects.filter(post=post).order_by('-published')[:5]
-        post['comments'] = comments
-        post['count'] = comments.count()
-        post['size'] = MAXIMUM_PAGE_SIZE
-        post['next'] = reverse('comments',kwargs={'post_id':post.id})
-    serializer = PostSerializer(result_posts, many=True)
-    return paginator.get_paginated_response(serializer.data, size)
-
-class Public_Post_List(APIView):
-    """
-    List all pulic posts
-    """
-    queryset = Post.objects.filter(visibility=0)
-    permission_classes = (IsAuthenticatedNodeOrAdmin,)
-    def get(self,request,format=None):
-        return handle_posts(self.queryset,request)
-
-class Post_Detail(APIView):
-
-    """
-    List one post with given post id
-    """
-    queryset = Post.objects.all()
-    def get(self,request,post_id,format=None):
-        posts = self.queryset.filter(pk=post_id)
-        return handle_posts(posts,request)
-
-
-class All_Visible_Post_List_From_An_Author_To_User(APIView):
-    """
-    List all posts from an author that visible to an authenticated user.
-    """
-    queryset = Post.objects.all()
-
-    def get(self,request, author_id, format=None):
-        size = int(request.GET.get('size', 1))
-        paginator = PostPagination()
-        paginator.page_size = size
-
-        """
-        author = Author.objects.get(pk=author_id)
-        all_posts = Post.objects.filter(author=author)
-        #TODO check if they are friend
-        is_friend = False
-        is_FOAF = False
-        if (is_friend):
-            posts = all_posts.filter(visibility=0, visibility=1, visibility=2)
-        elif (is_FOAF):
-            posts = all_posts.filter(visibility=0, visibility=2)
-        else:
-            posts = all_posts.filter(visibility=0)
-        """
-
-        result_posts = paginator.paginate_queryset(posts, request)
-        for post in result_posts:
-            comments = Comment.objects.filter(post=post).order_by('-published')[:5]
-            post['comments'] = comments
-            post['count'] = comments.count()
-            post['size'] = size
-            post['next'] = post.origin + 'service/posts/' + str(post.id) + '/comments'
-        serializer = PostSerializer(result_posts, many=True)
-        return paginator.get_paginated_response(serializer.data, size)
-
-class All_Visible_Post_List_To_User(APIView):
-    """
-    List all posts from an author that visible to an authenticated user.
-    """
-    queryset = Post.objects.all()
-
-    def get(self,request, format=None):
-        size = int(request.GET.get('size', 1))
-        paginator = PostPagination()
-        paginator.page_size = size
-
-        """
-        myself_user = User.objects.get(pk=request.user.id)
-        myself = Author.objects.get(pk=myself_user)
-        author = Author.objects.get(pk=author_id)
-        all_posts = Post.objects.filter(author=author)
-        #TODO check if they are friend one by one
-        is_friend = False
-        is_FOAF = False
-        if (is_friend):
-            posts = all_posts.filter(visibility=0, visibility=1, visibility=2)
-        elif (is_FOAF):
-            posts = all_posts.filter(visibility=0, visibility=2)
-        else:
-            posts = all_posts.filter(visibility=0)
-        """
-
-        result_posts = paginator.paginate_queryset(posts, request)
-        for post in result_posts:
-            comments = Comment.objects.filter(post=post).order_by('-published')[:5]
-            post['comments'] = comments
-            post['count'] = comments.count()
-            post['size'] = size
-            post['next'] = post.origin + 'service/posts/' + str(post.id) + '/comments'
-        serializer = PostSerializer(result_posts, many=True)
-        return paginator.get_paginated_response(serializer.data, size)
 
 
 
 
 
-class Comment_list(APIView):
 
-    """
-    List all comments, or create a new comment.
-    """
-    queryset = Comment.objects.all()
-    def get_object(self, pk):
-        try:
-            post =  Post.objects.get(pk=pk)
-        except Post.DoesNotExist:
-            raise Http404
-        return post
-
-    def get(self,request,post_id,format=None):
-        post = self.get_object(post_id)
-
-        size = int(request.GET.get('size', 5))
-        paginator = CommentPagination()
-        paginator.page_size = size
-
-        Comments = Comment.objects.filter(post=post_id)
-        result_comments = paginator.paginate_queryset(Comments, request)
-
-        serializer = CommentSerializer(result_comments, many=True)
-        return paginator.get_paginated_response(serializer.data, size)
-        # Comments = self.get_object(pk)
-        # serializer = CommentSerializer(result_posts,many=True)
-        # return Response(serializer.data)
-    def post(self,request,format=None):
-        serializer = CommentSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 #@api_view(['POST'])
 #def handle_friendrequest(request,format=None):
