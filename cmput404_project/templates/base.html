@@ -84,6 +84,7 @@ input[type="text"], textarea {
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
+        {% if request.user.username %}
         <h2 class="modal-title" style="text-align:center">Write A New Post</h2>
       </div>
       <div class="modal-body">
@@ -134,6 +135,7 @@ input[type="text"], textarea {
     </div>
 
   </div>
+  {% endif %}
 </div>
 
 

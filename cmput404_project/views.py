@@ -375,6 +375,9 @@ def create_post(request):
             author_X = Author.objects.get(user=request.user)
             new_post.author = author_X
             new_post.save()
+
+            #XXX:TODO Category
+
             new_post.source = "http://http://127.0.0.1:8000/service/posts/%s" %(new_post.id)
             new_post.origin = "http://http://127.0.0.1:8000/service/posts/%s" %(new_post.id)
             new_post.save()
@@ -398,9 +401,10 @@ def manage_post(request):
     return render(request,'post/manage_post.html',{'post':post, 'post_type2':post_type})
 
 @login_required
-def update_post(request, pk):
-    post = get_object_or_404(Post, pk=pk)
+def update_post(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
     if request.method == "POST":
+        print ("The value of unlisted is :" + request.POST['unlisted'])
         form = PostForm(request.POST, instance=post)
         if form.is_valid():
             post = form.save(commit=False)

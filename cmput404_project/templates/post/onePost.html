@@ -2,12 +2,12 @@
 {% block content %}
 
 <div class="container">
-            <form class="form-horizontal" role="form">
+            <form id="updateForm" class="form-horizontal" role="form" action="{% url 'update_post' post.id %}" method="post" >{% csrf_token %}
                 <h2 class="text-center">Post Title</h2>
                 <div class="form-group">
                     <label for="title" class="col-sm-3 control-label">Title:</label>
                     <div class="col-sm-6 read">
-                        <input type="text" id="title" value="{{post.title }}" placeholder="{{post.title}}" class="form-control" autofocus>
+                        <input name = "title" type="text" id="title" value="{{post.title }}" placeholder="{{post.title}}" class="form-control" autofocus>
 			<input type="hidden" value="{{ user }}" id="author">
 			<input type="hidden" value="{{ request.user }}" id="viewer">
 			<input type="hidden" value="{{ post.visibility }}" id="myVis">
@@ -21,14 +21,16 @@
                 <div class="form-group">
                     <label for="description" class="col-sm-3 control-label">Description</label>
                     <div class="col-sm-6">
-                        <input type="text" id="description" value="{{post.description}}" class="form-control">
+                        <input name="description" type="text" id="description" value="{{post.description}}" class="form-control">
                     </div>
                 </div>
  
                 <div class="form-group">
                     <label for="category" class="col-sm-3 control-label">Category</label>
                     <div class="col-sm-6">
-                        <input type="text" id="category"  value = "{{category}}" placeholder="..." class="form-control">
+                    {% if post.categories %}
+                        <input type="text" id="category"  value = "{{post.categories}}" placeholder="..." class="form-control">
+                    {% endif %}
 			<span class="help-block">block categories by #</span>
                     </div>
                 </div>
@@ -37,12 +39,12 @@
                 <div class="form-group">
                     <label for="vislibility" class="col-sm-3 control-label">Visibility</label>
                     <div class="col-sm-5">
-                        <select id="visibility" class="form-control" >
-			    <option value= "0">Public</option>
-                            <option value= "1">FOAF</option>
-                            <option value= "2">Friends</option>
-                            <option value= "3">Private</option>
-                            <option value= "4">Server-only</option>
+                        <select name ="visibility" id="visibility" class="form-control" >
+			                <option value= 0>Public</option>
+                            <option value= 1>FOAF</option>
+                            <option value= 2>Friends</option>
+                            <option value= 3>Private</option>
+                            <option value= 4>Server-only</option>
                           
                         </select>
                     </div>
@@ -51,33 +53,24 @@
                 <div class="form-group">
                     <label for="content_type" class="col-sm-3 control-label">Content Type</label>
                     <div class="col-sm-5">
-                        <select id="content_type" class="form-control">
-                            <option value = "0">Plain Text</option>
-                            <option value = "1">Markdown</option>
-                            <option value = "2">application/base64</option>
-			    <option value = "3">image/png;base64</option>
-			    <option value = "4">image/jpeg;base64</option>
-			    <option value = "5">github-activity</option>			    
+                        <select name ="contentType" id="content_type" class="form-control">
+                            <option value = 0>Plain Text</option>
+                            <option value = 1>Markdown</option>
+                            <option value = 2>application/base64</option>
+			                <option value = 3>image/png;base64</option>
+			                <option value = 4>image/jpeg;base64</option>
+			                <option value = 5>github-activity</option>			    
                         </select>
                     </div>
                 </div> <!-- /.form-group -->
 
                 <div class="form-group">
-                    <label class="control-label col-sm-3">Unlisted</label>
-                    <div class="col-sm-6">
-                        <div class="row">
-                            <div class="col-sm-4">
-                                <label class="radio-inline">
-                                    <input type="radio" id="T">True
-                                </label>
-                            </div>
-                            <div class="col-sm-4">
-                                <label class="radio-inline">
-                                    <input type="radio" id="F" >False
-                                </label>
-                            </div>
-                       
-                        </div>
+                        <label for="unlisted" class="col-sm-3 control-label">Unlisted</label>
+                    <div class="col-sm-5">
+                        <select name ="unlisted" id="listornot" class="form-control">
+                            <option id="LLL" value = False>Listed</option>
+                            <option id="UUU" value = True>Unlisted</option>             
+                        </select>
                     </div>
                 </div> <!-- /.form-group -->
 
@@ -92,7 +85,7 @@
 		<div class="form-group  center-block " role="group" aria-label="...">
 			<div class="list-group col-md-4"></div>
 			<div class="btn-group btn-lg" role="group">
-			    <button type="button" id= "update" class="btn btn-primary"> Update Post </button>
+			    <button type="update_button" id= "update" class="btn btn-primary"> Update Post </button>
 			</div>
 			<div class="btn-group btn-lg" role="group">
 			    <button type="button" id= "deletePost" class="btn btn-danger"><a href="delete_post" post.id> Delete Post </a></button>
@@ -114,11 +107,6 @@
   var myType = document.getElementById("myType").value;
   var unlisted = document.getElementById("unlisted").value;
 
-if (unlisted == "False"){
-  document.getElementById("F").checked = true;
-  document.getElementById("T").checked = false;
-}
-
   var update = document.getElementById("update");
   var deletePost = document.getElementById("deletePost");
 
@@ -134,7 +122,11 @@ if(author!=viewer) {
     }
 }
 
-
+    $(document).ready(function() {
+       $("#update_button").click(function() {
+           $("#updateForm").submit();
+       });
+    });
 
 
 </script>
