@@ -59,7 +59,9 @@ def handle_posts(posts,request):
         post['comments'] = comments
         post['count'] = comments.count()
         post['size'] = MAXIMUM_PAGE_SIZE
-        post['next'] = post.origin + 'service/posts/' + str(post.id) + '/comments'#reverse('comments',kwargs={'post_id':post.id})
+        post['next'] = post.origin + '/comments'
+        # post['next'] = post.origin + 'service/posts/' + str(post.id) + '/comments'
+        # post['next'] = reverse('comments',kwargs={'post_id':post.id})
     serializer = PostSerializer(result_posts, many=True)
     return paginator.get_paginated_response(serializer.data, size)
 
@@ -383,8 +385,8 @@ def create_post(request):
                 m=Category.objects.create(post=new_post,category=cate)
                 m.save()
 
-            new_post.source = "http://http://127.0.0.1:8000/service/posts/%s" %(new_post.id)
-            new_post.origin = "http://http://127.0.0.1:8000/service/posts/%s" %(new_post.id)
+            new_post.source = "http://127.0.0.1:8000/service/posts/%s" %(new_post.id)
+            new_post.origin = "http://127.0.0.1:8000/service/posts/%s" %(new_post.id)
             new_post.save()
             return HttpResponseRedirect(reverse('home'))
         else:
@@ -492,7 +494,7 @@ def ViewMyStream(request):
 def delete_post(request,post_id):
     post = Post.objects.get(id = post_id)
     post.delete()
-    
+
     comments = Comment.objects.all()
 
     #post = Post.objects.filter(author = request.user).order_by('-pub_datetime')
