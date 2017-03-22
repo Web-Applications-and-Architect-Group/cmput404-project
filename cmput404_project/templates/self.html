@@ -68,7 +68,7 @@
         <img alt="user photo" class="img-rounded" height=48 width=48 src="{{ post.author.img.url }}" >
         
         {{ post.author }}</h3>
-        <span>Title:    </span>{{ post.title }}</br>
+        <span>Title:    </span><a href="{% url 'onePost' post.id %}" > {{ post.title }}</a></br>
         <span>Description:    </span>{{ post.description }}</br>
         <hr class="w3-clear">
 
@@ -107,14 +107,8 @@
 
         {%if post.author.displayName == request.user.username  %}
         <div class="editPost">
-            <form style="display: inline-block;" action="{% url 'delete_post' %}" method="GET">
-                   {% csrf_token %}
-                    <button  name="post_id" value="{{ post.id }}">Delete Post</button>
-            </form>
 
-            <form style="display: inline-block;" action="{% url 'manage_post' %}" method="GET">
-                    <button  name="post_id" value="{{ post.id }}">Modiify Post</button>
-            </form>
+
 
             {% if post.visibility == 4 %}
               <p>This post is publicly shareable by URI only: <a href="{{ STATIC_URL }}/post/{{ post.id }}">{{ STATIC_URL }}/{{ post.author }}/{{ post.id }}</a></p>
