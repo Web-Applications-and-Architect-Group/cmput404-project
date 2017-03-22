@@ -1,6 +1,6 @@
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, Http404,HttpResponseForbidden
 from django.views import View
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404,get_list_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 import os
@@ -25,73 +25,6 @@ from collections import OrderedDict
 from .settings import MAXIMUM_PAGE_SIZE
 
 
-#@api_view(['POST'])
-#def handle_friendrequest(request,format=None):
-#    queryset = Notify.objects.all()
-#    if (request.method == 'POST'):
-#        data = request.data
-#        if not (data[query] == "friendrequest"):
-#            return Response(status=status.HTTP_400_BAD_REQUEST)
-#        try:
-#            friend =  Author.objects.get(data[friend][id])
-#        except Author.DoesNotExist:
-#            return Response(status=status.HTTP_400_BAD_REQUEST)
-#        new_notify = Notify.objects.create(friend,data[author][url])
-#        new_notify.save()
-
-class Friendrequest_Handler(APIView):
-    #TODO get rid of redundent Notify
-    queryset = Notify.objects.all()
-    def post(self,request,format=None):
-        data = request.data
-        if not (data["query"] == "friendrequest"):
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        try:
-            friend =  Author.objects.get(id=data["friend"]["id"])
-            new_notify = Notify.objects.create(requestee=friend,requester=data["author"]["url"])
-            new_notify.save()
-        except Author.DoesNotExist:
-            raise Http404
-        else:
-            response = OrderedDict()
-            response["query"] = "friendrequest"
-            response["success"] = True
-            response["message"] = "Friend request sent"
-            return Response(response, status=status.HTTP_200_OK)
-
-
-class Friend_Inquiry_Handler(APIView):
-    """
-    return all friends with a given author.
-    """
-    queryset = Friend.objects.all()
-
-    def post(self,request, author_id, format=None):
-        data = request.data
-
-        if not (data["query"] == "friends"):
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        if not (data["author"] == author_id):
-            return Response({
-                "success": False,
-                "message":"author id in body is different then author id in url"
-            }, status=status.HTTP_400_BAD_REQUEST)
-
-        inquiry_friend_list = data["authors"]
-        result = []
-        for friend_id in inquiry_friend_list:
-            try:
-                queryset = Friend.objects.filter(requester=author_id)
-                queryset.get(requestee_id=friend_id)
-            except Friend.DoesNotExist:
-                continue
-            else:
-                result.append(friend_id)
-
-        response = data
-        response["authors"] = result
-
-        return Response(response, status=status.HTTP_200_OK)
 
 
 class Send_Friendrequest(LoginRequiredMixin, View):
@@ -146,55 +79,39 @@ class Send_Friendrequest(LoginRequiredMixin, View):
 
 
 def home(request):
-    comments = Comment.objects.all()
     form = PostForm()
     #post = Post.objects.filter(author = request.user).order_by('-pub_datetime')
     post= Post.objects.filter(visibility=0).order_by('-published')
     author = None
-    if(request.user):
-        try:
-            author = Author.objects.get(id=request.user.username)
-        except Author.DoesNotExist:
-            author=None
-    else:
-        author = None
-    context = { 'posts': post , 'comments': comments,'form': form,'author':author}
+    if(request.user.is_authenticated()):
+        author = request.user.author
+    context = { 'posts': post ,'form': form,'author':author}
     return render(request,'home.html',context)
 
-def selfPage(request):
-    comments = Comment.objects.all()
-
-    #post = Post.objects.filter(author = request.user).order_by('-pub_datetime')
-    post_author = Author.objects.get(id=request.user.username)
-    post =Post.objects.filter(author=post_author).order_by('-published')
-    if(request.user):
-        try:
-            author = Author.objects.get(id=request.user.username)
-        except Author.DoesNotExist:
-            author=None
-    else:
-        author = None
+def stream(request,author_id):
+    author = get_object_or_404(Author,pk=author_id)
+    posts = Post.objects.filter(author=author).order_by('-published')
     form = PostForm()
-    context = { 'posts': post , 'comments': comments,'author':author,'form':form}
+    context = { 'posts': posts ,'author':author,'form':form}
     return render(request, 'self.html', context)
 
 
-@login_required
-def profile(request,username):
-    user = get_object_or_404(User, username=username)
+def profile(request,author_id):
+    user = get_object_or_404(Author, pk=author_id).user
     viewer = request.user
     if request.method == 'POST' and viewer.id == user.id:
         profile_form = ProfileForm(request.POST)
         image_form = ImageForm(request.POST,request.FILES)
         if profile_form.is_valid():
+            user.author.displayName = profile_form.cleaned_data['displayName']
             user.email = profile_form.cleaned_data['email']
-            user.profile.github = profile_form.cleaned_data['github']
-            user.profile.bio = profile_form.cleaned_data['bio']
+            user.author.github = profile_form.cleaned_data['github']
+            user.author.bio = profile_form.cleaned_data['bio']
         else:
             print(profile_form.errors)
         if image_form.is_valid():
-            user.profile.img = image_form.cleaned_data['image']
-        user.profile.save()
+            user.author.img = image_form.cleaned_data['image']
+        user.author.save()
         user.save()
     else:
         profile_form = ProfileForm()
@@ -372,25 +289,14 @@ def ViewMyStream(request):
     return render(request, 'stream/user_stream.html', context)
 
 @login_required
-def delete_post(request,post_id):
-    post = Post.objects.get(id = post_id)
-    post.delete()
-    
-    comments = Comment.objects.all()
+def delete_post(request,author_id,post_id):
+    post = get_object_or_404(Post,author=author_id,id = post_id)
+    if request.user.author.id == author_id:
+        post.delete()
 
-    #post = Post.objects.filter(author = request.user).order_by('-pub_datetime')
-    post_author = Author.objects.get(id=request.user.username)
-    post =Post.objects.filter(author=post_author).order_by('-published')
-    if(request.user):
-        try:
-            author = Author.objects.get(id=request.user.username)
-        except Author.DoesNotExist:
-            author=None
-    else:
-        author = None
-    form = PostForm()
-    context = { 'posts': post , 'comments': comments,'author':author,'form':form}
-    return render(request, 'self.html', context)
+    return HttpResponseRedirect(reverse('stream',kwargs={'author_id': author_id}))
+
+   
 
 
 @login_required
@@ -455,12 +361,11 @@ def friendList(request,username):
 	context={'username':username}
 	return render(request,'friend/friendList.html',context)
 
-def onePost(request,post_id):
-	post = Post.objects.get(id = post_id)
-
-	user = post.author.user
+def onePost(request,author_id,post_id):
+	post = get_object_or_404(Post,pk = post_id,author=author_id)
+	user = Author.objects.get(pk = author_id).user
 	result = ""
 	for category in post.categories.all():
-		result += "#"+ category.category + "  "
-	context = {'post':post, 'user': user, 'category':result}
+	    result += "#"+ category.category + "  "
+	context = {'post':post,'category':result,'user':user}
 	return render(request,'post/onePost.html',context)

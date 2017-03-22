@@ -7,7 +7,7 @@
 <div class="w3-container w3-content" style="max-width:1400px;margin-top:80px;margin-left:10em">
   <!-- The Grid -->
   <div class="w3-row">
-    {% if request.user.username %}
+    {% if author %}
     <!-- Left Column -->
     <div class="w3-col m3">
       <!-- Profile -->
@@ -42,12 +42,11 @@
 
     <!-- End Left Column -->
     </div>
-    {% else %}
 
     {% endif %}
 
     <!-- Middle Column -->
-    {% if request.user.username %}
+    {% if author %}
     <div class="w3-col m7" style="width:55em; margin-top:-1em">
     {% else %}
     <div class="w3-col m7" style="width:85%; margin-top:-1em">
@@ -61,12 +60,12 @@
         <span class="w3-right w3-opacity">{{post.published}}</span>
         <h3>
         <img alt="user photo" class="img-rounded" height=48 width=48 src="{{ post.author.img.url }}" >
-        <a href="{% url 'profile' post.author.user.username %}" >{{ post.author }}</a></h3>
-        <span>Title:    </span><a href="{% url 'onePost' post.id %}" > {{ post.title }}</a></br></br>
+        <a href="{% url 'profile' post.author.id %}" >{{ post.author.displayName }}</a></h3>
+        <span>Title:    </span><a href="{% url 'onePost' post.author.id post.id %}" > {{ post.title }}</a></br></br>
         <span>Description:    </span>{{ post.description }}
         <hr class="w3-clear">
         <li>  </br>
-        <span>Content:    </span>{{ post.content }}</br></br>
+        {{ post.content }}</br></br>
         <div class="w3-row-padding" style="margin:0 -16px">
           <div class="w3-half">
             <img src="/w3images/lights.jpg" style="width:100%" alt="Northern Lights" class="w3-margin-bottom">
@@ -75,24 +74,21 @@
             <img src="/w3images/nature.jpg" style="width:100%" alt="Nature" class="w3-margin-bottom">
         </div>
       </div>
-
+      
       <div style="text-align:left">
-          {% for comment in comments %}
-
-              {% if comment.post == post%}
-                  comment by {{comment.author}}: {{comment.comment}} ({{comment.published}})</br>
-              {%endif%}
-
+          {% for comment in post.comments.all %}
+            <hr class="w3-clear">
+            comment by {{comment.author}}: {{comment.comment}} ({{comment.published}})</br>
           {% endfor %}
       </div></br>
-
+        <hr class="w3-clear">
         <form action="{% url 'comment' %}" method="GET">
           <input hidden="hidden" name="github" value = "{{user.profile.github}}" id="githubID"/>
               {% csrf_token %}
                 <input style= "width:80%" name="comment_text"/>
                 <input hidden="hidden" name="post_id" value = "{{post.id }}"/>
                 <input hidden="hidden" name="content_type" value = "{{contentType}}"/>
-                <input type="submit" value = "comment"/>
+                <input type="submit" class="w3-button w3-theme-d2 w3-margin-bottom" value = "Comment"/>
         </form></br>
 
         {%if post.author.displayName == request.user.username  %}

@@ -24,6 +24,7 @@ input[type="text"], textarea {
 }
 </style>
 <head>
+<title>White Board</title>
 </head>
 
 <body class="w3-theme-l5">
@@ -33,39 +34,27 @@ input[type="text"], textarea {
  <div class="w3-bar w3-theme-d2 w3-left-align w3-large">
   <a class="w3-bar-item w3-button w3-hide-medium w3-hide-large w3-right w3-padding-large w3-hover-white w3-large w3-theme-d2" href="javascript:void(0);" onclick="openNav()"><i class="fa fa-bars"></i></a>
   <a href="{% url 'home' %}" class="w3-bar-item w3-button w3-padding-large w3-theme-d4"><i class="fa fa-home w3-margin-right"></i>Home</a>
-
-  <button type="button" class="w3-bar-item w3-button w3-padding-large w3-theme-d4" data-toggle="modal" data-target="#myModal"><i class="fa fa-pencil"></i> Post</button>
-
   {% if request.user.username %}
-
-  <a href="/logout/" class="w3-bar-item w3-button w3-hide-small w3-right w3-padding-large w3-hover-white" title="logout">Log out</a>
-  {% else %}
-  <a href="/login/" class="w3-bar-item w3-button w3-hide-small w3-right w3-padding-large w3-hover-white" title="logout">Log in</a>
-  {% endif %}
+  <button type="button" class="w3-bar-item w3-button w3-padding-large w3-theme-d4" data-toggle="modal" data-target="#myModal"><i class="fa fa-pencil"></i> Post</button>
   <div class="w3-dropdown-hover w3-hide-small w3-right">
-    <button class="w3-button w3-padding-large" title="Edit Profile"><i class="fa fa-user"></i><span class="w3-badge w3-right w3-small w3-green"></span></button>
+    <button class="w3-button w3-padding-large " title="Edit Profile"><i class="fa fa-user"></i><span class="w3-badge w3-right w3-small w3-green"></span></button>
     <div class="w3-dropdown-content w3-card-4 w3-bar-block" style="width:180px;font-size:80%">
-      <a href="{% url 'self' %}" class="w3-bar-item w3-button">My Page</a>
-      {% if request.user.username %}
-      <a href=" {% url 'profile' request.user.username %} " class="w3-bar-item w3-button">Edit Profile</a>
-      {% else %}
-
-      {% endif %}
+      <a href="{% url 'stream' request.user.author.id %}" class="w3-bar-item w3-button">My Page</a>
+      <a href=" {% url 'profile' request.user.author.id %} " class="w3-bar-item w3-button">Edit Profile</a>
+      <a href="/logout/" class="w3-bar-item w3-button w3-hide-small w3-right w3-padding-large w3-hover-white" title="logout">Log out</a>
     </div>
+    <a href="#" class="w3-bar-item w3-hide-small w3-right w3-padding-large" ><img src="{{request.user.author.img.url}}" class="w3-circle" style="height:25px;width:25px" alt="Avatar"></a>
   </div>
-
   <div class="w3-dropdown-hover w3-hide-small w3-right">
-    {% if request.user.username %}
-
     <button class="w3-button w3-padding-large" title="Notifications"><i class="fa fa-bell"></i><span class="w3-badge w3-right w3-small w3-green"></span></button>
     <div class="w3-dropdown-content w3-card-4 w3-bar-block" style="width:180px;font-size:80%">
       <a href="#" class="w3-bar-item w3-button">New friend request</a>
       <a href="#" class="w3-bar-item w3-button">New followers</a>
-      {% else %}
-
-      {% endif %}
     </div>
   </div>
+  {% else %}
+  <a href="/login/" class="w3-bar-item w3-button w3-hide-small w3-right w3-padding-large w3-hover-white" title="logout">Log in</a>
+  {% endif %}
  </div>
 </div>
 

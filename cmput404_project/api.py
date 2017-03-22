@@ -88,6 +88,7 @@ class Comment_list(APIView):
     List all comments, or create a new comment.
     """
     queryset = Comment.objects.all()
+    permission_classes = (IsAuthenticatedNodeOrAdmin,)
     def get(self,request,post_id,format=None):
         post = get_object_or_404(Post,pk=post_id)
         size = int(request.GET.get('size', 5))
@@ -115,13 +116,48 @@ class Comment_list(APIView):
             response['message'] = serializer.errors
         return Response(response)
 
+#@api_view(['POST'])
+#def handle_friendrequest(request,format=None):
+#    queryset = Notify.objects.all()
+#    if (request.method == 'POST'):
+#        data = request.data
+#        if not (data[query] == "friendrequest"):
+#            return Response(status=status.HTTP_400_BAD_REQUEST)
+#        try:
+#            friend =  Author.objects.get(data[friend][id])
+#        except Author.DoesNotExist:
+#            return Response(status=status.HTTP_400_BAD_REQUEST)
+#        new_notify = Notify.objects.create(friend,data[author][url])
+#        new_notify.save()
+
+class Friendrequest_Handler(APIView):
+    #TODO get rid of redundent Notify
+    permission_classes = (IsAuthenticatedNodeOrAdmin,)
+    queryset = Notify.objects.all()
+    def post(self,request,format=None):
+        data = request.data
+        if not (data["query"] == "friendrequest"):
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        try:
+            friend =  Author.objects.get(id=data["friend"]["id"])
+            new_notify = Notify.objects.create(requestee=friend,requester=data["author"]["url"])
+            new_notify.save()
+        except Author.DoesNotExist:
+            raise Http404
+        else:
+            response = OrderedDict()
+            response["query"] = "friendrequest"
+            response["success"] = True
+            response["message"] = "Friend request sent"
+            return Response(response, status=status.HTTP_200_OK)
+
 
 class Friend_Inquiry_Handler(APIView):
     """
     return all friends with a given author.
     """
     queryset = Friend.objects.all()
-
+    permission_classes = (IsAuthenticatedNodeOrAdmin,)
     def post(self,request, author_id, format=None):
         data = request.data
 
@@ -130,7 +166,7 @@ class Friend_Inquiry_Handler(APIView):
         if not (data["author"] == author_id):
             return Response({
                 "success": False,
-                "message":"author id in body have to be different to author id in url"
+                "message":"author id in body is different then author id in url"
             }, status=status.HTTP_400_BAD_REQUEST)
 
         inquiry_friend_list = data["authors"]
@@ -148,5 +184,3 @@ class Friend_Inquiry_Handler(APIView):
         response["authors"] = result
 
         return Response(response, status=status.HTTP_200_OK)
-
-

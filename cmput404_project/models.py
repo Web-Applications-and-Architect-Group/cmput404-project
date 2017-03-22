@@ -34,7 +34,7 @@ class Author(models.Model):
     displayName = models.CharField(max_length=200)
     id = models.CharField(primary_key=True,max_length=100)
     url = models.URLField()
-    #user = models.OneToOneField(User,on_delete=models.CASCADE,related_name='profile',blank=True)
+    user = models.OneToOneField(User,on_delete=models.CASCADE,related_name='author',blank=True,null=True)
 
 
     def __str__(self):

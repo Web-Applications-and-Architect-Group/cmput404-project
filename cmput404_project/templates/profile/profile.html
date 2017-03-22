@@ -2,7 +2,7 @@
 
 {% block content %}
 
-<div class="container clearfix">
+<div class="w3-container w3-content" style="max-width:1400px;margin-top:80px;margin-left:10em">
   <div class="col-md-2 float-left">
     <div class="panel panel-default">
       <div class="panel-heading">
@@ -15,7 +15,7 @@
       </div>
     </div>
   </div>
-  <div class="col-md-10 float-right">
+  <div class="col-md-10 float-right ">
     <div class="Subhead">
       <span class="col-md-10 float-left">
         <h2 class="Subhead-heading"> Profile </h2><br>
@@ -25,14 +25,14 @@
         <button type="button" class="btn btn-default">Follow</button>
       </span>
     </div>
-    <form action="{% url 'profile' user.username %}" method="post" enctype="multipart/form-data">
+    <form action="{% url 'profile' user.author.id %}" method="post" enctype="multipart/form-data">
       <input type="hidden" value="{{ request.user.id }}" id="viewer">
       <div class="col-md-6 float-left">
         <div class="form-group">
-          <label >User name</label>
-          <input type="text" class="form-control view" value="{{ user.username }}" id="isUser" >
+          <label >Display Name</label>
+          <input type="text" class="form-control view" value="{{ user.author.displayName }}" name='displayName' id="isUser" >
           <input type="hidden" class="form-control" value="{{ user.id }}" id="User">
-          <p>@{{ user.id }}</p>
+          <p>@{{ user.author.id }}</p>
         </div>
         {% csrf_token %}
         <div class="form-group">
@@ -41,11 +41,11 @@
         </div>
         <div class="form-group">
           <label >Github</label>
-          <input type="text" name="github" class="form-control view" value="{{ user.profile.github }}" id="isUser">
+          <input type="text" name="github" class="form-control view" value="{{ user.author.github }}" id="isUser">
         </div>
         <div class="form-group">
           <label >Bio</label>
-          <textarea rows="4" cols="50" name="bio" class="form-control view" value="{{ user.profile.bio }}" id="isUser"></textarea>
+          <textarea rows="4" cols="50" name="bio" class="form-control view"  id="isUser">{{ user.author.bio }}</textarea>
         </div>
         <p>
           <button type="submit" class="btn btn-default setBtn">Update Profile</button>
@@ -53,7 +53,7 @@
       </div>
 
       <div class="col-md-4 float-right">
-        <img class = "img-rounded center-block" alt="user photo" src={{user.profile.img.url}} height=300px width=300px/>
+        <img class = "img-rounded center-block" alt="user photo" src={{user.author.img.url}} height=300px width=300px/>
         <hr>
         <label class="btn btn-default btn-file center-block setBtn">
           Upload new picture <input name="image" class="hidden" type="file" accept="image/*">

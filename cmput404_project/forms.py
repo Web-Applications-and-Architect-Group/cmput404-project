@@ -7,7 +7,8 @@ class ImageForm(forms.Form):
     image = forms.ImageField()
 
 class ProfileForm(forms.Form):
-    email = forms.EmailField()
+    displayName = forms.CharField()
+    email = forms.EmailField(required=False)
     github = forms.CharField(required=False)
     bio = forms.CharField(required=False)
 

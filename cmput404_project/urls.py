@@ -25,10 +25,10 @@ from rest_framework.urlpatterns import format_suffix_patterns
 
 urlpatterns = [
  	url(r'^', include('registration.backends.simple.urls')),
- 	url(r'^(?P<username>[a-zA-Z0-9]+)/profile', views.profile, name="profile"),
-	url(r'^(?P<username>[a-zA-Z0-9]+)/friendList', views.friendList, name="friendList"),
+ 	url(r'^(?P<author_id>[a-zA-Z0-9-_]+)/profile$', views.profile, name="profile"),
+	url(r'^(?P<author_id>[a-zA-Z0-9-_]+)/friendList$', views.friendList, name="friendList"),
 	#url(r'^onePost',views.onePost, name="onePost"),
-	url(r'^(?P<post_id>[a-zA-Z0-9-]+)/onePost', views.onePost, name="onePost"),
+	url(r'^(?P<author_id>[a-zA-Z0-9-_]+)/posts/(?P<post_id>[a-zA-Z0-9-]+)$', views.onePost, name="onePost"),
 
 	#url(r'^friendList', views.friendList, name="friendList"),
 
@@ -57,39 +57,38 @@ urlpatterns = [
         name='authenticated_user_visible_post_list'),               # Allow [GET]. very complicated GET partial Done
 
 
-    url(r'^author/(?P<author_id>[a-zA-Z0-9-_]+)/friends/$', # Allow [GET, POST]. POST Done #TODO
+    url(r'^author/(?P<author_id>[a-zA-Z0-9-_]+)/friends$', # Allow [GET, POST]. POST Done #TODO
         api.Friend_Inquiry_Handler.as_view(), name='friend_inquiry'),
 
     # url(r'^service/author/(?P<author_id1>[a-zA-Z0-9-_]+)/friends/<service2>/author/(?P<author_id2>[a-zA-Z0-9-_]+)$',
     #     views.Post_list.as_view(), name='friend_inquiry_by_ids'), #TODO? Optional
 
-    url(r'^service/author/(?P<pk>[a-zA-Z0-9]+)$',                   # Allow [GET]. GET partial Done TODO should contain friend list as well
+    url(r'^author/(?P<pk>[a-zA-Z0-9]+)$',                   # Allow [GET]. GET partial Done TODO should contain friend list as well
         api.AuthorView.as_view(), name='author_profile'),
-    url(r'^service/friendrequest$',                                 # Allow [POST]. POST Done
-        views.Friendrequest_Handler.as_view(), name="make_friendrequest"),
+    url(r'^friendrequest$',                                 # Allow [POST]. POST Done
+        api.Friendrequest_Handler.as_view(), name="make_friendrequest"),
     ### (END) API specify by
     # https://github.com/Web-Applications-and-Architect-Group/CMPUT404-project-socialdistribution/blob/master/example-article.json
     # --------------------------------
 
     # url(r'^friendrequest$', views.handle_friendrequest.as_view(), name="make_friendrequest"),
 
-    url(r'^profile_old', views.profile_old, name="profile_old"),
     url(r'^create_post_html$', views.create_post_html, name="create_post_html"),
     url(r'^create_post$', views.create_post, name="create_post"),
     url(r'^$', views.home ,name="home"),
     url(r'^admin/', admin.site.urls),
-    url(r'^mystream$', views.ViewMyStream, name="ViewMyStream"),
-    url(r'^(?P<post_id>[a-zA-Z0-9-]+)/delete_post/$', views.delete_post, name="delete_post"),
-    url(r'^comment/$', views.comment, name="comment"),
-    url(r'^post/(?P<post_id>[a-zA-z0-9-_]+)$', views.viewUnlistedPost, name="viewUnlistedPost"),
-    url(r'^manage_post/$', views.manage_post, name="manage_post"),
-    url(r'^(?P<post_id>[a-zA-Z0-9-]+)/update_post/$', views.update_post, name="update_post"),
-    url(r'^Add_friend/$', views.Add_friend, name="Add_friend"),
-    url(r'^accept_friend/$', views.accept_friend, name="accept_friend"),
-    url(r'^api_list_my_friend_request/$', views.list_my_friend_request, name="list_my_friend_request"),
+    #url(r'^mystream$', views.ViewMyStream, name="ViewMyStream"),
+    url(r'^(?P<author_id>[a-zA-Z0-9-_]+)/posts/(?P<post_id>[a-zA-Z0-9-_]+)/delete_post$', views.delete_post, name="delete_post"),
+    url(r'^comment$', views.comment, name="comment"),
+    url(r'^unlistpost/(?P<post_id>[a-zA-z0-9-_]+)$', views.viewUnlistedPost, name="viewUnlistedPost"),
+    url(r'^manage_post$', views.manage_post, name="manage_post"),
+    url(r'^(?P<post_id>[a-zA-Z0-9-]+)/update_post$', views.update_post, name="update_post"),
+    url(r'^Add_friend$', views.Add_friend, name="Add_friend"),
+    url(r'^accept_friend$', views.accept_friend, name="accept_friend"),
+    url(r'^api_list_my_friend_request$', views.list_my_friend_request, name="list_my_friend_request"),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 
-    url(r'^self$', views.selfPage, name="self"),
+    url(r'^(?P<author_id>[a-zA-Z0-9-]+)$', views.stream, name="stream"),
 
 ]
 urlpatterns = format_suffix_patterns(urlpatterns)
