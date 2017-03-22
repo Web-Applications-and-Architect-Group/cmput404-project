@@ -8,8 +8,6 @@ import uuid
 from .settings import HOST_NAME
 
 
-
-
 accept = [
     (0, 'text/plain'),
     (1, 'text/markdown'),
@@ -19,7 +17,13 @@ accept = [
     (5, 'github-activity'),
     ]
 
+@python_2_unicode_compatible
+class Node(models.Model):
+    user = models.OneToOneField(User,on_delete=models.CASCADE,primary_key=True)
+    host = models.URLField()
 
+    def __str__(self):
+        return self.host
 @python_2_unicode_compatible
 class Author(models.Model):
     img = models.ImageField(upload_to= 'images/', default = 'images/defaultUserImage.png')
@@ -28,17 +32,18 @@ class Author(models.Model):
     is_active = models.BooleanField(default=False)
     host = models.URLField(default=HOST_NAME)
     displayName = models.CharField(max_length=200)
-    id = models.CharField(max_length=200,primary_key=True)
+    id = models.CharField(primary_key=True,max_length=100)
     url = models.URLField()
-    user = models.OneToOneField(User,on_delete=models.CASCADE,related_name='profile',blank=True)
+    user = models.OneToOneField(User,on_delete=models.CASCADE,related_name='author',blank=True,null=True)
 
 
     def __str__(self):
-        return self.id
+        return self.displayName
 
 def create_author(sender,instance,created,**kwargs):
     if created:
-        Author.objects.create(user=instance,displayName=instance.username,id=instance.username,url=HOST_NAME+"service/author/"+instance.username);
+        id = uuid.uuid4()
+        Author.objects.create(id=id,user=instance,displayName=instance.username,url=HOST_NAME+"/author/"+str(id))
 
 post_save.connect(create_author,sender=User)
     
@@ -53,14 +58,14 @@ class Post(models.Model):
         (4, 'SERVERONLY'),
     ]
 
-    id=models.UUIDField(primary_key=True, default=uuid.uuid4)
+    id=models.CharField(primary_key=True, default=uuid.uuid4,max_length=100)
     visibility = models.IntegerField(choices=authority, default=0)
     contentType = models.IntegerField(choices=accept, default=0)
-    description = models.CharField(max_length=100)
+    description = models.CharField(max_length=100,blank=True)
     #=================
     title = models.CharField(max_length=50)
-    source = models.URLField()
-    origin = models.URLField()
+    source = models.URLField(default=HOST_NAME)
+    origin = models.URLField(default=HOST_NAME)
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
     content = models.TextField(max_length=200)
     published = models.DateTimeField(auto_now =True)
@@ -172,7 +177,7 @@ class friend_request(models.Model):
 
 @python_2_unicode_compatible
 class Comment(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    id = models.CharField(primary_key=True, default=uuid.uuid4,max_length=100)
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
     comment = models.TextField()
     contentType = models.IntegerField(choices=accept, default=0)

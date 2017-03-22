@@ -1,82 +1,53 @@
-{%extends "base.html"%}
-{%block content%}
-
-  <div class="w3-dropdown-hover w3-hide-small w3-right">
-    <button class="w3-button w3-padding-large" title="Notifications"><i class="fa fa-bell"></i><span class="w3-badge w3-right w3-small w3-green"></span></button>
-    <div class="w3-dropdown-content w3-card-4 w3-bar-block" style="width:180px;font-size:80%">
-      <a href="#" class="w3-bar-item w3-button">New friend request</a>
-      <a href="#" class="w3-bar-item w3-button">New followers</a>
-    </div>
-  </div>
- </div>
-</div>
+{% extends 'base.html' %}
 
 
-
+{% block content %}
+<title>Social Distribution</title>
 <!-- Page Container -->
 <div class="w3-container w3-content" style="max-width:1400px;margin-top:80px;margin-left:10em">
   <!-- The Grid -->
   <div class="w3-row">
+    {% if author %}
     <!-- Left Column -->
     <div class="w3-col m3">
       <!-- Profile -->
       <div class="w3-card-2 w3-round w3-white">
         <div class="w3-container">
          <h4 class="w3-center">My Profile</h4>
-         <p class="w3-center"><img src="/w3images/avatar3.png" class="w3-circle" style="height:106px;width:106px" alt="Avatar"></p>
+         <p class="w3-center"><img src="{{author.img.url}}" class="w3-circle" style="height:106px;width:106px" alt="Avatar"></p>
          <hr>
          <p><i class="fa fa-envelope fa-fw w3-margin-right w3-text-theme"></i>{{author.displayName}}</p>
          <p><i class="fa fa-github fa-fw w3-margin-right w3-text-theme"></i>{{author.github}}</p>
          <p><i class="fa fa-pencil fa-fw w3-margin-right w3-text-theme"></i>{{author.bio}}</p>
         </div>
       </div>
-      <br>
-      <div class="w3-card-2 w3-round w3-white w3-center">
-        <div class="w3-container">
-          <p>Friend Request</p>
-          <img src="/w3images/avatar6.png" alt="Avatar" style="width:50%"><br>
-          <span>Jane Doe</span>
-          <div class="w3-row w3-opacity">
-            <div class="w3-half">
-              <button class="w3-button w3-block w3-green w3-section" title="Accept"><i class="fa fa-check"></i></button>
-            </div>
-            <div class="w3-half">
-              <button class="w3-button w3-block w3-red w3-section" title="Decline"><i class="fa fa-remove"></i></button>
-            </div>
-          </div>
-        </div>
-      </div>
-      <br>
-
 
     <!-- End Left Column -->
     </div>
 
-    <!-- Middle Column -->
-    <div class="w3-col m7" style="width:55em; margin-top:-1em">
+    {% endif %}
 
+    <!-- Middle Column -->
+    {% if author %}
+    <div class="w3-col m7" style="width:55em; margin-top:-1em">
+    {% else %}
+    <div class="w3-col m7" style="width:85%; margin-top:-1em">
+    {% endif %}
       {% if posts %}
-      <ul>
+      <ul style="list-style-type: none">
       {%for post in posts%}
 
-      {%if post.author.id == request.user.username  %}
 
       <div class="w3-container w3-card-2 w3-white w3-round w3-margin"><br>
         <span class="w3-right w3-opacity">{{post.published}}</span>
         <h3>
-        
         <img alt="user photo" class="img-rounded" height=48 width=48 src="{{ post.author.img.url }}" >
-        
-        {{ post.author }}</h3>
-        <span>Title:    </span><a href="{% url 'onePost' post.id %}" > {{ post.title }}</a></br>
-        <span>Description:    </span>{{ post.description }}</br>
+        <a href="{% url 'profile' post.author.id %}" >{{ post.author.displayName }}</a></h3>
+        <span>Title:    </span><a href="{% url 'onePost' post.author.id post.id %}" > {{ post.title }}</a></br></br>
+        <span>Description:    </span>{{ post.description }}
         <hr class="w3-clear">
-
-
-        <li> 
-              <h4>Content:</h4>
-              {{ post.content }}</br></br>
-
+        <li>  </br>
+        {{ post.content }}</br></br>
         <div class="w3-row-padding" style="margin:0 -16px">
           <div class="w3-half">
             <img src="/w3images/lights.jpg" style="width:100%" alt="Northern Lights" class="w3-margin-bottom">
@@ -85,29 +56,25 @@
             <img src="/w3images/nature.jpg" style="width:100%" alt="Nature" class="w3-margin-bottom">
         </div>
       </div>
-
+      
       <div style="text-align:left">
-          {% for comment in comments %}
-
-              {% if comment.post == post%}
-                  comment by {{comment.author}}: {{comment.comment}} ({{comment.published}})</br>
-              {%endif%}
-
+          {% for comment in post.comments.all %}
+            <hr class="w3-clear">
+            comment by {{comment.author}}: {{comment.comment}} ({{comment.published}})</br>
           {% endfor %}
       </div></br>
-
+        <hr class="w3-clear">
         <form action="{% url 'comment' %}" method="GET">
           <input hidden="hidden" name="github" value = "{{user.profile.github}}" id="githubID"/>
               {% csrf_token %}
                 <input style= "width:80%" name="comment_text"/>
                 <input hidden="hidden" name="post_id" value = "{{post.id }}"/>
                 <input hidden="hidden" name="content_type" value = "{{contentType}}"/>
-                <input type="submit" value = "comment"/>
+                <input type="submit" class="w3-button w3-theme-d2 w3-margin-bottom" value = "Comment"/>
         </form></br>
 
         {%if post.author.displayName == request.user.username  %}
         <div class="editPost">
-
 
 
             {% if post.visibility == 4 %}
@@ -130,7 +97,6 @@
 
 
               </li></br>
-              {%endif%}
       {% endfor %}</ul>
       {% else %}
         <p>You do no have any stream to show yet.</p>
@@ -139,34 +105,6 @@
 
     <!-- End Middle Column -->
     </div>
-{%endblock%}
-<!DOCTYPE html>
-<html>
-<title>{{user.username}}</title>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="https://www.w3schools.com/w3css/3/w3.css">
-<link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-blue-grey.css">
-<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Open+Sans'>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
-<!-- Trigger Modal for post -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-
-<style>
-html,body,h1,h2,h3,h4,h5 {font-family: "Open Sans", sans-serif}
-
-  ul {
-    list-style-type: none;
-  }
-
-</style>
-<body class="w3-theme-l5">
-
-
-
 
     <!-- Right Column -->
     <div class="w3-col m2">
@@ -191,49 +129,5 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Open Sans", sans-serif}
 
 <!-- End Page Container -->
 </div>
-<!-- Trigger the modal with a button -->
-<!-- Modal -->
 
-
-
-
-
-
-
-
-
-
-<!-- Footer -->
-
-
-<footer class="w3-container w3-theme-d5" style="position:relative; bottom:0; width:100%">
-  <p>Powered by <a href="https://github.com/Web-Applications-and-Architect-Group/cmput404-project" target="_blank">CMPUT404W17T04</a></p>
-</footer>
-
-<script>
-// Accordion
-function myFunction(id) {
-    var x = document.getElementById(id);
-    if (x.className.indexOf("w3-show") == -1) {
-        x.className += " w3-show";
-        x.previousElementSibling.className += " w3-theme-d1";
-    } else {
-        x.className = x.className.replace("w3-show", "");
-        x.previousElementSibling.className =
-        x.previousElementSibling.className.replace(" w3-theme-d1", "");
-    }
-}
-
-// Used to toggle the menu on smaller screens when clicking on the menu button
-function openNav() {
-    var x = document.getElementById("navDemo");
-    if (x.className.indexOf("w3-show") == -1) {
-        x.className += " w3-show";
-    } else {
-        x.className = x.className.replace(" w3-show", "");
-    }
-}
-</script>
-
-</body>
-</html>
+{% endblock %}

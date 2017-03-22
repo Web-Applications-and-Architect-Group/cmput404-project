@@ -1,5 +1,6 @@
 from rest_framework import permissions
 from django.contrib.auth.models import Group
+from .models import Node
 
 #http://www.django-rest-framework.org/tutorial/4-authentication-and-permissions/
 class IsOwnerOrReadOnly(permissions.BasePermission):
@@ -15,8 +16,11 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
 # only authenticated nodes and admin can use our api
 class IsAuthenticatedNodeOrAdmin(permissions.BasePermission):
     def has_permission(self,request,view):
-        group = Group.objects.get(name='node')
-        if request.user.is_staff or (group in request.user.groups.all()):
+        if request.user.is_staff:
             return True
-        return False
+        try:
+            node = Node.objects.get(pk=request.user.id)
+        except Node.DoesNotExist:
+            return False
+        return True
         
