@@ -4,7 +4,7 @@ from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 import os
-from .models import  Author,Post, friend_request, Comment,Notify,Friend
+from .models import  Author,Post, friend_request, Comment,Notify,Friend,Category
 from .forms import ProfileForm,ImageForm,PostForm
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -23,12 +23,6 @@ from rest_framework.decorators import api_view
 from .permissions import IsAuthenticatedNodeOrAdmin
 from collections import OrderedDict
 from .settings import MAXIMUM_PAGE_SIZE
-
-
-
-
-
-
 
 
 #@api_view(['POST'])
@@ -156,6 +150,7 @@ def home(request):
     form = PostForm()
     #post = Post.objects.filter(author = request.user).order_by('-pub_datetime')
     post= Post.objects.filter(visibility=0).order_by('-published')
+    author = None
     if(request.user):
         try:
             author = Author.objects.get(id=request.user.username)
@@ -263,6 +258,14 @@ def create_post(request):
             author_X = Author.objects.get(user=request.user)
             new_post.author = author_X
             new_post.save()
+
+            #XXX:TODO Category
+            cates = request.POST['categoies']
+            cate_list = cates.split('#')
+            for cate in cate_list:
+                m=Category.objects.create(post=new_post,category=cate)
+                m.save()
+
             new_post.source = "http://http://127.0.0.1:8000/service/posts/%s" %(new_post.id)
             new_post.origin = "http://http://127.0.0.1:8000/service/posts/%s" %(new_post.id)
             new_post.save()
@@ -286,9 +289,10 @@ def manage_post(request):
     return render(request,'post/manage_post.html',{'post':post, 'post_type2':post_type})
 
 @login_required
-def update_post(request, pk):
-    post = get_object_or_404(Post, pk=pk)
+def update_post(request, post_id):
+    post = get_object_or_404(Post, pk=post_id)
     if request.method == "POST":
+        print ("The value of unlisted is :" + request.POST['unlisted'])
         form = PostForm(request.POST, instance=post)
         if form.is_valid():
             post = form.save(commit=False)
@@ -368,16 +372,25 @@ def ViewMyStream(request):
     return render(request, 'stream/user_stream.html', context)
 
 @login_required
-def delete_post(request):
-    myPost = request.GET['post_id']
-    allPost = Post.objects.all()
-    for i in allPost:
-        if (str(i.post_id) == str(myPost)):
-            i.delete()
-    #return HttpResponseRedirect(reverse('ViewMyStream'))
-    post_type = request.GET['post_type']
-    context = postContent(post_type,request)
-    return render(request, 'stream/mystream.html', context)
+def delete_post(request,post_id):
+    post = Post.objects.get(id = post_id)
+    post.delete()
+    
+    comments = Comment.objects.all()
+
+    #post = Post.objects.filter(author = request.user).order_by('-pub_datetime')
+    post_author = Author.objects.get(id=request.user.username)
+    post =Post.objects.filter(author=post_author).order_by('-published')
+    if(request.user):
+        try:
+            author = Author.objects.get(id=request.user.username)
+        except Author.DoesNotExist:
+            author=None
+    else:
+        author = None
+    form = PostForm()
+    context = { 'posts': post , 'comments': comments,'author':author,'form':form}
+    return render(request, 'self.html', context)
 
 
 @login_required
@@ -444,6 +457,7 @@ def friendList(request,username):
 
 def onePost(request,post_id):
 	post = Post.objects.get(id = post_id)
+
 	user = post.author.user
 	result = ""
 	for category in post.categories.all():

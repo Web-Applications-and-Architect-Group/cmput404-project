@@ -17,9 +17,13 @@
 
 <style>
 html,body,h1,h2,h3,h4,h5 {font-family: "Open Sans", sans-serif}
+input[type="text"], textarea {
+
+  background-color : rgb(250, 255, 189);
+
+}
 </style>
 <head>
-<title>White Board</title>
 </head>
 
 <body class="w3-theme-l5">
@@ -29,24 +33,37 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Open Sans", sans-serif}
  <div class="w3-bar w3-theme-d2 w3-left-align w3-large">
   <a class="w3-bar-item w3-button w3-hide-medium w3-hide-large w3-right w3-padding-large w3-hover-white w3-large w3-theme-d2" href="javascript:void(0);" onclick="openNav()"><i class="fa fa-bars"></i></a>
   <a href="{% url 'home' %}" class="w3-bar-item w3-button w3-padding-large w3-theme-d4"><i class="fa fa-home w3-margin-right"></i>Home</a>
+
   <button type="button" class="w3-bar-item w3-button w3-padding-large w3-theme-d4" data-toggle="modal" data-target="#myModal"><i class="fa fa-pencil"></i> Post</button>
 
+  {% if request.user.username %}
 
   <a href="/logout/" class="w3-bar-item w3-button w3-hide-small w3-right w3-padding-large w3-hover-white" title="logout">Log out</a>
-
+  {% else %}
+  <a href="/login/" class="w3-bar-item w3-button w3-hide-small w3-right w3-padding-large w3-hover-white" title="logout">Log in</a>
+  {% endif %}
   <div class="w3-dropdown-hover w3-hide-small w3-right">
     <button class="w3-button w3-padding-large" title="Edit Profile"><i class="fa fa-user"></i><span class="w3-badge w3-right w3-small w3-green"></span></button>
     <div class="w3-dropdown-content w3-card-4 w3-bar-block" style="width:180px;font-size:80%">
       <a href="{% url 'self' %}" class="w3-bar-item w3-button">My Page</a>
+      {% if request.user.username %}
       <a href=" {% url 'profile' request.user.username %} " class="w3-bar-item w3-button">Edit Profile</a>
+      {% else %}
+
+      {% endif %}
     </div>
   </div>
 
   <div class="w3-dropdown-hover w3-hide-small w3-right">
+    {% if request.user.username %}
+
     <button class="w3-button w3-padding-large" title="Notifications"><i class="fa fa-bell"></i><span class="w3-badge w3-right w3-small w3-green"></span></button>
     <div class="w3-dropdown-content w3-card-4 w3-bar-block" style="width:180px;font-size:80%">
       <a href="#" class="w3-bar-item w3-button">New friend request</a>
       <a href="#" class="w3-bar-item w3-button">New followers</a>
+      {% else %}
+
+      {% endif %}
     </div>
   </div>
  </div>
@@ -67,6 +84,7 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Open Sans", sans-serif}
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
+        {% if request.user.username %}
         <h2 class="modal-title" style="text-align:center">Write A New Post</h2>
       </div>
       <div class="modal-body">
@@ -103,8 +121,9 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Open Sans", sans-serif}
           {% block Post %}
               <h1>New post</h1>
             <form method="POST" class="post-form">{% csrf_token %}
+                <h5>Categoies(separate by #):<input name="categoies" type="text" id="cate"></h5>
               {{ form.as_p }}
-            <button type="submit" class="save btn btn-default">Save</button>
+            <button type="submit" class="save btn btn-success btn-sm" style="background:#4CAF50">Save</button>
            </form>
           {% endblock %}
 
@@ -112,11 +131,12 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Open Sans", sans-serif}
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-success btn-sm" data-dismiss="modal">Close</button>
       </div>
     </div>
 
   </div>
+  {% endif %}
 </div>
 
 

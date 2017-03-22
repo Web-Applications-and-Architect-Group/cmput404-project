@@ -27,6 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     'cloud-dingkai.c9users.io',
+    'cmput404-tuxinzhang.c9users.io',
     'localhost',
     '127.0.0.1',
     '192.168.31.109',
@@ -110,6 +111,14 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ]
+}
+
+
+
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
 
@@ -159,3 +168,4 @@ STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 # change those settings before put on herok
 HOST_NAME = "http://127.0.0.1:8000/"
 MAXIMUM_PAGE_SIZE = 50
+

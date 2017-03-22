@@ -2,10 +2,12 @@
 
 
 {% block content %}
+<title>Social Distribution</title>
 <!-- Page Container -->
 <div class="w3-container w3-content" style="max-width:1400px;margin-top:80px;margin-left:10em">
   <!-- The Grid -->
   <div class="w3-row">
+    {% if request.user.username %}
     <!-- Left Column -->
     <div class="w3-col m3">
       <!-- Profile -->
@@ -40,12 +42,18 @@
 
     <!-- End Left Column -->
     </div>
+    {% else %}
+
+    {% endif %}
 
     <!-- Middle Column -->
+    {% if request.user.username %}
     <div class="w3-col m7" style="width:55em; margin-top:-1em">
-
+    {% else %}
+    <div class="w3-col m7" style="width:85%; margin-top:-1em">
+    {% endif %}
       {% if posts %}
-      <ul>
+      <ul style="list-style-type: none">
       {%for post in posts%}
 
 
@@ -89,14 +97,7 @@
 
         {%if post.author.displayName == request.user.username  %}
         <div class="editPost">
-            <form style="display: inline-block;" action="{% url 'delete_post' %}" method="GET">
-                   {% csrf_token %}
-                    <button  name="post_id" value="{{ post.id }}">Delete Post</button>
-            </form>
 
-            <form style="display: inline-block;" action="{% url 'manage_post' %}" method="GET">
-                    <button  name="post_id" value="{{ post.id }}">Modiify Post</button>
-            </form>
 
             {% if post.visibility == 4 %}
               <p>This post is publicly shareable by URI only: <a href="{{ STATIC_URL }}/post/{{ post.id }}">{{ STATIC_URL }}/{{ post.author }}/{{ post.id }}</a></p>

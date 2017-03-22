@@ -1,39 +1,25 @@
 {% load static %}
-<!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <link rel="stylesheet" type="text/css" href="{% static 'css/registration/registration_form.css' %}">
-        <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
-    </head>
-    <body>
 
+{% block content %}
+<head>
+  <title>Register</title>
+</head>
+<link rel="stylesheet" type="text/css" href="{% static 'css/login.css' %}">
+<div style="margin-top:5em">
+<div class="register-page">
+  <div class="form2" >
+    <form class="register-form" method="post" action=".">
 
-        {% if error_message %}
-        <p><strong>{{error_message}}</strong></p>
-        {% endif %}
+      {% csrf_token %}
+      {{ form.as_p }}
+      </br>
+      <input class="btn btn-success btn-sm" id="create" type="submit" value="create"/>
+      <input type="hidden" name="next" value="{{ next }}" />
+      <p class="message" style="text-align:center">Already registered? <a href="../login">Sign In</a></p>
+    </form>
 
-        {% if next %}
-        {% if user.is_authenticated %}
-        <p>If you want to create an new account. Please log out first.</p>
-        {% endif %}
-        {% endif %}
+  </div>
+</div>
+</div>
 
-        {% block content %}
-        <div>
-            <h1>Registration</h1>
-        </div>
-
-
-        <form method="post" action=".">
-            {% csrf_token %}
-            {{ form.as_p }}
-
-            <input type="submit" value="register" />
-            <input type="hidden" name="next" value="{{ next }}" />
-        </form> 
-
-
-        {% endblock %}
-    </body>
-</html>
+{% endblock %}
