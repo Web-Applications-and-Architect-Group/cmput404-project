@@ -242,6 +242,38 @@ class Friend_Inquiry_Handler(APIView):
         return successResponse(data["author"], result)
 
 
+class Accurate_Friend_Inquiry_Handler(APIView):
+    """
+    handle friend inquiry between two authors.
+    """
+    queryset = Friend.objects.all()
+
+    def get(self, request, author_id1, author_id2, format=None):
+        # prepare response
+        response = OrderedDict()
+        response["query"] = "friends"
+        response["authors"] = [author_id1, author_id2]
+        response["friends"] = True
+
+        # pull all the following author by author_id
+        following_1 = Friend.objects.filter(requester=author_id1)
+        following_2 = Friend.objects.filter(requester=author_id2)
+
+        # two way matches tests, true friend will need to pass both tests
+        try:
+            following_1.get(requestee_id=author_id2)
+        except Friend.DoesNotExist:
+            response["friends"] = False
+
+        try:
+            following_2.get(requestee_id=author_id1)
+        except Friend.DoesNotExist:
+            response["friends"] = False
+
+        # return response
+        return Response(response, status=status.HTTP_200_OK)
+
+
 class Send_Friendrequest(LoginRequiredMixin, View):
     """
     send friend request to remote server or our own server
