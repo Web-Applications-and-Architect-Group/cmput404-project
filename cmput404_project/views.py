@@ -27,6 +27,7 @@ from .settings import MAXIMUM_PAGE_SIZE
 
 
 
+
 class Send_Friendrequest(LoginRequiredMixin, View):
     """
     send friend request to remote server or our own server
@@ -183,8 +184,8 @@ def create_post(request):
                 m=Category.objects.create(post=new_post,category=cate)
                 m.save()
 
-            new_post.source = "http://http://127.0.0.1:8000/service/posts/%s" %(new_post.id)
-            new_post.origin = "http://http://127.0.0.1:8000/service/posts/%s" %(new_post.id)
+            new_post.source = "http://127.0.0.1:8000/service/posts/%s" %(new_post.id)
+            new_post.origin = "http://127.0.0.1:8000/service/posts/%s" %(new_post.id)
             new_post.save()
             return HttpResponseRedirect(reverse('home'))
         else:
@@ -293,7 +294,6 @@ def delete_post(request,author_id,post_id):
     post = get_object_or_404(Post,author=author_id,id = post_id)
     if request.user.author.id == author_id:
         post.delete()
-
     return HttpResponseRedirect(reverse('stream',kwargs={'author_id': author_id}))
 
    
