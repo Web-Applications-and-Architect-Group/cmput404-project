@@ -4,7 +4,7 @@ from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 import os
-from .models import  Author,Post, friend_request, Comment,Notify,Friend
+from .models import  Author,Post, friend_request, Comment,Notify,Friend,Category
 from .forms import ProfileForm,ImageForm,PostForm
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -377,6 +377,11 @@ def create_post(request):
             new_post.save()
 
             #XXX:TODO Category
+            cates = request.POST['categoies']
+            cate_list = cates.split('#')
+            for cate in cate_list:
+                m=Category.objects.create(post=new_post,category=cate)
+                m.save()
 
             new_post.source = "http://http://127.0.0.1:8000/service/posts/%s" %(new_post.id)
             new_post.origin = "http://http://127.0.0.1:8000/service/posts/%s" %(new_post.id)

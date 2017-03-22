@@ -121,6 +121,7 @@ input[type="text"], textarea {
           {% block Post %}
               <h1>New post</h1>
             <form method="POST" class="post-form">{% csrf_token %}
+                <h5>Categoies(separate by #):<input name="categoies" type="text" id="cate"></h5>
               {{ form.as_p }}
             <button type="submit" class="save btn btn-success btn-sm" style="background:#4CAF50">Save</button>
            </form>
