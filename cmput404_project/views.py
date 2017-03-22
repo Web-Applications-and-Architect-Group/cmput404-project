@@ -185,17 +185,48 @@ class Friend_Inquiry_Handler(APIView):
     """
     queryset = Friend.objects.all()
 
+    def successResponse(self, author_id, friend_list):
+        # generate success response
+        response = OrderedDict()
+        response["query"] = "friends"
+        response["author"] = author_id
+        response["authors"] = friend_list
+        return Response(response, status=status.HTTP_200_OK)
+
+    def failResponse(self, err_message, status_code):
+        # generate fail response
+        response = OrderedDict()
+        response["query"] = "friends"
+        response["success"] = False,
+        response["message"] = err_message
+        return Response(response, status=status_code)
+
+    def get(self, request, author_id, format=None):
+
+        # pull all the following author by author_id
+        friends = Friend.objects.filter(requester=author_id)
+
+        # store author ids in a list
+        result = []
+        for friend in friends:
+            result.append(friend.requestee_id)
+
+        # return success response
+        return self.successResponse(author_id, result)
+
+
     def post(self,request, author_id, format=None):
         data = request.data
 
+        # error handling
         if not (data["query"] == "friends"):
             return Response(status=status.HTTP_400_BAD_REQUEST)
         if not (data["author"] == author_id):
-            return Response({
-                "success": False,
-                "message":"author id in body is different then author id in url"
-            }, status=status.HTTP_400_BAD_REQUEST)
+            return self.failResponse(
+                "author id in body is different then author id in url",
+                status.HTTP_400_BAD_REQUEST)
 
+        # proceeds matching
         inquiry_friend_list = data["authors"]
         result = []
         for friend_id in inquiry_friend_list:
@@ -207,10 +238,8 @@ class Friend_Inquiry_Handler(APIView):
             else:
                 result.append(friend_id)
 
-        response = data
-        response["authors"] = result
-
-        return Response(response, status=status.HTTP_200_OK)
+        # return success response
+        return successResponse(data["author"], result)
 
 
 class Send_Friendrequest(LoginRequiredMixin, View):

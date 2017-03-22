@@ -62,7 +62,7 @@ urlpatterns = [
     # Comments API
     # """
     url(r'^service/posts/(?P<post_id>[a-zA-Z0-9-_]+)/comments$',
-        views.Comment_list.as_view(),name='comments_in_a_post'),    # Allow [GET, POST, PUT]. GET Done
+        views.Comment_list.as_view(),name='comments_in_a_post'),    # Allow [GET, POST, PUT]. GET Done TODO
 
 
     # """
@@ -75,7 +75,7 @@ urlpatterns = [
     # """
     # Friend API
     # """
-    url(r'^service/author/(?P<author_id>[a-zA-Z0-9-_]+)/friends/$', # Allow [GET, POST]. POST Done #TODO
+    url(r'^service/author/(?P<author_id>[a-zA-Z0-9-_]+)/friends/$', # Allow [GET, POST]. GET POST Done 
         views.Friend_Inquiry_Handler.as_view(), name='friend_inquiry'),
 
     # url(r'^service/author/(?P<author_id1>[a-zA-Z0-9-_]+)/friends/<service2>/author/(?P<author_id2>[a-zA-Z0-9-_]+)$',
