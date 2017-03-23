@@ -83,7 +83,7 @@ urlpatterns = [
     # --------------------------------
 
     # url(r'^friendrequest$', views.handle_friendrequest.as_view(), name="make_friendrequest"),
-
+    url(r'^(?P<author_id>[a-zA-Z0-9-_]+)/$', views.stream, name="stream"),
     url(r'^create_post_html$', views.create_post_html, name="create_post_html"),
     url(r'^create_post$', views.create_post, name="create_post"),
     url(r'^$', views.home ,name="home"),
@@ -99,7 +99,6 @@ urlpatterns = [
     url(r'^api_list_my_friend_request$', views.list_my_friend_request, name="list_my_friend_request"),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 
-    url(r'^(?P<author_id>[a-zA-Z0-9-]+)$', views.stream, name="stream"),
 
 ]
 urlpatterns = format_suffix_patterns(urlpatterns)

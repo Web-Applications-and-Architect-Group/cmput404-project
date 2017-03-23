@@ -100,6 +100,7 @@ def stream(request,author_id):
 def profile(request,author_id):
     user = get_object_or_404(Author, pk=author_id).user
     viewer = request.user
+    form = PostForm()
     if request.method == 'POST' and viewer.id == user.id:
         profile_form = ProfileForm(request.POST)
         image_form = ImageForm(request.POST,request.FILES)
@@ -116,7 +117,7 @@ def profile(request,author_id):
         user.save()
     else:
         profile_form = ProfileForm()
-    return render(request,'profile/profile.html',{'profile_form':profile_form,'viewer':viewer,'user':user})
+    return render(request,'profile/profile.html',{'profile_form':profile_form,'form':form,'viewer':viewer,'user':user})
 
 
 def profile_old(request):
@@ -213,8 +214,18 @@ def update_post(request, post_id):
         print ("The value of unlisted is :" + request.POST['unlisted'])
         form = PostForm(request.POST, instance=post)
         if form.is_valid():
-            post = form.save(commit=False)
-            post.save()
+            post = form.save()
+
+            cates = request.POST['category']
+            cate_list = cates.split('#')
+            print cate_list
+            Category.objects.filter(post=post).delete()
+            for cate in cate_list:
+                if cate.strip() != "":
+                    Category.objects.create(post=post,category=cate)
+    
+
+
             return HttpResponseRedirect(reverse('home'))
     else:
         form = PostForm(instance=post)
@@ -280,14 +291,15 @@ def postContent(post_type,request):
 
     return context
 
-@login_required
-def ViewMyStream(request):
-    Posts = Post.objects.order_by('-published')
-    comments = Comment.objects.all()
 
-    post_type = request.GET['post_type']
-    context = postContent(post_type,request)
-    return render(request, 'stream/user_stream.html', context)
+# @login_required
+# def ViewMyStream(request):
+#     Posts = Post.objects.order_by('-published')
+#     comments = Comment.objects.all()
+
+#     post_type = request.GET['post_type']
+#     context = postContent(post_type,request)
+#     return render(request, 'stream/user_stream.html', context)
 
 @login_required
 def delete_post(request,author_id,post_id):
@@ -357,8 +369,8 @@ def get_object_by_uuid_or_404(model, uuid_pk):
         raise Http404(str(e))
     return get_object_or_404(model, pk=uuid_pk)
 
-def friendList(request,username):
-	context={'username':username}
+def friendList(request,author_id):
+	context={'author_id':author_id,'form':PostForm()}
 	return render(request,'friend/friendList.html',context)
 
 def onePost(request,author_id,post_id):
@@ -366,6 +378,6 @@ def onePost(request,author_id,post_id):
 	user = Author.objects.get(pk = author_id).user
 	result = ""
 	for category in post.categories.all():
-	    result += "#"+ category.category + "  "
+	    result += "#"+ category.category
 	context = {'post':post,'category':result,'user':user}
 	return render(request,'post/onePost.html',context)

@@ -27,7 +27,7 @@
                 <div class="form-group">
                     <label for="category" class="col-sm-3 control-label">Category</label>
                     <div class="col-sm-6">
-                    <input type="text" id="category"  value = "{{category}}" id="category" class="form-control">
+                    <input name="category" type="text" id="category"  value = "{{category}}" id="category" class="form-control">
 			<span class="help-block">block categories by #</span>
                     </div>
                 </div>
@@ -103,6 +103,8 @@
   var myVis = document.getElementById("myVis").value;
   var myType = document.getElementById("myType").value;
   var unlisted = document.getElementById("unlisted").value;
+
+  
 
   var update = document.getElementById("update");
   var deletePost = document.getElementById("deletePost");
