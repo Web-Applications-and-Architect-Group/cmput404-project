@@ -12,7 +12,7 @@
 			<input type="hidden" value="{{ post.visibility }}" id="myVis">
 			<input type="hidden" value="{{ post.contentType }}" id="myType">
 			<input type="hidden" value="{{ post.unlisted }}" id="unlisted">
-			
+
 
                         <span class="help-block">@ author: {{post.author.displayName}}</span>
                     </div>
@@ -23,7 +23,7 @@
                         <input name="description" type="text" id="description" value="{{post.description}}" class="form-control">
                     </div>
                 </div>
- 
+
                 <div class="form-group">
                     <label for="category" class="col-sm-3 control-label">Category</label>
                     <div class="col-sm-6">
@@ -31,8 +31,8 @@
 			<span class="help-block">block categories by #</span>
                     </div>
                 </div>
-         
-               
+
+
                 <div class="form-group">
                     <label for="vislibility" class="col-sm-3 control-label">Visibility</label>
                     <div class="col-sm-5">
@@ -42,7 +42,7 @@
                             <option value= 2>Friends</option>
                             <option value= 3>Private</option>
                             <option value= 4>Server-only</option>
-                          
+
                         </select>
                     </div>
                 </div> <!-- /.form-group -->
@@ -56,7 +56,7 @@
                             <option value = 2>application/base64</option>
 			                <option value = 3>image/png;base64</option>
 			                <option value = 4>image/jpeg;base64</option>
-			                <option value = 5>github-activity</option>			    
+			                <option value = 5>github-activity</option>
                         </select>
                     </div>
                 </div> <!-- /.form-group -->
@@ -65,8 +65,8 @@
                         <label for="unlisted" class="col-sm-3 control-label">Unlisted</label>
                     <div class="col-sm-5">
                         <select name ="unlisted" id="listornot" class="form-control">
-                            <option id="LLL" value = False>Listed</option>
-                            <option id="UUU" value = True>Unlisted</option>             
+                            <option id="LLL" value="False">Listed</option>
+                            <option id="UUU" value="True">Unlisted</option>
                         </select>
                     </div>
                 </div> <!-- /.form-group -->
@@ -76,9 +76,9 @@
                     <div class="col-sm-6">
 		   <textarea name="content" rows="4" cols="53" >{{post.content}}</textarea>
                     </div>
-                </div>   
-           
-		
+                </div>
+
+
 		<div class="form-group  center-block " role="group" aria-label="...">
 			<div class="list-group col-md-4"></div>
 			<div class="btn-group btn-lg" role="group">
@@ -87,7 +87,7 @@
 			<div class="btn-group btn-lg" role="group">
 			    <button type="button" id= "deletePost" class="btn btn-danger"><a href="{%url 'delete_post' post.author.id post.id%}" > Delete Post </a></button>
 			</div>
-			 
+
 		</div>
 
             </form> <!-- /form -->
@@ -104,22 +104,26 @@
   var myType = document.getElementById("myType").value;
   var unlisted = document.getElementById("unlisted").value;
 
-  
-
   var update = document.getElementById("update");
   var deletePost = document.getElementById("deletePost");
 
   document.getElementById('visibility').value = myVis
   document.getElementById('content_type').value = myType
 
-if(author!=viewer) {
-  update.style.visibility = "hidden";
-  deletePost.style.visibility = "hidden";
+  if(unlisted=="True") {
+    //alert(unlisted);
+    document.getElementById("listornot")[1].selected=true;
+  }
 
-  for(i=0;i<readable.length;i++) {
-      readable[i].readOnly = true;
-    }
-}
+
+  if(author!=viewer) {
+    update.style.visibility = "hidden";
+    deletePost.style.visibility = "hidden";
+
+    for(i=0;i<readable.length;i++) {
+        readable[i].readOnly = true;
+      }
+  }
 
     $(document).ready(function() {
        $("#update_button").click(function() {
@@ -130,5 +134,3 @@ if(author!=viewer) {
 
 </script>
 {% endblock %}
-
-

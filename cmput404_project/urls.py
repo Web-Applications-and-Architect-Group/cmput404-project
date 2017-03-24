@@ -98,6 +98,7 @@ urlpatterns = [
     url(r'^accept_friend$', views.accept_friend, name="accept_friend"),
     url(r'^api_list_my_friend_request$', views.list_my_friend_request, name="list_my_friend_request"),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^post/(?P<post_id>[a-zA-z0-9-_]+)$', views.viewUnlistedPost, name="viewUnlistedPost"),
 
 
 ]

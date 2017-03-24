@@ -223,7 +223,7 @@ def update_post(request, post_id):
             for cate in cate_list:
                 if cate.strip() != "":
                     Category.objects.create(post=post,category=cate)
-    
+
 
 
             return HttpResponseRedirect(reverse('home'))
@@ -252,10 +252,11 @@ def update_post(request, post_id):
 def comment(request):
     author = Author.objects.get(displayName = request.user.username)
     comment_text = request.GET['comment_text']
+    comment_type = request.GET['content_type']
     post_id= request.GET['post_id']
     post = Post.objects.get(id = post_id)
 
-    new_comment = Comment.create(author, comment_text, post)
+    new_comment = Comment.create(author, comment_text, post, comment_type)
     new_comment.save()
 
     #post_type = request.GET['post_type']

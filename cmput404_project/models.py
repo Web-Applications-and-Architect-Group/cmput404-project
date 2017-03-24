@@ -46,7 +46,7 @@ def create_author(sender,instance,created,**kwargs):
         Author.objects.create(id=id,user=instance,displayName=instance.username,url=HOST_NAME+"/author/"+str(id))
 
 post_save.connect(create_author,sender=User)
-    
+
 @python_2_unicode_compatible
 class Post(models.Model):
     #================  https://docs.djangoproject.com/en/1.10/ref/models/fields/    idea from this page
@@ -185,8 +185,8 @@ class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE,related_name='comments')
 
     @classmethod
-    def create(cls, user, comment_text, post):
-        new_comment = cls(author=user, comment=comment_text, post=post)
+    def create(cls, user, comment_text, post, comment_type):
+        new_comment = cls(author=user, comment=comment_text, post=post, contentType=comment_type)
 
         return new_comment
 

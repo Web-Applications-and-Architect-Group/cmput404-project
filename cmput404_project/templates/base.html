@@ -24,7 +24,6 @@ input[type="text"], textarea {
 }
 </style>
 <head>
-<title>White Board</title>
 </head>
 
 <body class="w3-theme-l5">
@@ -41,7 +40,7 @@ input[type="text"], textarea {
     <div class="w3-dropdown-content w3-card-4 w3-bar-block" style="width:180px;font-size:80%">
       <a href="{% url 'stream' request.user.author.id %}" class="w3-bar-item w3-button">My Page</a>
       <a href=" {% url 'profile' request.user.author.id %} " class="w3-bar-item w3-button">Edit Profile</a>
-      <a href="/logout/" class="w3-bar-item w3-button w3-hide-small w3-right w3-padding-large w3-hover-white" title="logout">Log out</a>
+      <a href="/logout/" class="w3-bar-item w3-button" title="logout">Log out</a>
     </div>
     <a href="#" class="w3-bar-item w3-hide-small w3-right w3-padding-large" ><img src="{{request.user.author.img.url}}" class="w3-circle" style="height:25px;width:25px" alt="Avatar"></a>
   </div>
@@ -74,7 +73,7 @@ input[type="text"], textarea {
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
         {% if request.user.username %}
-        <h2 class="modal-title" style="text-align:center">Write A New Post</h2>
+        <h2 class="modal-title" style="text-align:center">Write A New Comment</h2>
       </div>
       <div class="modal-body">
         <div style="border: 2px solid	#e9f2fc; padding:2em;
@@ -124,7 +123,7 @@ input[type="text"], textarea {
   </div>
   {% endif %}
 </div>
-
+</div>
 
 <!-- Footer -->
 <footer class="footer w3-container w3-theme-d5">
