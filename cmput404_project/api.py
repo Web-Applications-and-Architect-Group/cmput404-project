@@ -121,9 +121,9 @@ class Comment_list(APIView):
 # ============================================= #
 class AuthorView(APIView):
     queryset = Author.objects.all()
-    permission_classes = (IsAuthenticatedNodeOrAdmin)
-    def get(self, request, pk, format=None):
-        author =  get_object_or_404(Author,pk=pk)
+    permission_classes = (IsAuthenticatedNodeOrAdmin,)
+    def get(self, request, author_id, format=None):
+        author =  get_object_or_404(Author,pk=author_id)
         serializer = AuthorSerializer(author)
         return Response(serializer.data)
 
