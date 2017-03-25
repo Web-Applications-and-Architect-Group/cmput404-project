@@ -129,7 +129,9 @@ class Friend(models.Model):
 class Notify(models.Model):
     requestee = models.ForeignKey(Author,on_delete=models.CASCADE,related_name="notify")
     requester = models.URLField()
-
+    requester_displayName = models.CharField(max_length=30,default ="AuthorName")
+    requester_host = models.CharField(max_length=100,default="Host")
+    requester_id = models.CharField(max_length=200,default="id")
     @classmethod
     def create(cls, requester, requestee):
         new_post = cls(requester=requester, requestee=requestee)

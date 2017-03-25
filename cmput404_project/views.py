@@ -348,6 +348,18 @@ def accept_friend(request):
 
 
     return HttpResponseRedirect(reverse('profile'))
+@login_required
+def AcceptFriendRequest(request,requester_id):
+    author = Author.objects.get(user=request.user)
+    notify = Notify.objects.get(requestee=author,requester_id=requester_id)
+    friend = Friend.objects.create(requester=author,requestee=notify.requester,requestee_id = notify.requester_id)
+    #notify.delete()
+    friend.save()
+
+    notify = Notify.objects.filter(requestee=author)
+    context={'user':request.user,'form':PostForm(),'author':author,'Friend_request':notify}
+    return render(request,'friend/friendList.html',context)
+
 
 
 def viewUnlistedPost(request, post_id):
@@ -371,9 +383,16 @@ def get_object_by_uuid_or_404(model, uuid_pk):
         raise Http404(str(e))
     return get_object_or_404(model, pk=uuid_pk)
 
-def friendList(request,author_id):
-	context={'author_id':author_id,'form':PostForm()}
-	return render(request,'friend/friendList.html',context)
+def friendList(request,username):
+    user = User.objects.get(username=username)
+    author = Author.objects.get(user=user)
+    notify = Notify.objects.filter(requestee=author)
+
+
+
+    context={'user':user,'form':PostForm(),'author':author,'Friend_request':notify}
+    #,'Friend':friends,'Followed':follows
+    return render(request,'friend/friendList.html',context)
 
 def onePost(request,author_id,post_id):
 	post = get_object_or_404(Post,pk = post_id,author=author_id)

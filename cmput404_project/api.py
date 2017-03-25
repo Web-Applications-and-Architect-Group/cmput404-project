@@ -312,7 +312,10 @@ class Friendrequest_Handler(APIView):
         try:
             friend =  Author.objects.get(id=data["friend"]["id"])
             new_notify = Notify.objects.create(requestee=friend,
-                                               requester=data["author"]["url"])
+                                               requester=data["author"]["url"],
+                                               requester_displayName=data["author"]["displayName"],
+                                               requester_host = data["author"]["host"],
+                                               requester_id = data["author"]["id"])
             new_notify.save()
         except Author.DoesNotExist:
             raise Http404

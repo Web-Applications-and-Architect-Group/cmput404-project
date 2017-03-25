@@ -77,7 +77,7 @@ urlpatterns = [
     url(r'^', include('registration.backends.simple.urls')),
     url(r'^admin/', admin.site.urls),
     url(r'^(?P<author_id>[a-zA-Z0-9-_]+)/profile$', views.profile, name="profile"),
-    url(r'^(?P<author_id>[a-zA-Z0-9-_]+)/friendList$', views.friendList, name="friendList"),
+    url(r'^(?P<username>[a-zA-Z0-9-_]+)/friendList$', views.friendList, name="friendList"),
     #url(r'^onePost',views.onePost, name="onePost"),
     url(r'^(?P<author_id>[a-zA-Z0-9-_]+)/posts/(?P<post_id>[a-zA-Z0-9-]+)$', views.onePost, name="onePost"),
 
@@ -100,7 +100,8 @@ urlpatterns = [
     url(r'^manage_post$', views.manage_post, name="manage_post"),
     url(r'^(?P<post_id>[a-zA-Z0-9-]+)/update_post$', views.update_post, name="update_post"),
     url(r'^Add_friend$', views.Add_friend, name="Add_friend"),
-    url(r'^accept_friend$', views.accept_friend, name="accept_friend"),
+    #url(r'^accept_friend$', views.accept_friend, name="accept_friend"),
+    url(r'^AcceptFriendRequest/(?P<requester_id>[a-zA-z0-9-_]+)$', views.AcceptFriendRequest, name="AcceptFriendRequest"),
     url(r'^api_list_my_friend_request$', views.list_my_friend_request, name="list_my_friend_request"),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^post/(?P<post_id>[a-zA-z0-9-_]+)$', views.viewUnlistedPost, name="viewUnlistedPost"),
