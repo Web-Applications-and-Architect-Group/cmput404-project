@@ -43,7 +43,7 @@ class Author(models.Model):
 def create_author(sender,instance,created,**kwargs):
     if created:
         id = uuid.uuid4()
-        Author.objects.create(id=id,user=instance,displayName=instance.username,url=HOST_NAME+"/author/"+str(id))
+        Author.objects.create(id=id,user=instance,displayName=instance.username,url=HOST_NAME+"service/author/"+str(id))
 
 post_save.connect(create_author,sender=User)
 

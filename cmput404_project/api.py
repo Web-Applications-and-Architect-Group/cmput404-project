@@ -9,8 +9,9 @@ from .settings import MAXIMUM_PAGE_SIZE
 from .models import  Author,Post, friend_request, Comment,Notify,Friend
 from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404,get_list_or_404
-import uuid,json
+import uuid,json, requests
 from django.http import Http404
+from rest_framework.renderers import JSONRenderer
 
 # ============================================= #
 # ============= Posts API (START) ============= #
@@ -44,9 +45,64 @@ class Post_Detail(APIView):
     """
     queryset = Post.objects.all()
     permission_classes = (IsAuthenticatedNodeOrAdmin,)
+
+    def failResponse(self, err_message, status_code):
+        # generate fail response
+        response = OrderedDict()
+        response["query"] = "getPost"
+        response["success"] = False
+        response["message"] = err_message
+        return Response(response, status=status_code)
+        # return Response(JSONRenderer().render(response), status=status_code)
+
     def get(self,request,post_id,format=None):
         posts = get_list_or_404(Post,pk=post_id)
         return handle_posts(posts,request)
+
+    def post(self, request, post_id, format=None):
+        data = request.data
+        # request data fields checking
+        try:
+            temp_field = data["friends"]
+        except KeyError:
+            return self.failResponse(
+                "Friend list not provided.",
+                status.HTTP_400_BAD_REQUEST
+            )
+        # HOST_NAME
+
+        # error handling
+        # if not (data["query"] == "getPost"):
+        #     return Response(status=status.HTTP_400_BAD_REQUEST)
+        # if not (data["postid"] == post_id):
+        #     return self.failResponse(
+        #         "The post id in body is different then the post id in url",
+        #         status.HTTP_400_BAD_REQUEST
+        #     )
+
+        # get the requested post
+        post = get_object_or_404(Post, pk=post_id)
+        # get possible FOAF
+        post_author_following_list = Friend.objects.filter(requester=post.author)
+        possible_middle_friends = post_author_following_list.filter(requestee_id__in=data["friends"])
+        # request following list from remote server and compare
+        is_FOAF = False
+        for middle_friend in possible_middle_friends:
+            r = requests.get(middle_friend.requestee+'friends')
+            remote_following_list = r.json()
+            if post.author.id in remote_following_list:
+                is_FOAF = True
+                break
+
+        # response
+        if is_FOAF:
+            posts = get_list_or_404(Post, pk=post_id)
+            return handle_posts(posts,request)
+        else:
+            return self.failResponse(
+                "Requester is not FOAF",
+                status.HTTP_401_UNAUTHORIZED
+            )
 
 class All_Visible_Post_List_To_User(APIView):
     """
@@ -108,7 +164,7 @@ class Comment_list(APIView):
         else:
             response['success'] = False
             response['message'] = serializer.errors
-        return Response(response)
+        return Response(response)   # !!!!!!!!!!!!!!!!!!!!!!!!!!!! didn't response with a status code
 
 # ============ Comments API (END) ============= #
 
@@ -192,7 +248,7 @@ class Friend_Inquiry_Handler(APIView):
             return Response(status=status.HTTP_400_BAD_REQUEST)
         if not (data["author"] == author_id):
             return self.failResponse(
-                "author id in body is different then author id in url",
+                "The author id in body is different then the author id in url",
                 status.HTTP_400_BAD_REQUEST)
 
         # proceeds matching
