@@ -262,6 +262,7 @@ def comment(request):
     #post_type = request.GET['post_type']
     post_type = post.contentType
     context= postContent(post_type,request)
+    context["author"] = author
 
     return render(request, 'home.html', context)
     #return HttpResponseRedirect(reverse('ViewMyStream'), kwargs={'post_type':post_type})
