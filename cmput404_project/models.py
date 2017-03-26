@@ -91,23 +91,16 @@ class Post(models.Model):
     def __getitem__(self, key):
         return getattr(self, key)
 
-# Ask if 2 authors are friends
-# GET http://service/author/<authorid>/friends/<authorid2>
-# STRIP the http:// and https:// from the URI in the restful query
-# If you need a template (optional): GET http://service/author/<authorid1>/friends/<service2>/author/<authorid2>
-# where authorid1 = de305d54-75b4-431b-adb2-eb6b9e546013 (actually author http://service/author/de305d54-75b4-431b-adb2-eb6b9e546013 )
-# where authorid2 =
-# GET http://service/author/de305d54-75b4-431b-adb2-eb6b9e546013/friends/127.0.0.1%3A5454/author/ae345d54-75b4-431b-adb2-fb6b9e547891
-# responds with:
-#{   "query":"friends",
-        # Array of Author UUIDs
-#        "authors":[
-#            "http://127.0.0.1:5454/author/de305d54-75b4-431b-adb2-eb6b9e546013",
-#            "http://127.0.0.1:5454/author/ae345d54-75b4-431b-adb2-fb6b9e547891"
-#       ],
-#        # boolean true or false
-#        "friends": true
-#}
+def content_file_name(instance, filename):
+    return '/'.join(['images', str(str(instance.post.id) + filename)])
+@python_2_unicode_compatible
+class PostImages(models.Model):
+    post = models.ForeignKey(Post,on_delete=models.CASCADE,related_name='images')
+    post_image = models.ImageField(upload_to=content_file_name)
+    def __str__(self):
+        return self.post.id
+
+
 
 
 @python_2_unicode_compatible

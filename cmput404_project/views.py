@@ -1,10 +1,11 @@
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, Http404,HttpResponseForbidden
 from django.views import View
+from django.conf import settings
 from django.shortcuts import render, get_object_or_404,get_list_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 import os
-from .models import  Author,Post, friend_request, Comment,Notify,Friend,Category
+from .models import  Author,Post, friend_request, Comment,Notify,Friend,Category,PostImages
 from .forms import ProfileForm,ImageForm,PostForm
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -12,7 +13,7 @@ import sys
 import json
 import uuid
 import requests
-
+import datetime
 from rest_framework.views import APIView
 
 from rest_framework.response import Response
@@ -86,14 +87,17 @@ def home(request):
     author = None
     if(request.user.is_authenticated()):
         author = request.user.author
-    context = { 'posts': post ,'form': form,'author':author}
+    notify = Notify.objects.filter(requestee=author)
+    images = PostImages.objects.all()
+    context = { 'posts': post ,'form': form,'author':author,'Friend_request':notify,'images':images}
     return render(request,'home.html',context)
 
 def stream(request,author_id):
     author = get_object_or_404(Author,pk=author_id)
     posts = Post.objects.filter(author=author).order_by('-published')
     form = PostForm()
-    context = { 'posts': posts ,'author':author,'form':form}
+    images = PostImages.objects.all()
+    context = { 'posts': posts ,'author':author,'form':form,'images':images}
     return render(request, 'self.html', context)
 
 
@@ -142,29 +146,10 @@ def profile_old(request):
 def create_post_html(request):
     return render(request,'post/create_post.html',{'user':request.user})
 
-
-
-# @login_required
-# def create_post(request):
-#     """
-#     Create new post view
-#     """
-#     if request.method == "POST":
-#         user = User.objects.get(id=request.user.id)
-#         visibility = request.POST['post_type']
-#         post_text = request.POST['POST_TEXT']
-#         post_type = request.POST['content_type']
-
-#         new_post = Post.create(request.user,post_text,can_view, post_type)
-#         '''
-#         form = ImageForm(request.POST,request.FILES)
-#         if form.is_valid():
-#             new_post.img = form.cleaned_data['image']
-#         '''
-#         new_post.save()
-
-#     return HttpResponseRedirect(reverse('profile'))
-
+# with open(settings.MEDIA_ROOT + "/images/" + str(datetime.datetime.now()) +str(count) ,'wb+') as destination:
+#     for chunk in f.chunks():
+#         destination.write(chunk)
+                    
 @login_required
 def create_post(request):
     """
@@ -188,6 +173,12 @@ def create_post(request):
             new_post.source = "http://127.0.0.1:8000/service/posts/%s" %(new_post.id)
             new_post.origin = "http://127.0.0.1:8000/service/posts/%s" %(new_post.id)
             new_post.save()
+#https://www.youtube.com/watch?v=C9MDtQHwGYM
+            for count,x in enumerate(request.FILES.getlist("files")):
+                image = PostImages.objects.create(post=new_post,post_image = x)
+                image.save()
+
+
             return HttpResponseRedirect(reverse('home'))
         else:
             form = PostForm()
@@ -264,6 +255,8 @@ def comment(request):
     context= postContent(post_type,request)
     context["author"] = author
 
+    images = PostImages.objects.all()
+    context["images"] = images
     return render(request, 'home.html', context)
     #return HttpResponseRedirect(reverse('ViewMyStream'), kwargs={'post_type':post_type})
 
@@ -353,7 +346,7 @@ def AcceptFriendRequest(request,requester_id):
     author = Author.objects.get(user=request.user)
     notify = Notify.objects.get(requestee=author,requester_id=requester_id)
     friend = Friend.objects.create(requester=author,requestee=notify.requester,requestee_id = notify.requester_id)
-    #notify.delete()
+    notify.delete()
     friend.save()
 
     notify = Notify.objects.filter(requestee=author)

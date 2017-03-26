@@ -144,8 +144,6 @@ MEDIA_ROOT = os.path.join(STATIC_ROOT, 'media')
 MEDIA_URL = STATIC_URL + 'media/'
 
 
-
-STATIC_URL = '/static/'
 STATICFILES_STORAGE =  'whitenoise.django.GzipManifestSaticFilesStorage'\
 
 # for login required decorator
