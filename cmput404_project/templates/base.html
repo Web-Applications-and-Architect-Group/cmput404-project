@@ -38,7 +38,10 @@ input[type="text"], textarea {
   <div class="w3-dropdown-hover w3-hide-small w3-right">
     <button class="w3-button w3-padding-large " title="Edit Profile"><i class="fa fa-user"></i><span class="w3-badge w3-right w3-small w3-green"></span></button>
     <div class="w3-dropdown-content w3-card-4 w3-bar-block" style="width:180px;font-size:80%">
-      <a href="{% url 'stream' request.user.author.id %}" class="w3-bar-item w3-button">My Page</a>
+      <a href=" {% url 'profile' request.user.author.id %} " class="w3-bar-item w3-button" style="color:#aaa;">
+        <div>Logged in as</div> {{request.user.username}}
+      </a>
+      <a href="{% url 'stream' request.user.author.id %}" class="w3-bar-item w3-button">My Stream</a>
       <a href=" {% url 'profile' request.user.author.id %} " class="w3-bar-item w3-button">Edit Profile</a>
       <a href="/logout/" class="w3-bar-item w3-button" title="logout">Log out</a>
     </div>
@@ -47,12 +50,13 @@ input[type="text"], textarea {
   <div class="w3-dropdown-hover w3-hide-small w3-right">
     <button class="w3-button w3-padding-large" title="Notifications"><i class="fa fa-bell"></i><span class="w3-badge w3-right w3-small w3-green"></span></button>
     <div class="w3-dropdown-content w3-card-4 w3-bar-block" style="width:180px;font-size:80%">
-      <a href="{% url 'friendList' request.user.username %}" class="w3-bar-item w3-button">New friend request</a>
+      <a href="{% url 'friendList' request.user.author.id %}" class="w3-bar-item w3-button">New friend request</a>
       <a href="#" class="w3-bar-item w3-button">New followers</a>
     </div>
   </div>
   {% else %}
   <a href="/login/" class="w3-bar-item w3-button w3-hide-small w3-right w3-padding-large w3-hover-white" title="logout">Log in</a>
+  <a href="/register/" class="w3-bar-item w3-button w3-hide-small w3-right w3-padding-large w3-hover-white" title="logout">Sign up</a>
   {% endif %}
  </div>
 </div>
@@ -82,33 +86,13 @@ input[type="text"], textarea {
         <form method="post" enctype="multipart/form-data" action="{% url 'create_post' %}">
         {% csrf_token %}
         	<div class="selection">
-<!--         		<select name="post_type">
-        		<option value= 0>public</option>
-        		<option value= 1>only friends</option>
-        		<option value= 2>Friends of friends</option>
-        		<option value= 3>Private</option>
-            <option value= 4>Unlisted</option>
-        		</select>
-
-            <select name="content_type">
-            <option value= 0>Plain Text</option>
-            <option value= 1>Markdown</option>
-          </select></br>
-        	</div>
-        	<div>
-        	<textarea name="POST_TEXT" rows="4" cols="50" ></textarea>
-        	</div>
-
-        	<div>
-        		<h4>Choose a picture to upload!</h4>
-        		<input style="margin-left:40%" name="uploadFile" type="file" />
-        	</div>
-
-        	<input type="submit" name="create new post" value="Submit"> -->
             <h1>New post</h1>
 
-            <h5>Categoies(separate by #):<input name="categoies" type="text" id="cate"></h5>
+            <h5><b>Categoies(separate by #):</b><input name="categoies" type="text" id="cate"></h5>
+            <h5><b>VisibleTo(separate by #):</b><input name="visibleTo" type="text" id="visiTo"></h5>
+
             {{ form.as_p }}
+            <input type="file" name="files" multiple>
             <button type="submit" class="save btn btn-success btn-sm" style="background:#4CAF50">Save</button>
 
 

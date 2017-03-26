@@ -144,8 +144,6 @@ MEDIA_ROOT = os.path.join(STATIC_ROOT, 'media')
 MEDIA_URL = STATIC_URL + 'media/'
 
 
-
-STATIC_URL = '/static/'
 STATICFILES_STORAGE =  'whitenoise.django.GzipManifestSaticFilesStorage'\
 
 # for login required decorator
@@ -166,6 +164,7 @@ STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
 
 # change those settings before put on herok
-HOST_NAME = "https://cloud-dingkai.c9users.io"
+# HOST_NAME = "https://cloud-dingkai.c9users.io"
+HOST_NAME = "http://127.0.0.1:8000"
 MAXIMUM_PAGE_SIZE = 50
 

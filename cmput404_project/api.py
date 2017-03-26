@@ -303,20 +303,36 @@ class Friendrequest_Handler(APIView):
     """
     Handle all friend requests
     """
-    #TODO get rid of redundent Notify
     queryset = Notify.objects.all()
     def post(self,request,format=None):
+        # data = json.loads(request.data)
         data = request.data
+        # print(data)
         if not (data["query"] == "friendrequest"):
             return Response(status=status.HTTP_400_BAD_REQUEST)
         try:
             friend =  Author.objects.get(id=data["friend"]["id"])
-            new_notify = Notify.objects.create(requestee=friend,
-                                               requester=data["author"]["url"],
-                                               requester_displayName=data["author"]["displayName"],
-                                               requester_host = data["author"]["host"],
-                                               requester_id = data["author"]["id"])
-            new_notify.save()
+
+            # redundent Notify check
+            varify_result = Notify.objects.all()
+            varify_result = varify_result.filter(requester=data["author"]["url"])
+            varify_result = varify_result.filter(requester_id = data["author"]["id"])
+            varify_result = varify_result.filter(requestee=friend)
+
+            # check if requestee have followed requester
+            f_varify_result = Friend.objects.all()
+            f_varify_result = f_varify_result.filter(requestee=data["author"]["url"])
+            f_varify_result = f_varify_result.filter(requestee_id=data["author"]["id"])
+            f_varify_result = f_varify_result.filter(requester=friend)
+
+            if(len(varify_result)<1 and len(f_varify_result)<1):
+                new_notify = Notify.objects.create(requestee=friend,
+                                                   requester=data["author"]["url"],
+                                                   requester_displayName=data["author"]["displayName"],
+                                                   requester_host = data["author"]["host"],
+                                                   requester_id = data["author"]["id"])
+                new_notify.save()
+
         except Author.DoesNotExist:
             raise Http404
         else:

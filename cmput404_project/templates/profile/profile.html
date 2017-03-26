@@ -6,7 +6,7 @@
   <div class="col-md-2 float-left">
     <div class="panel panel-default">
       <div class="panel-heading">
-        <h3 class="panel-title">Author</h3>
+        <h3 class="panel-title">{{author}}</h3>
       </div>
       <div class="btn-group-vertical center-block" role="group">
          <a href="" class="btn btn-primary"><strong>Profile</strong></a>
@@ -22,7 +22,14 @@
       </span>
 
       <span class="col-md-2 float-right">
-        <a href="#"><button type="button" class="btn btn-default">Follow</button></a>
+        {% if author.id == viewer.id %}
+        {% else %}
+        <form id="follow_action" method="post" action="{% url 'send_friendrequest' %}">
+          {% csrf_token %}
+          <input type="hidden" name="friend_url" value="{{ author.url }}" />
+          <a onclick="document.getElementById('follow_action').submit();"><button type="button" class="btn btn-default">Follow</button></a>
+        </form>
+        {% endif %}
       </span>
     </div>
     <form action="{% url 'profile' author.id %}" method="post" enctype="multipart/form-data">
