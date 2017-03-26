@@ -38,7 +38,10 @@ input[type="text"], textarea {
   <div class="w3-dropdown-hover w3-hide-small w3-right">
     <button class="w3-button w3-padding-large " title="Edit Profile"><i class="fa fa-user"></i><span class="w3-badge w3-right w3-small w3-green"></span></button>
     <div class="w3-dropdown-content w3-card-4 w3-bar-block" style="width:180px;font-size:80%">
-      <a href="{% url 'stream' request.user.author.id %}" class="w3-bar-item w3-button">My Page</a>
+      <a href=" {% url 'profile' request.user.author.id %} " class="w3-bar-item w3-button" style="color:#aaa;">
+        <div>Logged in as</div> {{request.user.username}}
+      </a>
+      <a href="{% url 'stream' request.user.author.id %}" class="w3-bar-item w3-button">My Stream</a>
       <a href=" {% url 'profile' request.user.author.id %} " class="w3-bar-item w3-button">Edit Profile</a>
       <a href="/logout/" class="w3-bar-item w3-button" title="logout">Log out</a>
     </div>
@@ -53,6 +56,7 @@ input[type="text"], textarea {
   </div>
   {% else %}
   <a href="/login/" class="w3-bar-item w3-button w3-hide-small w3-right w3-padding-large w3-hover-white" title="logout">Log in</a>
+  <a href="/register/" class="w3-bar-item w3-button w3-hide-small w3-right w3-padding-large w3-hover-white" title="logout">Sign up</a>
   {% endif %}
  </div>
 </div>
