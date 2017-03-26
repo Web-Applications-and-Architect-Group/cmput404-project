@@ -27,6 +27,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     'cloud-dingkai.c9users.io',
+    'cmput404-tuxinzhang.c9users.io',
     'localhost',
     '127.0.0.1',
     '192.168.31.109',
@@ -109,13 +110,13 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+
 REST_FRAMEWORK = {
-    # Use Django's standard `django.contrib.auth` permissions,
-    # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+        'rest_framework.permissions.IsAuthenticated',
     ]
 }
+
 
 
 # Internationalization
@@ -143,13 +144,12 @@ MEDIA_ROOT = os.path.join(STATIC_ROOT, 'media')
 MEDIA_URL = STATIC_URL + 'media/'
 
 
-
-STATIC_URL = '/static/'
 STATICFILES_STORAGE =  'whitenoise.django.GzipManifestSaticFilesStorage'\
 
 # for login required decorator
 # https://docs.djangoproject.com/en/1.10/topics/auth/default/#django.contrib.auth.decorators.login_required
 LOGIN_URL = "/login/"
+LOGIN_REDIRECT_URL = "/"
 
 # Update database configuration with $DATABASE_URL.
 import dj_database_url
@@ -161,3 +161,10 @@ DATABASES['default'].update(db_from_env)
 # https://warehouse.python.org/project/whitenoise/
 
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
+
+
+# change those settings before put on herok
+# HOST_NAME = "https://cloud-dingkai.c9users.io"
+HOST_NAME = "http://127.0.0.1:8000"
+MAXIMUM_PAGE_SIZE = 50
+

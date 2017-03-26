@@ -1,0 +1,143 @@
+{%extends 'base.html' %}
+{% block content %}
+<div class="w3-container w3-content w3-card-2 w3-round w3-white center-block" style="max-width:1400;margin-top:80px;margin-left:10em">
+            <form id="updateForm" class="form-horizontal" role="form" action="{% url 'update_post' post.id %}" method="post" >{% csrf_token %}
+                <h2 class="text-center">Post Title</h2>
+                <div class="form-group">
+                    <label for="title" class="col-sm-3 control-label">Title:</label>
+                    <div class="col-sm-6 read">
+                        <input name = "title" type="text" id="title" value="{{post.title }}" placeholder="{{post.title}}" class="form-control" autofocus>
+			<input type="hidden" value="{{ user }}" id="author">
+			<input type="hidden" value="{{ request.user }}" id="viewer">
+			<input type="hidden" value="{{ post.visibility }}" id="myVis">
+			<input type="hidden" value="{{ post.contentType }}" id="myType">
+			<input type="hidden" value="{{ post.unlisted }}" id="unlisted">
+
+
+                        <span class="help-block">@ author: {{post.author.displayName}}</span>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="description" class="col-sm-3 control-label">Description</label>
+                    <div class="col-sm-6">
+                        <input name="description" type="text" id="description" value="{{post.description}}" class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="category" class="col-sm-3 control-label">Category</label>
+                    <div class="col-sm-6">
+                    <input name="category" type="text" id="category"  value = "{{category}}" id="category" class="form-control">
+			<span class="help-block">block categories by #</span>
+                </div>
+
+                <div class="form-group">
+              </div>
+              <label for="visibleTo" class="col-sm-3 control-label">VisibleTo</label>
+              <div class="col-sm-6">
+              <input name="visibleTo" type="text" id="visiTo"  value = "{{visibleTo}}" id="visibleTo" class="form-control">
+<span class="help-block">block visibleTo by #</span>
+              </div>
+            </div>
+            
+                <div class="form-group">
+                    <label for="vislibility" class="col-sm-3 control-label">Visibility</label>
+                    <div class="col-sm-5">
+                        <select name ="visibility" id="visibility" class="form-control" >
+			                <option value= 0>Public</option>
+                            <option value= 1>FOAF</option>
+                            <option value= 2>Friends</option>
+                            <option value= 3>Private</option>
+                            <option value= 4>Server-only</option>
+
+                        </select>
+                    </div>
+                </div> <!-- /.form-group -->
+
+                <div class="form-group">
+                    <label for="content_type" class="col-sm-3 control-label">Content Type</label>
+                    <div class="col-sm-5">
+                        <select name ="contentType" id="content_type" class="form-control">
+                            <option value = 0>Plain Text</option>
+                            <option value = 1>Markdown</option>
+                            <option value = 2>application/base64</option>
+			                <option value = 3>image/png;base64</option>
+			                <option value = 4>image/jpeg;base64</option>
+			                <option value = 5>github-activity</option>
+                        </select>
+                    </div>
+                </div> <!-- /.form-group -->
+
+                <div class="form-group">
+                        <label for="unlisted" class="col-sm-3 control-label">Unlisted</label>
+                    <div class="col-sm-5">
+                        <select name ="unlisted" id="listornot" class="form-control">
+                            <option id="LLL" value="False">Listed</option>
+                            <option id="UUU" value="True">Unlisted</option>
+                        </select>
+                    </div>
+                </div> <!-- /.form-group -->
+
+	        <div class="form-group">
+                    <label for="content" class="col-sm-3 control-label">Content</label>
+                    <div class="col-sm-6">
+		   <textarea name="content" rows="4" cols="53" >{{post.content}}</textarea>
+                    </div>
+                </div>
+
+
+		<div class="form-group  center-block " role="group" aria-label="...">
+			<div class="list-group col-md-4"></div>
+			<div class="btn-group btn-lg" role="group">
+			    <button type="update_button" id= "update" class="btn btn-primary"> Update Post </button>
+			</div>
+			<div class="btn-group btn-lg" role="group">
+			    <button type="button" id= "deletePost" class="btn btn-danger"><a href="{%url 'delete_post' post.author.id post.id%}" > Delete Post </a></button>
+			</div>
+
+		</div>
+
+            </form> <!-- /form -->
+        </div> <!-- ./container -->
+
+{% endblock %}
+
+{% block javascript %}
+<script>
+  var author = document.getElementById("author").value;
+  var viewer = document.getElementById("viewer").value;
+  var readable = document.getElementsByClassName("read");
+  var myVis = document.getElementById("myVis").value;
+  var myType = document.getElementById("myType").value;
+  var unlisted = document.getElementById("unlisted").value;
+
+  var update = document.getElementById("update");
+  var deletePost = document.getElementById("deletePost");
+
+  document.getElementById('visibility').value = myVis
+  document.getElementById('content_type').value = myType
+
+  if(unlisted=="True") {
+    //alert(unlisted);
+    document.getElementById("listornot")[1].selected=true;
+  }
+
+
+  if(author!=viewer) {
+    update.style.visibility = "hidden";
+    deletePost.style.visibility = "hidden";
+
+    for(i=0;i<readable.length;i++) {
+        readable[i].readOnly = true;
+      }
+  }
+
+    $(document).ready(function() {
+       $("#update_button").click(function() {
+           $("#updateForm").submit();
+       });
+    });
+
+
+</script>
+{% endblock %}

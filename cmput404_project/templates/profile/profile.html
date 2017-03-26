@@ -1,153 +1,91 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends 'base.html' %}
 
-<head>
-    <title>My Profile</title>
-    {% load static %}
-    <link rel="stylesheet" type="text/css" href="{%static 'css/profile.css' %}">
+{% block content %}
 
-</head>
-
-
-
-
-
-
-<body>
-  {% if user.profile.is_active %}
-    <div class="profile">
-        <img alt="user photo" src={{user.profile.img.url}} height='300' width='300' />
-        <br/><br/>
-
-
-        <table><tbody>
-              <tr><td>Username</td><td>{{ user.username }}</td><tr>
-              <tr><td>Email</td>
-                  <td>{% if user.email %} {{ user.email }}
-                      {% else %} n/a
-                      {% endif %}</td><tr>
-
-              <tr><td>Github</td>
-                <td>{% if user.profile.github %} {{ user.profile.github }}
-                    {% else %} n/a
-                    {% endif %}</td><tr>
-
-              <tr><td>Bio</td>
-                <td>{% if user.profile.bio %} {{ user.profile.bio }}
-                    {% else %} n/a
-                    {% endif %}</td><tr>
-       </tbody></table>
+<div class="w3-container w3-content" style="max-width:1400px;margin-top:80px;margin-left:10em">
+  <div class="col-md-2 float-left">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">{{author}}</h3>
+      </div>
+      <div class="btn-group-vertical center-block" role="group">
+         <a href="" class="btn btn-primary"><strong>Profile</strong></a>
+         <a href="{% url 'friendList' author.id %}" class="btn btn-default">Friendship</a>
+         <a href="" class="btn btn-default">Followers</a>
+      </div>
     </div>
-    <br/>
+  </div>
+  <div class="col-md-10 float-right ">
+    <div class="Subhead">
+      <span class="col-md-10 float-left">
+        <h2 class="Subhead-heading"> Profile </h2><br>
+      </span>
 
-
-    {% if request_by %}
-      {% if request_by.id == user.id %}
-        <!-- <p> Your account has not yet been approved by admin. Please wait until you been approved.</p> -->
-        <!-- <button id="show" class="editProfile"> -->
-
-        <a class="editProfile" href="{% url 'profile_edit' %}">Edit Profile</a>
-
-
-        <a href="{% url 'create_post_html' %}">Write post</a>
-
-
-        <form action="{% url 'ViewMyStream' %}" method="GET">
-          <select name="post_type">
-              <option value="">select posts</option>
-              <option value= "my_post">View My Posts</option>
-              <option value= "public_post">View Public Posts</option>
-              <<option value="friend_post">View Friends' Posts</option>
-           </select>
-            <button name="confirm_post">confirm</button>
+      <span class="col-md-2 float-right">
+        {% if author.id == viewer.id %}
+        {% else %}
+        <form id="follow_action" method="post" action="{% url 'send_friendrequest' %}">
+          {% csrf_token %}
+          <input type="hidden" name="friend_url" value="{{ author.url }}" />
+          <a onclick="document.getElementById('follow_action').submit();"><button type="button" class="btn btn-default">Follow</button></a>
         </form>
-
-        <div class="navigation">
-          <a class="button" href="{% url 'auth_logout' %}">Logout</a>
+        {% endif %}
+      </span>
+    </div>
+    <form action="{% url 'profile' author.id %}" method="post" enctype="multipart/form-data">
+      <div class="col-md-6 float-left">
+        <div class="form-group">
+          <label >Display Name</label>
+          <input type="text" class="form-control view" value="{{ author.displayName }}" name='displayName' id="isUser" >
+          <p>@{{ author.id }}</p>
         </div>
+        {% csrf_token %}
+        <div class="form-group">
+          <label >Email address</label>
+          <input type="email" name="email" class="form-control view" value="{{ author.user.email }}" id="isUser">
+        </div>
+        <div class="form-group">
+          <label >Github</label>
+          <input type="text" name="github" class="form-control view" value="{{ author.github }}" id="isUser">
+        </div>
+        <div class="form-group">
+          <label >Bio</label>
+          <textarea rows="4" cols="50" name="bio" class="form-control view"  id="isUser">{{ author.bio }}</textarea>
+        </div>
+        <p>
+          <button type="submit" class="btn btn-default setBtn">Update Profile</button>
+        </p>
+      </div>
 
-        <div id="friend_request">
-          <h3>My Friend request</h3>
+      <div class="col-md-4 float-right">
+        <img class = "img-rounded center-block" alt="user photo" src={{author.img.url}} height=300px width=300px/>
+        <hr>
+        <label class="btn btn-default btn-file center-block setBtn">
+          Upload new picture <input name="image" class="hidden" type="file" accept="image/*">
+        </label>
+      </div>
+    </form>
+  </div>
+</div>
 
+{% endblock %}
 
-
-                {% if friend_request %}
-                        {% for request in friend_request %}
-                        <div class="double">
-                                <div>
-                                  {% if request.status == False %}
-                                        {{ request.request_sender}} wants to be your friend
-                                        <div id="accept" class="accept_friend">
-                                          <form action="{% url 'accept_friend' %}" method="post">
-                                                        {% csrf_token %}
-                                            <input name="request_id" value="{{ request.request_id }}" type = "hidden" />
-                                            <input type="submit" value="Accept"/>
-                                          </form>
-                                        </div>
-                                  {% endif %}
-                                </div>
-                        </div>
-                        {% endfor %}
-                {% else %}
-                        <p>No Requests.</p>
-                {% endif %}
-
-
-
-                <h3>My Friends</h3>
-                {% if friend_list %}
-                    {% for friend in friend_list %}
-                        <div class="double">
-                            {{friend}}
-                        </div>
-                        {% endfor %}
-                {% else %}
-                      <p>You have no friends.</p>
-                {% endif%}
-
-      {% else %}
-
-          {% if  isFriend == True %}
-            <p> you guys are friends !</p>
-          {% else%}
-            <button id="show" class="uploadPhoto">Follow</button>
-
-            <form action="{% url 'Add_friend' %}" method="post">
-                {% csrf_token %}
-                <input name="request_sender" value="{{ request_by.id }}" type = "hidden" />
-                <input name="request_receiver" value="{{ user.id }}" type = "hidden" />
-
-                <input type="submit" value="Add Friend"/>
-             </form>
-         {% endif %}
-
-
-
-         </div>
-
-
-
-      {% endif %}
-    {% else %}
-    {% endif %}
-
-
-
-
-  {% else %}
-    {% if request_by %}
-      {% if request_by.id == user.id %}
-        <p> Your account has not yet been approved by admin. Please wait until you been approved.</p>
-      {% else %}
-        <p> This user haven been approved by admin. </p>
-      {% endif %}
-    {% else %}
-
-      <p> This user haven been approved by admin. </p>
-    {% endif %}
-
-  {% endif %}
-
-
-
-</body>
+{% block javascript %}
+<script>
+  //var user = document.getElementById("User").value;
+  //var viewer = document.getElementById("viewer").value;
+  var readable = document.getElementsByClassName("view");
+  var visibility = document.getElementsByClassName("setBtn");
+  //alert(visibility.length);
+  //alert(user);
+  //alert(viewer);
+  if("{{ author.id }}"!= "{{viewer.id}}") {
+    for(i=0;i<readable.length;i++) {
+      readable[i].readOnly = true;
+    }
+    for(i=0;i<visibility.length;i++) {
+      visibility[i].style.visibility = "hidden";
+    }
+  }
+</script>
+{% endblock %}

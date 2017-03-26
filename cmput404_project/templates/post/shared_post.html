@@ -15,18 +15,53 @@
   </head>
 
   <body>
-    <div class="post">
-      {% if profile.photo %}
-          <img alt="user photo" src="{{ STATIC_URL }}/users/{{user.id}}/{{profile.photo }}" >
+
+
+    <div class="w3-container w3-card-2 w3-white w3-round w3-margin"><br>
+      <span class="w3-right w3-opacity">{{post.published}}</span>
+      <h3>
+      <img alt="user photo" class="img-rounded" height=48 width=48 src="{{ post.author.img.url }}" >
+      <a href="{% url 'profile' post.author.id %}" >{{ post.author.displayName }}</a></h3>
+      <span>Title:    </span><a> {{ post.title }}</a></br></br>
+      <span>Description:    </span>{{ post.description }}
+      <hr class="w3-clear">
+      <ul style="list-style: none">
+      <li>  </br>
+      {% if post.contentType == 1 %}
+      {{ post.content|markdown }}
       {% else %}
-          <img alt="user photo" src="{% static "../static/images/defaultUserImage.png" %}" width = "30" height = "30">
+      {{ post.content|urlize }}
       {% endif %}
-      {{ post.author }}  ({{ post.pub_datetime }})</br></br>
-      {% if post.post_type == 1 %}
-          {{ post.post_text|markdown }}</br></br>
-      {% else %}
-        {{ post.post_text|urlize }}</br></br>
-      {% endif %}
+
+    </br></br>
+      <div class="w3-row-padding" style="margin:0 -16px">
+        <div class="w3-half">
+          <img src="/w3images/lights.jpg" style="width:100%" alt="Northern Lights" class="w3-margin-bottom">
+        </div>
+        <div class="w3-half">
+          <img src="/w3images/nature.jpg" style="width:100%" alt="Nature" class="w3-margin-bottom">
+      </div>
     </div>
+
+    <div style="text-align:left">
+        {% for comment in post.comments.all %}
+          <hr class="w3-clear">
+          comment by {{comment.author}}: {{comment.comment}} ({{comment.published}})</br>
+        {% endfor %}
+    </div></br>
+      <hr class="w3-clear">
+      <form action="{% url 'comment' %}" method="GET">
+        <input hidden="hidden" name="github" value = "{{user.profile.github}}" id="githubID"/>
+            {% csrf_token %}
+              <input style= "width:80%" name="comment_text"/>
+              <input hidden="hidden" name="post_id" value = "{{post.id }}"/>
+              <input hidden="hidden" name="content_type" value = "{{contentType}}"/>
+              <input type="submit" class="w3-button w3-theme-d2 w3-margin-bottom" value = "Comment"/>
+      </form></br>
+    </div>
+
+      </li></br>
+    </ul>
+
   </body>
 </html>

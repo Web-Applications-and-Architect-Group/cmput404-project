@@ -1,3 +1,4 @@
+{% extends 'base.html' %}
 {% load static %}
 {% load markdown_deux_tags %}
 
@@ -25,9 +26,11 @@
     </style>
     {% if posts %}
       <div class="myStream">
+
      <!-- <button id="show" class="home"> -->
       <a href="{% url 'profile' %}"><h4>Go Back To Profile</h4></a>
     <!-- </button> -->
+
       <ul style= "width: 70%; margin-left:12%;  ">
 
 {%for post in posts%}

@@ -1,0 +1,141 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="{% static 'css/bootstrap-theme.min.css' %}">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/3/w3.css">
+<link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-blue-grey.css">
+<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Open+Sans'>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
+<!-- Trigger Modal for post -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+<style>
+html,body,h1,h2,h3,h4,h5 {font-family: "Open Sans", sans-serif}
+input[type="text"], textarea {
+
+  background-color : rgb(250, 255, 189);
+
+}
+</style>
+<head>
+</head>
+
+<body class="w3-theme-l5">
+
+<!-- Navbar -->
+<div class="w3-top">
+ <div class="w3-bar w3-theme-d2 w3-left-align w3-large">
+  <a class="w3-bar-item w3-button w3-hide-medium w3-hide-large w3-right w3-padding-large w3-hover-white w3-large w3-theme-d2" href="javascript:void(0);" onclick="openNav()"><i class="fa fa-bars"></i></a>
+  <a href="{% url 'home' %}" class="w3-bar-item w3-button w3-padding-large w3-theme-d4"><i class="fa fa-home w3-margin-right"></i>Home</a>
+  {% if request.user.username %}
+  <button type="button" class="w3-bar-item w3-button w3-padding-large w3-theme-d4" data-toggle="modal" data-target="#myModal"><i class="fa fa-pencil"></i> Post</button>
+  <div class="w3-dropdown-hover w3-hide-small w3-right">
+    <button class="w3-button w3-padding-large " title="Edit Profile"><i class="fa fa-user"></i><span class="w3-badge w3-right w3-small w3-green"></span></button>
+    <div class="w3-dropdown-content w3-card-4 w3-bar-block" style="width:180px;font-size:80%">
+      <a href=" {% url 'profile' request.user.author.id %} " class="w3-bar-item w3-button" style="color:#aaa;">
+        <div>Logged in as</div> {{request.user.username}}
+      </a>
+      <a href="{% url 'stream' request.user.author.id %}" class="w3-bar-item w3-button">My Stream</a>
+      <a href=" {% url 'profile' request.user.author.id %} " class="w3-bar-item w3-button">Edit Profile</a>
+      <a href="/logout/" class="w3-bar-item w3-button" title="logout">Log out</a>
+    </div>
+    <a href="#" class="w3-bar-item w3-hide-small w3-right w3-padding-large" ><img src="{{request.user.author.img.url}}" class="w3-circle" style="height:25px;width:25px" alt="Avatar"></a>
+  </div>
+  <div class="w3-dropdown-hover w3-hide-small w3-right">
+    <button class="w3-button w3-padding-large" title="Notifications"><i class="fa fa-bell"></i><span class="w3-badge w3-right w3-small w3-green"></span></button>
+    <div class="w3-dropdown-content w3-card-4 w3-bar-block" style="width:180px;font-size:80%">
+      <a href="{% url 'friendList' request.user.author.id %}" class="w3-bar-item w3-button">New friend request</a>
+      <a href="#" class="w3-bar-item w3-button">New followers</a>
+    </div>
+  </div>
+  {% else %}
+  <a href="/login/" class="w3-bar-item w3-button w3-hide-small w3-right w3-padding-large w3-hover-white" title="logout">Log in</a>
+  <a href="/register/" class="w3-bar-item w3-button w3-hide-small w3-right w3-padding-large w3-hover-white" title="logout">Sign up</a>
+  {% endif %}
+ </div>
+</div>
+
+<!-- Navbar on small screens -->
+
+{% block content %}
+{% endblock %}
+
+
+<!-- Trigger the modal with a button -->
+<!-- Modal -->
+<div class="modal fade" id="myModal" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        {% if request.user.username %}
+        <h2 class="modal-title" style="text-align:center">Write A New Post</h2>
+      </div>
+      <div class="modal-body">
+        <div style="border: 2px solid	#e9f2fc; padding:2em;
+                    text-align:center; background-color: #eaf2fb; font-family: verdana;" >
+
+        <form method="post" enctype="multipart/form-data" action="{% url 'create_post' %}">
+        {% csrf_token %}
+        	<div class="selection">
+            <h1>New post</h1>
+
+            <h5><b>Categoies(separate by #):</b><input name="categoies" type="text" id="cate"></h5>
+            <h5><b>VisibleTo(separate by #):</b><input name="visibleTo" type="text" id="visiTo"></h5>
+
+            {{ form.as_p }}
+            <input type="file" name="files" multiple>
+            <button type="submit" class="save btn btn-success btn-sm" style="background:#4CAF50">Save</button>
+
+
+        </form>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success btn-sm" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+
+  </div>
+  {% endif %}
+</div>
+</div>
+
+<script>
+// Accordion
+function myFunction(id) {
+    var x = document.getElementById(id);
+    if (x.className.indexOf("w3-show") == -1) {
+        x.className += " w3-show";
+        x.previousElementSibling.className += " w3-theme-d1";
+    } else {
+        x.className = x.className.replace("w3-show", "");
+        x.previousElementSibling.className =
+        x.previousElementSibling.className.replace(" w3-theme-d1", "");
+    }
+}
+
+// Used to toggle the menu on smaller screens when clicking on the menu button
+function openNav() {
+    var x = document.getElementById("navDemo");
+    if (x.className.indexOf("w3-show") == -1) {
+        x.className += " w3-show";
+    } else {
+        x.className = x.className.replace(" w3-show", "");
+    }
+}
+</script>
+{% block javascript %}
+{% endblock %}
+
+
+</body>
+</html>

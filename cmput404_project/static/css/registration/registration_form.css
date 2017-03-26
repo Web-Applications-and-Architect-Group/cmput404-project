@@ -1,0 +1,102 @@
+body{
+    margin-top: 5%;
+    text-align: center;
+}
+/*
+table{
+    margin: auto;
+    text-align: left;
+    font-size: 120%;
+}
+*/
+
+.navigation{
+    min-height: 100px;
+    width: 100%;
+    margin-top: 80px;
+}
+
+/*
+@keyframes
+button-hover-in {
+    from {
+        background-color: #ddd;
+        color: black;
+        border-radius: 5px;
+        padding: 8px 18px;
+        text-decoration: none;
+        font-weight: 700;
+    }
+    to {
+        background-color: #eee;
+        color: #555;
+        border-radius: 5px;
+        padding: 14px 24px;
+        text-decoration: none;
+        font-size: 14pt;
+    }
+}
+.button {
+    background-color: #ddd;
+    color: black;
+    border-radius: 5px;
+    padding: 8px 18px;
+    text-decoration: none;
+    font-weight: 700;
+}
+.button:hover {
+    background-color: #eee;
+    color: #222;
+    border-radius: 5px;
+    padding: 10px 20px;
+    text-decoration: none;
+    font-size: 14pt;
+    animation-name: button-hover-in;
+    animation-duration: 0.05s;
+}
+*/
+
+.helptext {
+    padding: 10px;
+    color: darkgray;
+}
+
+.errorlist {
+    color: crimson;
+}
+
+/*
+form {
+    text-align: left;
+}
+*/
+
+h1 {
+    padding: 14px;
+}
+
+
+
+input {
+/*    height: 24px;*/
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+    -webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+}
+input:focus {
+    border-color: #66afe9;
+    outline: 0;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, .6);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102, 175, 233, .6);
+}
+
