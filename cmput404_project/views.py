@@ -4,7 +4,7 @@ from django.shortcuts import render, get_object_or_404,get_list_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 import os
-from .models import  Author,Post, friend_request, Comment,Notify,Friend,Category
+from .models import  Author,Post, friend_request, Comment,Notify,Friend,Category, Node
 from .forms import ProfileForm,ImageForm,PostForm
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -81,12 +81,19 @@ class Send_Friendrequest(LoginRequiredMixin, View):
 
 def home(request):
     form = PostForm()
-    #post = Post.objects.filter(author = request.user).order_by('-pub_datetime')
     post= Post.objects.filter(visibility=0).order_by('-published')
+    for node in Node.objects.all():
+        r = requests.get(node.host+node.public_post_url, auth=(node.auth_username, node.auth_password))
+        if r.status_code == 200:
+            print "-----------------------------------------"
+            print(r.json())
+            serializer = PostSerializer(data=r.json()['posts'],many=True)
+            if serializer.is_valid():
+                posts = serializer.save()
     author = None
     if(request.user.is_authenticated()):
         author = request.user.author
-    context = { 'posts': post ,'form': form,'author':author}
+    context = { 'posts': post ,'form': PostForm(),'author':author}
     return render(request,'home.html',context)
 
 def stream(request,author_id):
@@ -98,46 +105,30 @@ def stream(request,author_id):
 
 
 def profile(request,author_id):
-    user = get_object_or_404(Author, pk=author_id).user
-    viewer = request.user
+    author = get_object_or_404(Author, pk=author_id)
+    viewer = None
+    if request.user.is_authenticated:
+        viewer = request.user.author
     form = PostForm()
-    if request.method == 'POST' and viewer.id == user.id:
+    if request.method == 'POST' and viewer.id == author.id:
         profile_form = ProfileForm(request.POST)
         image_form = ImageForm(request.POST,request.FILES)
         if profile_form.is_valid():
-            user.author.displayName = profile_form.cleaned_data['displayName']
-            user.email = profile_form.cleaned_data['email']
-            user.author.github = profile_form.cleaned_data['github']
-            user.author.bio = profile_form.cleaned_data['bio']
+            author.displayName = profile_form.cleaned_data['displayName']
+            author.user.email = profile_form.cleaned_data['email']
+            author.github = profile_form.cleaned_data['github']
+            author.bio = profile_form.cleaned_data['bio']
         else:
             print(profile_form.errors)
         if image_form.is_valid():
-            user.author.img = image_form.cleaned_data['image']
-        user.author.save()
-        user.save()
+            author.img = image_form.cleaned_data['image']
+        author.save()
+        author.user.save()
     else:
         profile_form = ProfileForm()
-    return render(request,'profile/profile.html',{'profile_form':profile_form,'form':form,'viewer':viewer,'user':user})
+    return render(request,'profile/profile.html',{'profile_form':profile_form,'form':form,'viewer':viewer,'author':author})
 
 
-def profile_old(request):
-    try:
-        profile = Profile.objects.get(user_id=request.user.id)
-        user = User.objects.get(id=request.user.id)
-    except (KeyError, Profile.DoesNotExist):
-        # profile no found create new
-        profile = Profile.create(request.user)
-        profile.save()
-    else:
-        # print profile
-        pass
-
-    friend_requests = friend_request.objects.filter(request_receiver=request.user)
-
-    friends = Profile.objects.get(user=request.user).friends.all()
-    # print (friends)
-    return render(request,'profile/profile_old.html',{'user':request.user, 'request_by':request.user,
-        'friend_list':friends,'friend_request':friend_requests})
 @login_required
 def create_post_html(request):
     return render(request,'post/create_post.html',{'user':request.user})
@@ -383,14 +374,14 @@ def get_object_by_uuid_or_404(model, uuid_pk):
         raise Http404(str(e))
     return get_object_or_404(model, pk=uuid_pk)
 
-def friendList(request,username):
-    user = User.objects.get(username=username)
-    author = Author.objects.get(user=user)
-    notify = Notify.objects.filter(requestee=author)
+def friendList(request,author_id):
+    author = Author.objects.get(pk=author_id)
+    friend_requests = author.notify.all()
+    viewer = None
+    if request.user.is_authenticated:
+        viewer = request.user.author
 
-
-
-    context={'user':user,'form':PostForm(),'author':author,'Friend_request':notify}
+    context={'author':author,'form':PostForm(),'viewer':viewer,'friend_requests':friend_requests}
     #,'Friend':friends,'Followed':follows
     return render(request,'friend/friendList.html',context)
 

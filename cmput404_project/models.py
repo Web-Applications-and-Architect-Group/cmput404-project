@@ -21,9 +21,14 @@ accept = [
 class Node(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE,primary_key=True)
     host = models.URLField()
+    auth_username = models.CharField(max_length=50)
+    auth_password = models.CharField(max_length=50)
+    public_post_url = models.CharField(max_length=50,default="/service/posts?format=json")
+    auth_post_url = models.CharField(max_length=50,default="/service/author/posts?format=json")
 
     def __str__(self):
         return self.host
+        
 @python_2_unicode_compatible
 class Author(models.Model):
     img = models.ImageField(upload_to= 'images/', default = 'images/defaultUserImage.png')
