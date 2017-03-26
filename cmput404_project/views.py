@@ -121,10 +121,12 @@ def home(request):
 
 def stream(request,author_id):
     author = get_object_or_404(Author,pk=author_id)
-    posts = Post.objects.filter(author=author).order_by('-published')
+    posts = Post.objects.filter(author=author).order_by('-published') | Post.objects.filter(visibility=3).order_by('-published')
     form = PostForm()
+    visi = None
+    visi = VisibleTo.objects.filter(visibleTo=author.url)
     images = PostImages.objects.all()
-    context = { 'posts': posts ,'author':author,'form':form,'images':images}
+    context = { 'posts': posts ,'author':author,'form':form,'images':images, 'visi':visi}
     return render(request, 'self.html', context)
 
 
