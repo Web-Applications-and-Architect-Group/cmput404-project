@@ -47,7 +47,7 @@ input[type="text"], textarea {
   <div class="w3-dropdown-hover w3-hide-small w3-right">
     <button class="w3-button w3-padding-large" title="Notifications"><i class="fa fa-bell"></i><span class="w3-badge w3-right w3-small w3-green"></span></button>
     <div class="w3-dropdown-content w3-card-4 w3-bar-block" style="width:180px;font-size:80%">
-      <a href="{% url 'friendList' request.user.username %}" class="w3-bar-item w3-button">New friend request</a>
+      <a href="{% url 'friendList' request.user.author.id %}" class="w3-bar-item w3-button">New friend request</a>
       <a href="#" class="w3-bar-item w3-button">New followers</a>
     </div>
   </div>

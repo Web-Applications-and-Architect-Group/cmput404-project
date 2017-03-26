@@ -22,7 +22,11 @@
       </span>
 
       <span class="col-md-2 float-right">
-        <a href="#"><button type="button" class="btn btn-default">Follow</button></a>
+        <form id="follow_action" method="post" action="{% url 'send_friendrequest' %}">
+          {% csrf_token %}
+          <input type="hidden" name="friend_url" value="{{ author.url }}" />         
+          <a onclick="document.getElementById('follow_action').submit();"><button type="button" class="btn btn-default">Follow</button></a>
+        </form>
       </span>
     </div>
     <form action="{% url 'profile' author.id %}" method="post" enctype="multipart/form-data">
