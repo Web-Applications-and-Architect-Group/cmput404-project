@@ -1,9 +1,10 @@
 {%extends 'base.html' %}
 {% block content %}
 
-<div class= "pull-center w3-container w3-content" style="max-width:1400px;margin-top:80px;margin-left:10em">
-<div class="list-group col-md-2">
-</div>
+<!-- <div class= "pull-center w3-container w3-content" style="max-width:1400px;margin-top:80px;"> -->
+<div class="w3-container w3-content" style="max-width:1400px;margin-top:80px;margin-left:10em">
+<!-- <div class="list-group col-md-2">
+</div> -->
 <!-- <div class="list-group col-md-3">
   <h3 class="text-center"> Friends</h3>
   <a href="#" class="list-group-item ">Cras justo odio
@@ -16,15 +17,32 @@
 </div> -->
 
 
+<div class="col-md-2 float-left">
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h3 class="panel-title">Author</h3>
+    </div>
+    <div class="btn-group-vertical center-block" role="group">
+       <a href="{% url 'profile' author.id %}" class="btn btn-default">Profile</a>
+       <a href="{% url 'friendList' author.id %}" class="btn btn-primary"><strong>Friendship</strong></a>
+       <a href="" class="btn btn-default">Followers</a>
+    </div>
+  </div>
+</div>
 
-
-<div class="list-group col-md-3">
+<div class="list-group col-md-4">
   <h3 class="text-center"> Friend Request</h3>
   {% for f_request in friend_requests %}
-  <a href="{% url 'AcceptFriendRequest' f_request.requester_id %}" class="list-group-item "> {{f_request.requester_displayName}}
+  <a href="
+  {% if author.id == viewer.id %}
+    {% url 'AcceptFriendRequest' f_request.requester_id %}
+  {% endif %}" class="list-group-item "> {{f_request.requester_displayName}}
 
-	<button type="button" class="btn btn-success btn-xs pull-right">
-	<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Accept</button></a>
+  {% if author.id == viewer.id %}
+  <button type="button" class="btn btn-success btn-xs pull-right">
+  <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Accept</button>
+  {% endif %}
+</a>
   {% endfor %}
 
 </div>
@@ -32,7 +50,7 @@
 
 
 
-<div class="list-group col-md-3">
+<div class="list-group col-md-4">
   <h3 class="text-center"> Following and Friends</h3>
   {% for author in following_list %}
   <a href="#" class="list-group-item "> {{ author.displayName }}

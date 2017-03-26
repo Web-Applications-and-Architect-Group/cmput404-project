@@ -427,7 +427,7 @@ def friendList(request,author_id):
         r = requests.get(f_author.requestee+'/friends', auth=admin_auth)
         if r.status_code==200:
             remote_author_following_list = r.json()
-            print(remote_author_following_list)
+            # print(remote_author_following_list)
             if author_id in remote_author_following_list["authors"]:
                 # they are friend
                 a_remote_author["relationship"] = "friend"
