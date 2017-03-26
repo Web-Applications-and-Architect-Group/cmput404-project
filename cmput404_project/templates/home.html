@@ -122,6 +122,7 @@
       </br></br>
 
     <form action="{% url 'comment' %}" method="POST">
+            {% csrf_token %}
             <div class="editor" id="test" style="display:none">
       <div class="editor-header">
 
@@ -138,7 +139,6 @@
       </div>
 
   <input hidden="hidden" name="github" value = "{{user.profile.github}}" id="githubID"/>
-      {% csrf_token %}
         <input style= "width:80%" name="comment_text" class="editor-content"/>
         <input hidden="hidden" name="post_id" value = "{{post.id }}"/>
         <input type="submit" class="w3-button w3-theme-d2 w3-margin-bottom" value = "Comment" />

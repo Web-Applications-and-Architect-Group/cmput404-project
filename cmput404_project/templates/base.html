@@ -82,32 +82,9 @@ input[type="text"], textarea {
         <form method="post" enctype="multipart/form-data" action="{% url 'create_post' %}">
         {% csrf_token %}
         	<div class="selection">
-<!--         		<select name="post_type">
-        		<option value= 0>public</option>
-        		<option value= 1>only friends</option>
-        		<option value= 2>Friends of friends</option>
-        		<option value= 3>Private</option>
-            <option value= 4>Unlisted</option>
-        		</select>
-
-            <select name="content_type">
-            <option value= 0>Plain Text</option>
-            <option value= 1>Markdown</option>
-          </select></br>
-        	</div>
-        	<div>
-        	<textarea name="POST_TEXT" rows="4" cols="50" ></textarea>
-        	</div>
-
-        	<div>
-        		<h4>Choose a picture to upload!</h4>
-        		<input style="margin-left:40%" name="uploadFile" type="file" />
-        	</div>
-
-        	<input type="submit" name="create new post" value="Submit"> -->
             <h1>New post</h1>
 
-            <h5>Categoies(separate by #):<input name="categoies" type="text" id="cate"></h5>
+            <h5><b>Categoies(separate by #):</b><input name="categoies" type="text" id="cate"></h5>
             {{ form.as_p }}
             <input type="file" name="files" multiple>
             <button type="submit" class="save btn btn-success btn-sm" style="background:#4CAF50">Save</button>

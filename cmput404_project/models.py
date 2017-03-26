@@ -95,7 +95,7 @@ class Post(models.Model):
 
     def __getitem__(self, key):
         return getattr(self, key)
-
+#https://www.youtube.com/watch?v=C9MDtQHwGYM
 def content_file_name(instance, filename):
     return '/'.join(['images', str(str(instance.post.id) + filename)])
 @python_2_unicode_compatible

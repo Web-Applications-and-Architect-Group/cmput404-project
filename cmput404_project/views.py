@@ -233,9 +233,9 @@ def update_post(request, post_id):
 @login_required
 def comment(request):
     author = Author.objects.get(displayName = request.user.username)
-    comment_text = request.GET['comment_text']
-    comment_type = request.GET['content_type']
-    post_id= request.GET['post_id']
+    comment_text = request.POST['comment_text']
+    comment_type = request.POST['content_type']
+    post_id= request.POST['post_id']
     post = Post.objects.get(id = post_id)
 
     new_comment = Comment.create(author, comment_text, post, comment_type)
@@ -248,6 +248,7 @@ def comment(request):
 
     images = PostImages.objects.all()
     context["images"] = images
+    context["form"] = PostForm()
     return render(request, 'home.html', context)
     #return HttpResponseRedirect(reverse('ViewMyStream'), kwargs={'post_type':post_type})
 
@@ -384,5 +385,5 @@ def onePost(request,author_id,post_id):
 	result = ""
 	for category in post.categories.all():
 	    result += "#"+ category.category
-	context = {'post':post,'category':result,'user':user}
+	context = {'post':post,'category':result,'user':user,'form':PostForm}
 	return render(request,'post/onePost.html',context)
