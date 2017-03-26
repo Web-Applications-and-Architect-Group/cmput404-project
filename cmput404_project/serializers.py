@@ -64,6 +64,19 @@ class PostSerializer(serializers.ModelSerializer):
     		result.append(category.category)
     	return result
 
+    def create(self,validated_data):
+        comment_data = validated_data.pop('comments')
+        validated_data.pop('count')
+        validated_data.pop('size')
+        validated_data.pop('next')
+        author_data = validated_data.pop('author')
+        try:
+            author = Author.objects.get(pk=author_data['id'])
+        except Author.DoesNotExist:
+            author = Author.objects.create(**author_data)
+        post = Post.objects.create(author=author, **validated_data)
+        return post
+    
 
 
 
@@ -116,7 +129,6 @@ class AddCommentQuerySerializer(serializers.Serializer):
         comment_data = validated_data.pop('comment')
         comment_data['post'] = Post.objects.get(pk=validated_data.pop('post_id'))
         author_data = comment_data.pop('author')
-        print author_data
         try:
             author = Author.objects.get(pk=author_data['id'])
         except Author.DoesNotExist:

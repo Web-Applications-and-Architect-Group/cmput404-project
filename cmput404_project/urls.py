@@ -73,9 +73,8 @@ urlpatterns = [
     ### (END) API specify by
     # https://github.com/Web-Applications-and-Architect-Group/CMPUT404-project-socialdistribution/blob/master/example-article.json
     # --------------------------------
-
-    url(r'^', include('registration.backends.simple.urls')),
     url(r'^admin/', admin.site.urls),
+    url(r'^', include('registration.backends.simple.urls')),
     url(r'^(?P<author_id>[a-zA-Z0-9-_]+)/profile$', views.profile, name="profile"),
     url(r'^(?P<username>[a-zA-Z0-9-_]+)/friendList$', views.friendList, name="friendList"),
     #url(r'^onePost',views.onePost, name="onePost"),

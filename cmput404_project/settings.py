@@ -164,6 +164,6 @@ STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
 
 # change those settings before put on herok
-HOST_NAME = "http://127.0.0.1:8000/"
+HOST_NAME = "https://cloud-dingkai.c9users.io"
 MAXIMUM_PAGE_SIZE = 50
 
