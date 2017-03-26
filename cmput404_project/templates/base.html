@@ -89,6 +89,8 @@ input[type="text"], textarea {
             <h1>New post</h1>
 
             <h5><b>Categoies(separate by #):</b><input name="categoies" type="text" id="cate"></h5>
+            <h5><b>VisibleTo(separate by #):</b><input name="visibleTo" type="text" id="visiTo"></h5>
+
             {{ form.as_p }}
             <input type="file" name="files" multiple>
             <button type="submit" class="save btn btn-success btn-sm" style="background:#4CAF50">Save</button>
