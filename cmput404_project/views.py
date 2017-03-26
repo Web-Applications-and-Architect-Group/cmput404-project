@@ -47,7 +47,7 @@ class Send_Friendrequest(LoginRequiredMixin, View):
         # r = requests.get('http://127.0.0.1:8000/service/author/diqiu') # for test
         # print(request.POST["friend_url"])
         # return
-        r = requests.get(request.POST["friend_url"], auth=("admin", "1234qwer"))
+        r = requests.get(request.POST["friend_url"], auth=("admin", "nimabide"))
         remote_friend = r.json()
         # print(remote_friend)
         # return
@@ -68,7 +68,7 @@ class Send_Friendrequest(LoginRequiredMixin, View):
         r = requests.post(
             remote_friend["host"]+'/service/friendrequest', 
             json=remote_request, 
-            auth=("admin", "1234qwer")
+            auth=("admin", "nimabide")
         )
 
         # store the follow relationship if success
@@ -388,8 +388,9 @@ def friendList(request,author_id):
 
     following_list = author.follow.all()
     for f_author in following_list:
-        r = requests.get() # get remote author info thr API
-        remote_author_info = r.json()
+        #r = requests.get() # get remote author info thr API
+        #remote_author_info = r.json()
+        pass
 
     context = {
         'author':author,
