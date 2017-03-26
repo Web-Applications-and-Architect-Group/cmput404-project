@@ -29,21 +29,19 @@
       </div>
       <br>
       <div class="w3-card-2 w3-round w3-white w3-center">
-
+        {% for f_request in Friend_request%}
         <div class="w3-container">
           <p>Friend Request</p>
-          <img  src="{{ post.author.profile.img.url }}" alt="Avatar" style="width:50%"><br>
-          <span>Jane Doe</span>
+          <!-- <img  src="{{ post.author.profile.img.url }}" alt="Avatar" style="width:50%"><br> -->
+          <span>{{f_request.requester_displayName}}</span>
           <div class="w3-row w3-opacity">
             <div class="w3-half">
-              <button class="w3-button w3-block w3-green w3-section" title="Accept"><i class="fa fa-check"></i></button>
+              <a href="{% url 'AcceptFriendRequest' f_request.requester_id %}"><button class="w3-button w3-block w3-green w3-section" title="Accept"><i class="fa fa-check"></i></button></a>
             </div>
-            <div class="w3-half">
-              <button class="w3-button w3-block w3-red w3-section" title="Decline"><i class="fa fa-remove"></i></button>
-            </div>
+
           </div>
         </div>
-      
+        {% endfor %}
       </div>
       <br>
 
@@ -73,22 +71,24 @@
         <span>Description:    </span>{{ post.description }}
         <hr class="w3-clear">
         <ul style="list-style: none">
-        <li>  </br>
+        <li>
         {% if post.contentType == 1 %}
         {{ post.content|markdown }}
         {% else %}
         {{ post.content|urlize }}
         {% endif %}
-
-      </br></br>
+      </br>
         <div class="w3-row-padding" style="margin:0 -16px">
+          {% for image in images%}
+          {% if post.id == image.post.id%}
           <div class="w3-half">
-            <img src="/w3images/lights.jpg" style="width:100%" alt="Northern Lights" class="w3-margin-bottom">
+            <img src="{{image.post_image.url}}" style="width:40%" alt="POST IMAGE" class="w3-margin-bottom">
           </div>
-          <div class="w3-half">
-            <img src="/w3images/nature.jpg" style="width:100%" alt="Nature" class="w3-margin-bottom">
-        </div>
+          {%endif%}
+          {% endfor %}
+
       </div>
+
 
       {% if post.unlisted %}
     </br></br>
