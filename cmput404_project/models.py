@@ -141,13 +141,12 @@ class Notify(models.Model):
         return self.requestee.displayName
 
 @python_2_unicode_compatible
-class VisibileTo(models.Model):
-    post = models.ForeignKey(Post,on_delete=models.CASCADE,related_name="visibileTo")
-    visibileTo = models.URLField()
+class VisibleTo(models.Model):
+    post = models.ForeignKey(Post,on_delete=models.CASCADE,related_name="visibleTo")
+    visibleTo = models.URLField()
+
     def __str__(self):
-        return self.requestee.username
-
-
+        return self.visibleTo
 
 
 @python_2_unicode_compatible

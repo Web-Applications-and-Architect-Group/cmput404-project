@@ -4,7 +4,7 @@ from django.shortcuts import render, get_object_or_404,get_list_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 import os
-from .models import  Author,Post, friend_request, Comment,Notify,Friend,Category
+from .models import  Author,Post, friend_request, Comment,Notify,Friend,Category, VisibleTo
 from .forms import ProfileForm,ImageForm,PostForm
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -72,21 +72,23 @@ class Send_Friendrequest(LoginRequiredMixin, View):
         # return HttpResponse(json.dumps(remote_request), status=status.HTTP_200_OK)
         return HttpResponse(r, status=r.status_code)
 
-
-
-
-
-
-
-
 def home(request):
     form = PostForm()
     #post = Post.objects.filter(author = request.user).order_by('-pub_datetime')
-    post= Post.objects.filter(visibility=0).order_by('-published')
+    post= Post.objects.filter(visibility=0).order_by('-published') | Post.objects.filter(visibility=3).order_by('-published')
     author = None
+    visi = None
     if(request.user.is_authenticated()):
         author = request.user.author
-    context = { 'posts': post ,'form': form,'author':author}
+        visi = VisibleTo.objects.filter(visibleTo=author.url)
+        visi1=VisibleTo.objects.all()
+
+    #print ("!!!!!!!!")
+    #print (visi)
+    #print (author.url)
+    #print (visi1)
+    #print (post[0])
+    context = { 'posts': post ,'form': form,'author':author, 'visi':visi}
     return render(request,'home.html',context)
 
 def stream(request,author_id):
@@ -185,6 +187,13 @@ def create_post(request):
                 m=Category.objects.create(post=new_post,category=cate)
                 m.save()
 
+            #XXX:TODO VisibleTo
+            visiTo = request.POST['visibleTo']
+            visi_list = visiTo.split('#')
+            for visi in visi_list:
+                n = VisibleTo.objects.create(post=new_post,visibleTo=visi)
+                n.save()
+
             new_post.source = "http://127.0.0.1:8000/service/posts/%s" %(new_post.id)
             new_post.origin = "http://127.0.0.1:8000/service/posts/%s" %(new_post.id)
             new_post.save()
@@ -224,6 +233,12 @@ def update_post(request, post_id):
                 if cate.strip() != "":
                     Category.objects.create(post=post,category=cate)
 
+            visiTo = request.POST['visibleTo']
+            visi_list = visiTo.split('#')
+            VisibleTo.objects.filter(post=post).delete()
+            for visi in visi_list:
+                if visi.strip() != "":
+                    VisibleTo.objects.create(post=post,visibleTo=visi)
 
 
             return HttpResponseRedirect(reverse('home'))
@@ -398,7 +413,11 @@ def onePost(request,author_id,post_id):
 	post = get_object_or_404(Post,pk = post_id,author=author_id)
 	user = Author.objects.get(pk = author_id).user
 	result = ""
+	visible = ""
 	for category in post.categories.all():
 	    result += "#"+ category.category
-	context = {'post':post,'category':result,'user':user}
+	for visi in post.visibleTo.all():
+	    visible += "#"+ visi.visibleTo
+
+	context = {'post':post,'category':result,'visibleTo':visible,'user':user}
 	return render(request,'post/onePost.html',context)
