@@ -81,19 +81,21 @@ class Send_Friendrequest(LoginRequiredMixin, View):
 
 def home(request):
     form = PostForm()
-    post= Post.objects.filter(visibility=0).order_by('-published')
+    posts = set(Post.objects.filter(visibility=0).order_by('-published'))
     for node in Node.objects.all():
         r = requests.get(node.host+node.public_post_url, auth=(node.auth_username, node.auth_password))
         if r.status_code == 200:
-            print "-----------------------------------------"
-            print(r.json())
             serializer = PostSerializer(data=r.json()['posts'],many=True)
             if serializer.is_valid():
-                posts = serializer.save()
+                posts =  posts | set(serializer.save())
+            else:
+                print(serializer.errors)
+        else:
+            print(r.status_code)
     author = None
     if(request.user.is_authenticated()):
         author = request.user.author
-    context = { 'posts': post ,'form': PostForm(),'author':author}
+    context = { 'posts': posts ,'form': PostForm(),'author':author}
     return render(request,'home.html',context)
 
 def stream(request,author_id):
