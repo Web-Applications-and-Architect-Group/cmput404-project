@@ -4,7 +4,7 @@
 <div class= "pull-center w3-container w3-content" style="max-width:1400px;margin-top:80px;margin-left:10em">
 <div class="list-group col-md-2">
 </div>
-<div class="list-group col-md-3">
+<!-- <div class="list-group col-md-3">
   <h3 class="text-center"> Friends</h3>
   <a href="#" class="list-group-item ">Cras justo odio 
 	<button type="button" class="btn btn-primary btn-xs pull-right">
@@ -13,7 +13,7 @@
     <a href="#" class="list-group-item ">Cras justo odio 
 	<button type="button" class="btn btn-success btn-xs pull-right">
 	<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>Follow</button></a>
-</div>
+</div> -->
    
 
 
@@ -33,14 +33,13 @@
 
 
 <div class="list-group col-md-3">
-  <h3 class="text-center"> Followed</h3>
-  <a href="#" class="list-group-item ">Cras justo odio 
-	<button type="button" class="btn btn-primary btn-xs pull-right">
-	<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Followed</button></a>
+  <h3 class="text-center"> Following and Friends</h3>
+  {% for f_request in following_list %}
+  <a href="{% url 'AcceptFriendRequest' f_request.requester_id %}" class="list-group-item "> {{f_request.requester_displayName}} 
 
-    <a href="#" class="list-group-item ">Cras justo odio 
 	<button type="button" class="btn btn-success btn-xs pull-right">
-	<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>Follow</button></a>
+	<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Accept</button></a>
+  {% endfor %}
 
 </div>
 

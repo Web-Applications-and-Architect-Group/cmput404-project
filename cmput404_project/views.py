@@ -43,24 +43,32 @@ class Send_Friendrequest(LoginRequiredMixin, View):
 
     def post(self, request):
         # get the friend on remote server
-        r = requests.get('http://127.0.0.1:8000/service/author/diqiu') # for test
-        # r = requests.get(request.friend_url)
+        # r = requests.get('http://127.0.0.1:8000/service/author/diqiu') # for test
+        # print(request.POST["friend_url"])
+        # return
+        r = requests.get(request.POST["friend_url"], auth=("admin", "1234qwer"))
         remote_friend = r.json()
+        # print(remote_friend)
+        # return
 
         # get the author on our server
         user = self.get_object(User, request.user.id)
-        author = Author.objects.get(id=user.username)
+        author = Author.objects.get(user=request.user)
         serializer = AuthorSerializer(author)
 
         # combines the info
         remote_request = OrderedDict()
         remote_request["query"] = "friendrequest"
         remote_request["author"] = serializer.data
-        remote_request["friend"] = r.json()
+        remote_request["friend"] = remote_friend
 
         # send friend request to remote server
         # r = requests.post(remote_friend["host"]+'service/friendrequest', data = remote_request)
-        r = requests.post(remote_friend["host"]+'service/friendrequest', data = remote_request)
+        r = requests.post(
+            remote_friend["host"]+'/service/friendrequest', 
+            json=remote_request, 
+            auth=("admin", "1234qwer")
+        )
 
         # store the follow relationship if success
         # print(r.status_code)
@@ -339,6 +347,9 @@ def accept_friend(request):
 
 
     return HttpResponseRedirect(reverse('profile'))
+
+
+
 @login_required
 def AcceptFriendRequest(request,requester_id):
     author = Author.objects.get(user=request.user)
@@ -377,11 +388,24 @@ def get_object_by_uuid_or_404(model, uuid_pk):
 def friendList(request,author_id):
     author = Author.objects.get(pk=author_id)
     friend_requests = author.notify.all()
+
     viewer = None
     if request.user.is_authenticated:
         viewer = request.user.author
 
-    context={'author':author,'form':PostForm(),'viewer':viewer,'friend_requests':friend_requests}
+    following_list = author.follow.all()
+    for f_author in following_list:
+        r = requests.get() # get remote author info thr API
+        remote_author_info = r.json()
+
+    context = {
+        'author':author,
+        'form':PostForm(),
+        'viewer':viewer,
+        'friend_requests':friend_requests,
+        'following_list':following_list
+    }
+
     #,'Friend':friends,'Followed':follows
     return render(request,'friend/friendList.html',context)
 

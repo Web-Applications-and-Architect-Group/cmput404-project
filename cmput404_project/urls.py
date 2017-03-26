@@ -76,7 +76,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^', include('registration.backends.simple.urls')),
     url(r'^(?P<author_id>[a-zA-Z0-9-_]+)/profile$', views.profile, name="profile"),
-    url(r'^(?P<username>[a-zA-Z0-9-_]+)/friendList$', views.friendList, name="friendList"),
+    url(r'^(?P<author_id>[a-zA-Z0-9-_]+)/friendList$', views.friendList, name="friendList"),
     #url(r'^onePost',views.onePost, name="onePost"),
     url(r'^(?P<author_id>[a-zA-Z0-9-_]+)/posts/(?P<post_id>[a-zA-Z0-9-]+)$', views.onePost, name="onePost"),
 
