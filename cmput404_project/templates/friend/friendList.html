@@ -6,22 +6,22 @@
 </div>
 <!-- <div class="list-group col-md-3">
   <h3 class="text-center"> Friends</h3>
-  <a href="#" class="list-group-item ">Cras justo odio 
+  <a href="#" class="list-group-item ">Cras justo odio
 	<button type="button" class="btn btn-primary btn-xs pull-right">
 	<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Followed</button></a>
 
-    <a href="#" class="list-group-item ">Cras justo odio 
+    <a href="#" class="list-group-item ">Cras justo odio
 	<button type="button" class="btn btn-success btn-xs pull-right">
 	<span class="glyphicon glyphicon-plus" aria-hidden="true"></span>Follow</button></a>
 </div> -->
-   
+
 
 
 
 <div class="list-group col-md-3">
   <h3 class="text-center"> Friend Request</h3>
   {% for f_request in friend_requests %}
-  <a href="{% url 'AcceptFriendRequest' f_request.requester_id %}" class="list-group-item "> {{f_request.requester_displayName}} 
+  <a href="{% url 'AcceptFriendRequest' f_request.requester_id %}" class="list-group-item "> {{f_request.requester_displayName}}
 
 	<button type="button" class="btn btn-success btn-xs pull-right">
 	<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Accept</button></a>
@@ -34,11 +34,15 @@
 
 <div class="list-group col-md-3">
   <h3 class="text-center"> Following and Friends</h3>
-  {% for f_request in following_list %}
-  <a href="{% url 'AcceptFriendRequest' f_request.requester_id %}" class="list-group-item "> {{f_request.requester_displayName}} 
-
+  {% for author in following_list %}
+  <a href="#" class="list-group-item "> {{ author.displayName }}
+    {% if author.relationship == 'friend' %}
 	<button type="button" class="btn btn-success btn-xs pull-right">
-	<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Accept</button></a>
+	<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Friend</button></a>
+    {% else %}
+    <button type="button" class="btn btn-info btn-xs pull-right">
+  	<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Following</button></a>
+    {% endif %}
   {% endfor %}
 
 </div>

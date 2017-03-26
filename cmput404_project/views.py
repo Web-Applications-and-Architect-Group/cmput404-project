@@ -47,7 +47,9 @@ class Send_Friendrequest(LoginRequiredMixin, View):
         # r = requests.get('http://127.0.0.1:8000/service/author/diqiu') # for test
         # print(request.POST["friend_url"])
         # return
-        r = requests.get(request.POST["friend_url"], auth=("admin", "nimabide"))
+        admin_auth=("admin", "nimabide")
+
+        r = requests.get(request.POST["friend_url"], auth=admin_auth)
         remote_friend = r.json()
         # print(remote_friend)
         # return
@@ -66,16 +68,23 @@ class Send_Friendrequest(LoginRequiredMixin, View):
         # send friend request to remote server
         # r = requests.post(remote_friend["host"]+'service/friendrequest', data = remote_request)
         r = requests.post(
-            remote_friend["host"]+'/service/friendrequest', 
-            json=remote_request, 
-            auth=("admin", "nimabide")
+            remote_friend["host"]+'/service/friendrequest',
+            json=remote_request,
+            auth=admin_auth
         )
 
         # store the follow relationship if success
         # print(r.status_code)
         if (r.status_code==200):
-            new_friend = Friend.objects.create(requestee=remote_friend["url"], requestee_id=remote_friend["id"], requester=author)
-            new_friend.save()
+            # varify if there is already an exist friend requests
+            varify_result = Friend.objects.all()
+            varify_result = varify_result.filter(requestee=remote_friend["url"])
+            varify_result = varify_result.filter(requestee_id=remote_friend["id"])
+            varify_result = varify_result.filter(requester=author)
+
+            if(len(varify_result)<1):
+                new_friend = Friend.objects.create(requestee=remote_friend["url"], requestee_id=remote_friend["id"], requester=author)
+                new_friend.save()
 
         # return HttpResponse(json.dumps(serializer.data), status=status.HTTP_200_OK)
         # return HttpResponse(json.dumps(remote_request), status=status.HTTP_200_OK)
@@ -148,7 +157,7 @@ def create_post_html(request):
 # with open(settings.MEDIA_ROOT + "/images/" + str(datetime.datetime.now()) +str(count) ,'wb+') as destination:
 #     for chunk in f.chunks():
 #         destination.write(chunk)
-                    
+
 @login_required
 def create_post(request):
     """
@@ -354,7 +363,8 @@ def AcceptFriendRequest(request,requester_id):
 
     notify = Notify.objects.filter(requestee=author)
     context={'user':request.user,'form':PostForm(),'author':author,'Friend_request':notify}
-    return render(request,'friend/friendList.html',context)
+    # return render(request,'friend/friendList.html',context)
+    return HttpResponseRedirect(reverse('friendList',kwargs={'author_id': request.user.author.id}))
 
 
 
@@ -379,6 +389,18 @@ def get_object_by_uuid_or_404(model, uuid_pk):
         raise Http404(str(e))
     return get_object_or_404(model, pk=uuid_pk)
 
+"""
+Generic function for validating friend relationship status
+"""
+def friend_relation_validation(friend_url1, friend_url2):
+    # greb info from urls
+    author1 = requests.get(friend_url1)
+    author2 = requests.get(friend_url2)
+
+    # validate response from servers
+
+    return friend_status
+
 def friendList(request,author_id):
     author = Author.objects.get(pk=author_id)
     friend_requests = author.notify.all()
@@ -388,17 +410,39 @@ def friendList(request,author_id):
         viewer = request.user.author
 
     following_list = author.follow.all()
+    following_detail_list = []
     for f_author in following_list:
-        #r = requests.get() # get remote author info thr API
-        #remote_author_info = r.json()
-        pass
+        # get the authentication of node
+        admin_auth=("admin", "nimabide")
+
+        # get remote author info thr API
+        r = requests.get(f_author.requestee, auth=admin_auth)
+        if r.status_code==200:
+            a_remote_author = OrderedDict()
+            a_remote_author = r.json()
+        else:
+            continue
+
+        # get remote author's following list
+        r = requests.get(f_author.requestee+'/friends', auth=admin_auth)
+        if r.status_code==200:
+            remote_author_following_list = r.json()
+            print(remote_author_following_list)
+            if author_id in remote_author_following_list["authors"]:
+                # they are friend
+                a_remote_author["relationship"] = "friend"
+            else:
+                a_remote_author["relationship"] = "follow"
+            following_detail_list.append(a_remote_author)
+        else:
+            continue
 
     context = {
         'author':author,
         'form':PostForm(),
         'viewer':viewer,
         'friend_requests':friend_requests,
-        'following_list':following_list
+        'following_list':following_detail_list
     }
 
     #,'Friend':friends,'Followed':follows
