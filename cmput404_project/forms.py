@@ -5,6 +5,8 @@ from .models import Post,Comment
 class ImageForm(forms.Form):
     """Image upload form."""
     image = forms.ImageField()
+class FileFieldForm(forms.Form):
+	file_field = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple': True}))
 
 class ProfileForm(forms.Form):
     displayName = forms.CharField()

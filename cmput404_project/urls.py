@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.contrib.auth.forms import UserCreationForm
 from django.views.generic.edit import CreateView
 from . import views,api
-
+from django.conf import settings
 from django.contrib.auth.models import User
 from rest_framework import routers, serializers, viewsets
 from rest_framework.urlpatterns import format_suffix_patterns
@@ -73,11 +73,10 @@ urlpatterns = [
     ### (END) API specify by
     # https://github.com/Web-Applications-and-Architect-Group/CMPUT404-project-socialdistribution/blob/master/example-article.json
     # --------------------------------
-
-    url(r'^', include('registration.backends.simple.urls')),
     url(r'^admin/', admin.site.urls),
+    url(r'^', include('registration.backends.simple.urls')),
     url(r'^(?P<author_id>[a-zA-Z0-9-_]+)/profile$', views.profile, name="profile"),
-    url(r'^(?P<username>[a-zA-Z0-9-_]+)/friendList$', views.friendList, name="friendList"),
+    url(r'^(?P<author_id>[a-zA-Z0-9-_]+)/friendList$', views.friendList, name="friendList"),
     #url(r'^onePost',views.onePost, name="onePost"),
     url(r'^(?P<author_id>[a-zA-Z0-9-_]+)/posts/(?P<post_id>[a-zA-Z0-9-]+)$', views.onePost, name="onePost"),
 

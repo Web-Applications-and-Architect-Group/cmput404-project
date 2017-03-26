@@ -6,11 +6,11 @@
   <div class="col-md-2 float-left">
     <div class="panel panel-default">
       <div class="panel-heading">
-        <h3 class="panel-title">User</h3>
+        <h3 class="panel-title">Author</h3>
       </div>
       <div class="btn-group-vertical center-block" role="group">
          <a href="" class="btn btn-primary"><strong>Profile</strong></a>
-         <a href="{% url 'friendList' user.username %}" class="btn btn-default">Friendship</a>
+         <a href="{% url 'friendList' author.id %}" class="btn btn-default">Friendship</a>
          <a href="" class="btn btn-default">Followers</a>
       </div>
     </div>
@@ -22,30 +22,32 @@
       </span>
 
       <span class="col-md-2 float-right">
-        <a href="#"><button type="button" class="btn btn-default">Follow</button></a>
+        <form id="follow_action" method="post" action="{% url 'send_friendrequest' %}">
+          {% csrf_token %}
+          <input type="hidden" name="friend_url" value="{{ author.url }}" />         
+          <a onclick="document.getElementById('follow_action').submit();"><button type="button" class="btn btn-default">Follow</button></a>
+        </form>
       </span>
     </div>
-    <form action="{% url 'profile' user.author.id %}" method="post" enctype="multipart/form-data">
-      <input type="hidden" value="{{ request.user.id }}" id="viewer">
+    <form action="{% url 'profile' author.id %}" method="post" enctype="multipart/form-data">
       <div class="col-md-6 float-left">
         <div class="form-group">
           <label >Display Name</label>
-          <input type="text" class="form-control view" value="{{ user.author.displayName }}" name='displayName' id="isUser" >
-          <input type="hidden" class="form-control" value="{{ user.id }}" id="User">
-          <p>@{{ user.author.id }}</p>
+          <input type="text" class="form-control view" value="{{ author.displayName }}" name='displayName' id="isUser" >
+          <p>@{{ author.id }}</p>
         </div>
         {% csrf_token %}
         <div class="form-group">
           <label >Email address</label>
-          <input type="email" name="email" class="form-control view" value="{{ user.email }}" id="isUser">
+          <input type="email" name="email" class="form-control view" value="{{ author.user.email }}" id="isUser">
         </div>
         <div class="form-group">
           <label >Github</label>
-          <input type="text" name="github" class="form-control view" value="{{ user.author.github }}" id="isUser">
+          <input type="text" name="github" class="form-control view" value="{{ author.github }}" id="isUser">
         </div>
         <div class="form-group">
           <label >Bio</label>
-          <textarea rows="4" cols="50" name="bio" class="form-control view"  id="isUser">{{ user.author.bio }}</textarea>
+          <textarea rows="4" cols="50" name="bio" class="form-control view"  id="isUser">{{ author.bio }}</textarea>
         </div>
         <p>
           <button type="submit" class="btn btn-default setBtn">Update Profile</button>
@@ -53,7 +55,7 @@
       </div>
 
       <div class="col-md-4 float-right">
-        <img class = "img-rounded center-block" alt="user photo" src={{user.author.img.url}} height=300px width=300px/>
+        <img class = "img-rounded center-block" alt="user photo" src={{author.img.url}} height=300px width=300px/>
         <hr>
         <label class="btn btn-default btn-file center-block setBtn">
           Upload new picture <input name="image" class="hidden" type="file" accept="image/*">
@@ -61,19 +63,20 @@
       </div>
     </form>
   </div>
+</div>
 
 {% endblock %}
 
 {% block javascript %}
 <script>
-  var user = document.getElementById("User").value;
-  var viewer = document.getElementById("viewer").value;
+  //var user = document.getElementById("User").value;
+  //var viewer = document.getElementById("viewer").value;
   var readable = document.getElementsByClassName("view");
   var visibility = document.getElementsByClassName("setBtn");
   //alert(visibility.length);
   //alert(user);
   //alert(viewer);
-  if(user!=viewer) {
+  if("{{ author.id }}"!= "{{viewer.id}}") {
     for(i=0;i<readable.length;i++) {
       readable[i].readOnly = true;
     }

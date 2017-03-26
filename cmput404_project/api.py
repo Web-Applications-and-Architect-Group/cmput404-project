@@ -306,7 +306,9 @@ class Friendrequest_Handler(APIView):
     #TODO get rid of redundent Notify
     queryset = Notify.objects.all()
     def post(self,request,format=None):
+        # data = json.loads(request.data)
         data = request.data
+        # print(data)
         if not (data["query"] == "friendrequest"):
             return Response(status=status.HTTP_400_BAD_REQUEST)
         try:
