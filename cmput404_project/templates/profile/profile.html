@@ -27,6 +27,7 @@
         <form id="follow_action" method="post" action="{% url 'send_friendrequest' %}">
           {% csrf_token %}
           <input type="hidden" name="friend_url" value="{{ author.url }}" />
+          <input type="hidden" name="friend_host" value="{{ author.host }}" />
           <a onclick="document.getElementById('follow_action').submit();"><button type="button" class="btn btn-default">Follow</button></a>
         </form>
         {% endif %}
