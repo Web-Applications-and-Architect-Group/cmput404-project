@@ -98,6 +98,9 @@ def update():
     for node in Node.objects.all():
         r = requests.get(node.host+node.auth_post_url, auth=(node.auth_username, node.auth_password))
         if r.status_code == 200:
+            print ("========================")
+            print (r.json()['posts'][0])
+            print ("=========================")
             serializer = PostSerializer(data=r.json()['posts'],many=True)
             if serializer.is_valid():
                 serializer.save()
