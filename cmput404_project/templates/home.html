@@ -81,7 +81,7 @@
                <hr class="w3-clear">
                <ul style="list-style: none">
                <li>  </br>
-               {% if post.contentType == 1 %}
+               {% if post.contentType == 'text/markdown' %}
                {{ post.content|markdown }}
                {% else %}
                {{ post.content|urlize }}
@@ -181,7 +181,7 @@
         <hr class="w3-clear">
         <ul style="list-style: none">
         <li>
-        {% if post.contentType == 1 %}
+        {% if post.contentType == 'text/markdown' %}
         {{ post.content|markdown }}
         {% else %}
         {{ post.content|urlize }}
@@ -208,7 +208,7 @@
           {% for comment in post.comments.all %}
             <hr class="w3-clear">
             comment by {{comment.author}}:
-            {% if comment.contentType == 1 %}
+            {% if comment.contentType == 'text/markdown' %}
             {{ comment.comment|markdown }}
             {% else %}
             {{ comment.comment|urlize }}
@@ -237,12 +237,8 @@
 
             <div style="width:20%">
                 <select name ="content_type" class="form-control" value = "{{commentType}}">
-                    <option value = 0 selected="true">Plain Text</option>
-                    <option value = 1>Markdown</option>
-                    <option value = 2>application/base64</option>
-                    <option value = 3>image/png;base64</option>
-                    <option value = 4>image/jpeg;base64</option>
-                    <option value = 5>github-activity</option>
+                    <option value = 'text/plain' selected="true">Plain Text</option>
+                    <option value = 'text/markdown'>Markdown</option>
             </select>
         </div> <!-- /.form-group -->
       </div>

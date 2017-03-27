@@ -37,42 +37,18 @@ class CommentSerializer(serializers.ModelSerializer):
 class PostSerializer(serializers.ModelSerializer):
 
     author = AuthorSerializer()
-    visibility = serializers.SerializerMethodField()
-    contentType = serializers.SerializerMethodField()
-    categories = serializers.SerializerMethodField()
+    categories = serializers.ListField(child=serializers.CharField(max_length=20))
     count = serializers.IntegerField()
     size = serializers.IntegerField()
     next = serializers.URLField()
     comments = CommentSerializer(many=True)
     published = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S")
-    visibleTo = serializers.SerializerMethodField()
+    visibleTo = serializers.ListField(child=serializers.CharField(max_length=20))
     class Meta:
         model = Post
         fields = ('title','source','origin','description','contentType','content','author','categories','count','size','next','comments','published','id','visibility','visibleTo','unlisted')
 
 
-    def get_contentType(self,obj):
-    	return obj.get_contentType_display()
-
-    def get_visibility(self,obj):
-    	return obj.get_visibility_display()
-
-    def get_visibleTo(self,obj):
-    	result = []
-    	for visibleTo in obj.visibleTo.all():
-    		result.append(visibleTo.visbileTo)
-    	return result
-
-    def get_categories(self,obj):
-    	result = []
-    	for category in obj.categories.all():
-    		result.append(category.category)
-    	return result
-    
-    def validate_contentType(self, value):
-        print value
-        return True
-        
 
     def create(self,validated_data):
         comments = validated_data.pop('comments')

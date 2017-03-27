@@ -18,7 +18,7 @@ accept = [
 
 @python_2_unicode_compatible
 class Node(models.Model):
-    user = models.OneToOneField(User,on_delete=models.CASCADE,primary_key=True)
+    user = models.ForeignKey(User,on_delete=models.CASCADE)
     host = models.URLField(unique=True)
     auth_username = models.CharField(max_length=50)
     auth_password = models.CharField(max_length=50)
@@ -92,11 +92,11 @@ class Post(models.Model):
         return self.title
 
     def __setitem__(self, key, data):
-        return setattr(self, key, json.dumps(data))
+        return setattr(self, key, data)
 
     def __getitem__(self, key):
-        return json.loads(getattr(self, key))
-        
+        return getattr(self, key)
+    
         
         
         

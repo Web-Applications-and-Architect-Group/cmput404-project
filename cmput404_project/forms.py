@@ -24,13 +24,13 @@ class PostForm(forms.ModelForm):
         
     def clean_categories(self):
         data = self.cleaned_data['categories']
-        data = data.strip().split('#')
+        data = filter(lambda a: a != '',data.strip().split('#'))
         data = json.dumps(data)
         return data
     
     def clean_visibleTo(self):
         data = self.cleaned_data['visibleTo']
-        data = data.strip().split(';')
+        data = filter(lambda a: a != '',data.strip().split('#'))
         data = json.dumps(data)
         return data
 	    

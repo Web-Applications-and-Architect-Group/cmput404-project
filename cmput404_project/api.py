@@ -27,6 +27,9 @@ def handle_posts(posts,request):
         post['count'] = comments.count()
         post['size'] = MAXIMUM_PAGE_SIZE
         post['next'] = post.origin + '/comments'
+        post['categories'] = json.loads(post.categories)
+        post['visibleTo'] = json.loads(post.visibleTo)
+    print result_posts
     serializer = PostSerializer(result_posts, many=True)
     return paginator.get_paginated_response(serializer.data, size)
 
@@ -34,7 +37,7 @@ class Public_Post_List(APIView):
     """
     List all pulic posts
     """
-    queryset = Post.objects.filter(visibility=0).filter(temp=False)
+    queryset = Post.objects.filter(visibility='PUBLIC').filter(temp=False)
     permission_classes = (IsAuthenticatedNodeOrAdmin,)
     def get(self,request,format=None):
         return handle_posts(self.queryset,request)
@@ -108,7 +111,7 @@ class All_Visible_Post_List_To_User(APIView):
     """
     List all posts that visible to an authenticated user.
     """
-    queryset = Post.objects.exclude(visibility=4).filter(temp=False)
+    queryset = Post.objects.exclude(visibility='SERVERONLY').filter(temp=False)
     permission_classes = (IsAuthenticatedNodeOrAdmin,)
     def get(self,request, format=None):
         return handle_posts(self.queryset,request)
@@ -117,7 +120,7 @@ class All_Visible_Post_List_From_An_Author_To_User(APIView):
     """
     List all posts from an author that visible to an authenticated user.
     """
-    queryset = Post.objects.exclude(visibility=4).filter(temp=False)
+    queryset = Post.objects.exclude(visibility='SERVERONLY').filter(temp=False)
     permission_classes = (IsAuthenticatedNodeOrAdmin,)
     def get(self,request, author_id, format=None):
         author = get_object_or_404(Author.filter(temp=False),pk=author_id)

@@ -241,15 +241,14 @@ def comment(request):
     new_comment.save()
 
     #post_type = request.GET['post_type']
-    post_type = post.contentType
-    context= postContent(post_type,request)
-    context["author"] = author
+    #post_type = post.contentType
+    #context= postContent(post_type,request)
+    #context["author"] = author
 
-    images = PostImages.objects.all()
-    context["images"] = images
-    context["form"] = PostForm()
-    return render(request, 'home.html', context)
-    #return HttpResponseRedirect(reverse('ViewMyStream'), kwargs={'post_type':post_type})
+    #images = PostImages.objects.all()
+    #context["images"] = images
+    #context["form"] = PostForm()
+    return HttpResponseRedirect(reverse('home'))
 
 def postContent(post_type,request):
     comments = Comment.objects.all()
@@ -437,9 +436,8 @@ def onePost(request,author_id,post_id):
 	viewer = None
 	if request.user.is_authenticated:
 	    viewer = request.user.author
-	form = PostForm(instance=post)
-	form.data['categories'] = "#".join(post['categories'])
-	form.data['visibleTo'] = ';'.join(post['visibleTo'])
-	print form
+	form = PostForm()
+	post.categories = '#'.join(json.loads(post.categories))
+	post.visibleTo = ';'.join(json.loads(post.visibleTo))
 	context = {'post':post,'author':author,'form':form,'viewer':viewer}
 	return render(request,'post/onePost.html',context)
