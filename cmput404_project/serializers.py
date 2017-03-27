@@ -13,7 +13,7 @@ class AuthorSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'id': {'validators':[]},
         }
-        
+
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -30,7 +30,7 @@ class CommentSerializer(serializers.ModelSerializer):
     	return obj.get_contentType_display()
 
 
-    
+
 class PostSerializer(serializers.ModelSerializer):
 
     author = AuthorSerializer()
@@ -43,19 +43,19 @@ class PostSerializer(serializers.ModelSerializer):
     comments = CommentSerializer(many=True)
     class Meta:
         model = Post
-        fields = ('title','source','origin','description','contentType','content','author','categories','count','size','next','comments','published','id','visibility','visibileTo','unlisted')
+        fields = ('title','source','origin','description','contentType','content','author','categories','count','size','next','comments','published','id','visibility','visibleTo','unlisted')
 
-    
+
     def get_contentType(self,obj):
     	return obj.get_contentType_display()
 
     def get_visibility(self,obj):
     	return obj.get_visibility_display()
 
-    def get_visibileTo(self,obj):
+    def get_visibleTo(self,obj):
     	result = []
-    	for visibileTo in obj.visibileTo.all():
-    		result.append(author.visibileTo)
+    	for visibleTo in obj.visibleTo.all():
+    		result.append(author.visbileTo)
     	return result
 
     def get_categories(self,obj):
@@ -76,7 +76,7 @@ class PostSerializer(serializers.ModelSerializer):
             author = Author.objects.create(**author_data)
         post = Post.objects.create(author=author, **validated_data)
         return post
-    
+
 
 
 
@@ -118,13 +118,13 @@ class CommentPagination(pagination.PageNumberPagination):
             response['previous'] = previous_link
 
         return Response(response)
-        
+
 class AddCommentQuerySerializer(serializers.Serializer):
     query = serializers.CharField(max_length=10)
     post = serializers.URLField()
     comment = CommentSerializer()
     post_id = serializers.CharField(max_length=100)
-    
+
     def create(self,validated_data):
         comment_data = validated_data.pop('comment')
         comment_data['post'] = Post.objects.get(pk=validated_data.pop('post_id'))
@@ -135,7 +135,7 @@ class AddCommentQuerySerializer(serializers.Serializer):
             author = Author.objects.create(**author_data)
         comment = Comment.objects.create(author=author, **comment_data)
         return comment
-    
+
     def validate_post_id(self,value):
         """
         Check that the post_id exist
@@ -145,7 +145,7 @@ class AddCommentQuerySerializer(serializers.Serializer):
         except Post.DoesNotExist:
             raise serializers.ValidationError("Post with id"+value+" does not exist")
         return value
-    
+
     def validate_query(self,value):
         """
         Check that the query is addComment
@@ -153,4 +153,3 @@ class AddCommentQuerySerializer(serializers.Serializer):
         if value != 'addComment':
             raise serializers.ValidationError("only accept query addComment")
         return value
-        
