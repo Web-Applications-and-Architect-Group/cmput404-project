@@ -125,11 +125,11 @@ def home(request):
     posts= Post.objects.filter(unlisted=False)
 
     viewer = None
-    #if(request.user.is_authenticated()):
-     #   viewer = request.user.author
-      #  posts = prunning(posts,viewer)
-    #else:
-    #    posts = posts.filter(visibility='PUBLIC')
+    if(request.user.is_authenticated()):
+        viewer = request.user.author
+        posts = prunning(posts,viewer)
+    else:
+        posts = posts.filter(visibility='PUBLIC')
     print posts
     author = viewer
     
@@ -254,7 +254,7 @@ def update_post(request, post_id):
 
 @login_required
 def comment(request):
-    author = Author.objects.get(displayName = request.user.username)
+    author = get_object_or_404(Author,request.user.author.id)
     comment_text = request.POST['comment_text']
     comment_type = request.POST['content_type']
     post_id= request.POST['post_id']
