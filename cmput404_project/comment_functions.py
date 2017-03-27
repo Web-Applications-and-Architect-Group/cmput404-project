@@ -23,42 +23,53 @@ from .serializers import AuthorSerializer,PostSerializer,CommentSerializer,PostP
 from rest_framework.decorators import api_view
 from .permissions import IsAuthenticatedNodeOrAdmin
 from collections import OrderedDict
-from .settings import MAXIMUM_PAGE_SIZE
+from .settings import MAXIMUM_PAGE_SIZE, HOST_NAME
 
 
 
 def getNodeAuth(host_root):
-    #TODO
-    # try:
-    #     node = Node.objects.get(host=host_root)
-    # except Node.DoesNotExist:
-    #     return {
-    #         "success":False,
-    #         "messages": "Attempt to connect an untrusted host."
-    #     }
-    # else:
-    #     auth = (node.auth_username, node.auth_password)
-    #     return {
-    #         "success": True,
-    #         "auth": auth
-    #     }
-    return ("admin", "nimabide")
+    if host_root==HOST_NAME:
+        return {
+            "success": True,
+            "auth": ("admin","nimabide")
+        }
+    
+    try:
+        node = Node.objects.get(host=host_root)
+    except Node.DoesNotExist:
+        return {
+            "success":False,
+            "messages": "Attempt to connect an untrusted host."
+        }
+    else:
+        auth = (node.auth_username, node.auth_password)
+        return {
+            "success": True,
+            "auth": auth
+        }
+    # return ("admin", "nimabide")
 
 def getNodeAPIPrefix(host_root):
-    # try:
-    #     node = Node.objects.get(host=host_root)
-    # except Node.DoesNotExist:
-    #     return {
-    #         "success":False,
-    #         "messages": "Attempt to connect an untrusted host."
-    #     }
-    # else:
-    #     api_prefix = node.api_prefix
-    #     return {
-    #         "success": True,
-    #         "api_prefix": api_prefix
-    #     }
-    return "/service"
+    if host_root==HOST_NAME:
+        return {
+            "success": True,
+            "api_prefix": "/service/"
+        }
+
+    try:
+        node = Node.objects.get(host=host_root)
+    except Node.DoesNotExist:
+        return {
+            "success":False,
+            "messages": "Attempt to connect an untrusted host."
+        }
+    else:
+        api_prefix = node.api_prefix
+        return {
+            "success": True,
+            "api_prefix": api_prefix
+        }
+    # return "/service"
 
 
 """
@@ -66,8 +77,8 @@ Generic function for validating friend relationship status
 """
 def friend_relation_validation(friend_url1, friend_host1, friend_url2, friend_host2):
     # greb the Authentication
-    node_auth1 = getNodeAuth(friend_host1)
-    node_auth2 = getNodeAuth(friend_host2)
+    node_auth1 = getNodeAuth(friend_host1)["auth"]
+    node_auth2 = getNodeAuth(friend_host2)["auth"]
 
     # greb info from urls
     response1 = requests.get(friend_url1, auth=node_auth1)

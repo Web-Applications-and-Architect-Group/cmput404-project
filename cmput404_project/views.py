@@ -24,7 +24,8 @@ from rest_framework.decorators import api_view
 from .permissions import IsAuthenticatedNodeOrAdmin
 from collections import OrderedDict
 from .settings import MAXIMUM_PAGE_SIZE,HOST_NAME
-from .comment_functions import getNodeAuth,friend_relation_validation
+from .comment_functions import getNodeAuth,getNodeAPIPrefix,friend_relation_validation
+
 
 
 
@@ -46,9 +47,13 @@ class Send_Friendrequest(LoginRequiredMixin, View):
     def post(self, request):
         # get the friend on remote server
         # r = requests.get('http://127.0.0.1:8000/service/author/diqiu') # for test
-        # print(request.POST["friend_url"])
+        friend_hostname = request.POST["friend_host"]
+        if friend_hostname[len(friend_hostname)-1]=="/":
+            friend_hostname = friend_hostname[0:len(friend_hostname)-2]
+        # print friend_hostname
         # return
-        admin_auth=getNodeAuth("Need_TODO_here") #TODO
+        admin_auth=getNodeAuth(friend_hostname)["auth"] #TODO
+        # print(admin_auth)
 
         r = requests.get(request.POST["friend_url"], auth=admin_auth)
         remote_friend = r.json()
@@ -69,7 +74,7 @@ class Send_Friendrequest(LoginRequiredMixin, View):
         # send friend request to remote server
         # r = requests.post(remote_friend["host"]+'service/friendrequest', data = remote_request)
         r = requests.post(
-            remote_friend["host"]+'/service/friendrequest',
+            remote_friend["host"]+getNodeAPIPrefix(remote_friend["host"])["api_prefix"]+'friendrequest',
             json=remote_request,
             auth=admin_auth
         )
@@ -408,9 +413,12 @@ def friendList(request,author_id):
     following_detail_list = []
     for f_author in following_list:
         # get the authentication of node
-        admin_auth=getNodeAuth(f_author.requester.host)
+        # print(f_author.requester.host)
+        admin_auth=getNodeAuth(f_author.requester.host)["auth"]
 
         # get remote author info thr API
+        # print(f_author.requestee, admin_auth)
+        # return
         r = requests.get(f_author.requestee, auth=admin_auth)
         if r.status_code==200:
             a_remote_author = OrderedDict()

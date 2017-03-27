@@ -22,6 +22,7 @@ class Node(models.Model):
     host = models.URLField(unique=True)
     auth_username = models.CharField(max_length=50)
     auth_password = models.CharField(max_length=50)
+    api_prefix = models.CharField(max_length=50,default="/service")
     public_post_url = models.CharField(max_length=50,default="/service/posts?format=json")
     auth_post_url = models.CharField(max_length=50,default="/service/author/posts?format=json")
     def __str__(self):
