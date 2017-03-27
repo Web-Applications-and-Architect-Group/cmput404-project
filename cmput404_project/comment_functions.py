@@ -33,6 +33,7 @@ def getNodeAuth(host_root):
             "success": True,
             "auth": ("admin","nimabide")
         }
+    print("debug! getNodeAuth function! host", host_root)
     
     try:
         node = Node.objects.get(host=host_root)

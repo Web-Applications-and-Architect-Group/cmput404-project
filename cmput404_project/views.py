@@ -48,11 +48,13 @@ class Send_Friendrequest(LoginRequiredMixin, View):
         # r = requests.get('http://127.0.0.1:8000/service/author/diqiu') # for test
         friend_hostname = request.POST["friend_host"]
         if friend_hostname[len(friend_hostname)-1]=="/":
-            friend_hostname = friend_hostname[0:len(friend_hostname)-2]
-        # print friend_hostname
+            friend_hostname = friend_hostname[0:len(friend_hostname)-1]
+        print friend_hostname
         # return
+        print(getNodeAuth(friend_hostname))
         admin_auth=getNodeAuth(friend_hostname)["auth"] #TODO
-        # print(admin_auth)
+        print(admin_auth)
+        # return
 
         r = requests.get(request.POST["friend_url"], auth=admin_auth)
         remote_friend = r.json()
@@ -72,8 +74,10 @@ class Send_Friendrequest(LoginRequiredMixin, View):
 
         # send friend request to remote server
         # r = requests.post(remote_friend["host"]+'service/friendrequest', data = remote_request)
+        print(friend_hostname+getNodeAPIPrefix(friend_hostname)["api_prefix"]+'friendrequest/')
+        # return
         r = requests.post(
-            remote_friend["host"]+getNodeAPIPrefix(remote_friend["host"])["api_prefix"]+'friendrequest',
+            friend_hostname+getNodeAPIPrefix(friend_hostname)["api_prefix"]+'friendrequest/',
             json=remote_request,
             auth=admin_auth
         )

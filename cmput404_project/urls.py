@@ -67,7 +67,7 @@ urlpatterns = [
         name='friend_inquiry_by_ids'),                              # Allow [GET]. GET done
     # url(r'^service/author/(?P<author_id1>[a-zA-Z0-9-_]+)/friends/<service2>/author/(?P<author_id2>[a-zA-Z0-9-_]+)$',
     #     views.Post_list.as_view(), name='friend_inquiry_by_ids'), #TODO? Optional
-    url(r'^service/friendrequest$',                                         # Allow [POST]. POST Done
+    url(r'^service/friendrequest/$',                                         # Allow [POST]. POST Done
         api.Friendrequest_Handler.as_view(), name="make_friendrequest"),
 
     ### (END) API specify by
