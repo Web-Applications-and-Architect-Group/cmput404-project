@@ -1,5 +1,6 @@
 {%extends 'base.html' %}
 {% block content %}
+{% load markdown_deux_tags %}
 <div class="w3-container w3-content w3-card-2 w3-round w3-white center-block" style="max-width:1400;margin-top:80px;margin-left:10em">
             <form id="updateForm" class="form-horizontal" role="form" action="{% url 'update_post' post.id %}" method="post" >{% csrf_token %}
                 <h2 class="text-center">Post Title</h2>
@@ -84,6 +85,19 @@
 		   <textarea name="content" rows="4" cols="53" >{{post.content}}</textarea>
                     </div>
                 </div>
+
+       <div style="text-align:center">
+          {% for comment in post.comments.all %}
+            <hr class="w3-clear">
+            Comment by {{comment.author}}:
+            {% if comment.contentType == 1 %}
+            <b>{{ comment.comment|markdown }}</b>
+            {% else %}
+            <b>{{ comment.comment|urlize }}</b>
+            {% endif %}
+            ({{comment.published}})</br>
+          {% endfor %}
+      </div></br>
 
 
 		<div class="form-group  center-block " role="group" aria-label="...">
