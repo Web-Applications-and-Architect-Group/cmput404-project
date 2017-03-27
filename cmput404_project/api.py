@@ -29,7 +29,6 @@ def handle_posts(posts,request):
         post['next'] = post.origin + '/comments'
         post['categories'] = json.loads(post.categories)
         post['visibleTo'] = json.loads(post.visibleTo)
-    print result_posts
     serializer = PostSerializer(result_posts, many=True)
     return paginator.get_paginated_response(serializer.data, size)
 
@@ -158,7 +157,6 @@ class Comment_list(APIView):
         response = OrderedDict()
         response['query'] = 'addComment'
         data = request.data
-        data['post_id'] = post_id
         serializer = AddCommentQuerySerializer(data=data)
         if serializer.is_valid():
             serializer.save()

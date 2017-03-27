@@ -133,7 +133,6 @@ def home(request):
         posts = prunning(posts,viewer)
     else:
         posts = posts.filter(visibility='PUBLIC')
-    print posts
     author = viewer
     
     posts = posts.order_by('-published')
@@ -257,23 +256,21 @@ def update_post(request, post_id):
 
 @login_required
 def comment(request):
-    author = get_object_or_404(Author,request.user.author.id)
-    comment_text = request.POST['comment_text']
-    comment_type = request.POST['content_type']
-    post_id= request.POST['post_id']
-    post = Post.objects.get(id = post_id)
+    if request.method == "POST":
+        author = get_object_or_404(Author,pk=request.user.author.id)
+        comment_text = request.POST['comment_text']
+        comment_type = request.POST['content_type']
+        post_id= request.POST['post_id']
+        post = Post.objects.get(id = post_id)
 
-    new_comment = Comment.create(author, comment_text, post, comment_type)
-    new_comment.save()
+        new_comment = Comment(author, comment_text, post, comment_type)
 
-    #post_type = request.GET['post_type']
-    #post_type = post.contentType
-    #context= postContent(post_type,request)
-    #context["author"] = author
-
-    #images = PostImages.objects.all()
-    #context["images"] = images
-    #context["form"] = PostForm()
+        host = post.author.host
+        if host == HOST_NAME:
+            new_comment.save()
+        else:
+            serializer = AddCommentQuerySerializer(data={'query':'addComment','post':post.origin,'comment':new_comment})
+            print serializer.data
     return HttpResponseRedirect(reverse('home'))
 
 def postContent(post_type,request):
