@@ -24,6 +24,7 @@ from rest_framework.decorators import api_view
 from .permissions import IsAuthenticatedNodeOrAdmin
 from collections import OrderedDict
 from .settings import MAXIMUM_PAGE_SIZE
+from .comment_functions import getNodeAuth,friend_relation_validation
 
 
 
@@ -47,7 +48,7 @@ class Send_Friendrequest(LoginRequiredMixin, View):
         # r = requests.get('http://127.0.0.1:8000/service/author/diqiu') # for test
         # print(request.POST["friend_url"])
         # return
-        admin_auth=("admin", "nimabide")
+        admin_auth=getNodeAuth("Need_TODO_here") #TODO
 
         r = requests.get(request.POST["friend_url"], auth=admin_auth)
         remote_friend = r.json()
@@ -417,17 +418,6 @@ def get_object_by_uuid_or_404(model, uuid_pk):
         raise Http404(str(e))
     return get_object_or_404(model, pk=uuid_pk)
 
-"""
-Generic function for validating friend relationship status
-"""
-def friend_relation_validation(friend_url1, friend_url2):
-    # greb info from urls
-    author1 = requests.get(friend_url1)
-    author2 = requests.get(friend_url2)
-
-    # validate response from servers
-
-    return friend_status
 
 def friendList(request,author_id):
     author = Author.objects.get(pk=author_id)
@@ -441,7 +431,7 @@ def friendList(request,author_id):
     following_detail_list = []
     for f_author in following_list:
         # get the authentication of node
-        admin_auth=("admin", "nimabide")
+        admin_auth=getNodeAuth(f_author.requester.host)
 
         # get remote author info thr API
         r = requests.get(f_author.requestee, auth=admin_auth)
@@ -451,6 +441,16 @@ def friendList(request,author_id):
         else:
             continue
 
+        friend_validation = friend_relation_validation(author.url, author.host, a_remote_author["url"], a_remote_author["host"])
+        if friend_validation["success"] == True and friend_validation["friend_status"] == True:
+            a_remote_author["relationship"] = "friend"
+        elif friend_validation["success"] == True and friend_validation["friend_status"] == False:
+            a_remote_author["relationship"] = "follow"
+        else:
+            print(friend_validation["messages"])
+            continue
+
+        """
         # get remote author's following list
         r = requests.get(f_author.requestee+'/friends', auth=admin_auth)
         if r.status_code==200:
@@ -464,6 +464,8 @@ def friendList(request,author_id):
             following_detail_list.append(a_remote_author)
         else:
             continue
+        """
+        following_detail_list.append(a_remote_author)
 
     context = {
         'author':author,
