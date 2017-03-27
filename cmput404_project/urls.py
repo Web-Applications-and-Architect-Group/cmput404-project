@@ -95,7 +95,6 @@ urlpatterns = [
     #url(r'^mystream$', views.ViewMyStream, name="ViewMyStream"),
     url(r'^(?P<author_id>[a-zA-Z0-9-_]+)/posts/(?P<post_id>[a-zA-Z0-9-_]+)/delete_post$', views.delete_post, name="delete_post"),
     url(r'^comment$', views.comment, name="comment"),
-    url(r'^unlistpost/(?P<post_id>[a-zA-z0-9-_]+)$', views.viewUnlistedPost, name="viewUnlistedPost"),
     url(r'^manage_post$', views.manage_post, name="manage_post"),
     url(r'^(?P<post_id>[a-zA-Z0-9-]+)/update_post$', views.update_post, name="update_post"),
     url(r'^Add_friend$', views.Add_friend, name="Add_friend"),
@@ -103,8 +102,9 @@ urlpatterns = [
     url(r'^AcceptFriendRequest/(?P<requester_id>[a-zA-z0-9-_]+)$', views.AcceptFriendRequest, name="AcceptFriendRequest"),
     url(r'^api_list_my_friend_request$', views.list_my_friend_request, name="list_my_friend_request"),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    url(r'^post/(?P<post_id>[a-zA-z0-9-_]+)$', views.viewUnlistedPost, name="viewUnlistedPost"),
-
-
 ]
 urlpatterns = format_suffix_patterns(urlpatterns)
+
+#http://stackoverflow.com/questions/29099404/ssl-insecureplatform-error-when-using-requests-package
+import requests.packages.urllib3
+requests.packages.urllib3.disable_warnings()

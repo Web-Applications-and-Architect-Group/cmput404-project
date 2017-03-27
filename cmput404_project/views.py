@@ -5,7 +5,7 @@ from django.shortcuts import render, get_object_or_404,get_list_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 import os
-from .models import  Author,Post, friend_request, Comment,Notify,Friend,Category,PostImages,Node, VisibleTo
+from .models import  Author,Post, friend_request, Comment,Notify,Friend,PostImages,Node
 from .forms import ProfileForm,ImageForm,PostForm
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -102,31 +102,24 @@ def update():
             if serializer.is_valid():
                 serializer.save()
             else:
-                print(serializer.errors)
+                print(serializer.errors) 
         else:
             print(r.status_code)
 
 def home(request):
     update()
     form = PostForm()
-    post= Post.objects.filter(visibility=0).order_by('-published') | Post.objects.filter(visibility=3).order_by('-published')
+    post= Post.objects.filter(visibility='PUBLIC').order_by('-published')
 
-    author = None
-    visi = None
+    viewer = None
     if(request.user.is_authenticated()):
-        author = request.user.author
-        visi = VisibleTo.objects.filter(visibleTo=author.url)
-        visi1=VisibleTo.objects.all()
+        viewer = request.user.author
+    author = viewer
 
-    #print ("!!!!!!!!")
-    #print (visi)
-    #print (author.url)
-    #print (visi1)
-    #print (post[0])
 
     notify = Notify.objects.filter(requestee=author)
     images = PostImages.objects.all()
-    context = { 'posts': post ,'form': form,'author':author,'Friend_request':notify,'images':images, 'visi':visi}
+    context = { 'posts': post ,'form': form,'author':author,'Friend_request':notify,'images':images,'viewer':viewer}
 
     return render(request,'home.html',context)
 
@@ -135,7 +128,6 @@ def stream(request,author_id):
     posts = Post.objects.filter(author=author).order_by('-published') | Post.objects.filter(visibility=3).order_by('-published')
     form = PostForm()
     visi = None
-    visi = VisibleTo.objects.filter(visibleTo=author.url)
     images = PostImages.objects.all()
     context = { 'posts': posts ,'author':author,'form':form,'images':images, 'visi':visi}
     return render(request, 'self.html', context)
@@ -182,38 +174,16 @@ def create_post(request):
     if request.method == "POST":
         form = PostForm(request.POST)
         if form.is_valid():
-            new_post = form.save(commit=False)
-            author_X = Author.objects.get(user=request.user)
-            new_post.author = author_X
-            new_post.save()
-
-            #XXX:TODO Category
-            cates = request.POST['categoies']
-            cate_list = cates.split('#')
-            for cate in cate_list:
-                m=Category.objects.create(post=new_post,category=cate)
-                m.save()
-
-            #XXX:TODO VisibleTo
-            visiTo = request.POST['visibleTo']
-            visi_list = visiTo.split('#')
-            for visi in visi_list:
-                n = VisibleTo.objects.create(post=new_post,visibleTo=visi)
-                n.save()
-
-            new_post.source = "http://127.0.0.1:8000/service/posts/%s" %(new_post.id)
-            new_post.origin = "http://127.0.0.1:8000/service/posts/%s" %(new_post.id)
-            new_post.save()
-#https://www.youtube.com/watch?v=C9MDtQHwGYM
+            Post.objects.create(author=request.user.author,**form.cleaned_data)
+            
+            #https://www.youtube.com/watch?v=C9MDtQHwGYM
             for count,x in enumerate(request.FILES.getlist("files")):
                 image = PostImages.objects.create(post=new_post,post_image = x)
                 image.save()
 
-
-            return HttpResponseRedirect(reverse('home'))
         else:
+            print(form.errors)
             form = PostForm()
-            return render(request,'/',{'form': form})
     return HttpResponseRedirect(reverse('home'))
 
 
@@ -233,31 +203,14 @@ def manage_post(request):
 def update_post(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     if request.method == "POST":
-        print ("The value of unlisted is :" + request.POST['unlisted'])
         form = PostForm(request.POST, instance=post)
         if form.is_valid():
             post = form.save()
-
-            cates = request.POST['category']
-            cate_list = cates.split('#')
-            print cate_list
-            Category.objects.filter(post=post).delete()
-            for cate in cate_list:
-                if cate.strip() != "":
-                    Category.objects.create(post=post,category=cate)
-
-            visiTo = request.POST['visibleTo']
-            visi_list = visiTo.split('#')
-            VisibleTo.objects.filter(post=post).delete()
-            for visi in visi_list:
-                if visi.strip() != "":
-                    VisibleTo.objects.create(post=post,visibleTo=visi)
-
-
-            return HttpResponseRedirect(reverse('home'))
+        else:
+            print form.errors
     else:
         form = PostForm(instance=post)
-    return render(request,'/',{'form': form})
+    return HttpResponseRedirect(reverse('onePost',kwargs={'post_id':post_id,'author_id':post.author.id}))
 
 # @login_required
 # def update_post(request):
@@ -480,12 +433,13 @@ def friendList(request,author_id):
 
 def onePost(request,author_id,post_id):
 	post = get_object_or_404(Post,pk = post_id,author=author_id)
-	user = Author.objects.get(pk = author_id).user
-	result = ""
-	visible = ""
-	for category in post.categories.all():
-	    result += "#"+ category.category
-	for visi in post.visibleTo.all():
-	    visible += "#"+ visi.visibleTo
-	context = {'post':post,'category':result,'user':user,'form':PostForm, 'visibleTo':visible}
+	author = get_object_or_404(Author,pk = author_id)
+	viewer = None
+	if request.user.is_authenticated:
+	    viewer = request.user.author
+	form = PostForm(instance=post)
+	form.data['categories'] = "#".join(post['categories'])
+	form.data['visibleTo'] = ';'.join(post['visibleTo'])
+	print form
+	context = {'post':post,'author':author,'form':form,'viewer':viewer}
 	return render(request,'post/onePost.html',context)

@@ -1,6 +1,9 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm 
 from .models import Post,Comment
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Submit
+import json
 
 class ImageForm(forms.Form):
     """Image upload form."""
@@ -15,6 +18,21 @@ class ProfileForm(forms.Form):
     bio = forms.CharField(required=False)
 
 class PostForm(forms.ModelForm):
-	class Meta:
-		model=Post
-		fields = ['visibility','contentType','description','title','content','unlisted']
+    class Meta:
+        model=Post
+        fields = ['title','description','categories','contentType','visibility','content','unlisted','visibleTo']
+        
+    def clean_categories(self):
+        data = self.cleaned_data['categories']
+        data = data.strip().split('#')
+        data = json.dumps(data)
+        return data
+    
+    def clean_visibleTo(self):
+        data = self.cleaned_data['visibleTo']
+        data = data.strip().split(';')
+        data = json.dumps(data)
+        return data
+	    
+
+	

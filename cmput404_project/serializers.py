@@ -16,9 +16,6 @@ class AuthorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Author
         fields = ('id', 'host','displayName','url','github','bio')
-        extra_kwargs = {
-            'id': {'validators':[]},
-        }
 
 
 
@@ -26,7 +23,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
     author = AuthorSerializer()
     contentType = serializers.SerializerMethodField()
-
+    published = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S")
     class Meta:
         model = Comment
         fields = ('author','comment', 'contentType','published','id')
@@ -71,6 +68,11 @@ class PostSerializer(serializers.ModelSerializer):
     	for category in obj.categories.all():
     		result.append(category.category)
     	return result
+    
+    def validate_contentType(self, value):
+        print value
+        return True
+        
 
     def create(self,validated_data):
         comments = validated_data.pop('comments')
