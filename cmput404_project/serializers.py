@@ -4,11 +4,20 @@ import json
 from rest_framework.response import Response
 from collections import OrderedDict
 
+def get_id(url):
+    ids = url.split('/')
+    for i in range(len(ids)-1,-1,-1):
+        aid = str(ids[i])
+        if aid != '':
+            break
+    return aid
+
 def get_or_create_author(author_data):
+    author_id = get_id(author_data.pop('id'))
     try:
-        author = Author.objects.get(pk=author_data['id'])
+        author = Author.objects.get(pk=author_id)
     except Author.DoesNotExist:
-        author = Author.objects.create(temp=False,**author_data)
+        author = Author.objects.create(id=author_id,temp=False,**author_data)
     return author
 
 class AuthorSerializer(serializers.ModelSerializer):
@@ -41,11 +50,11 @@ class PostSerializer(serializers.ModelSerializer):
     author = AuthorSerializer()
     categories = serializers.ListField(child=serializers.CharField(max_length=20))
     count = serializers.IntegerField()
-    size = serializers.IntegerField()
-    next = serializers.URLField()
+    size = serializers.IntegerField(required=False)
+    next = serializers.URLField(required=False)
     comments = CommentSerializer(many=True)
     published = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S")
-    visibleTo = serializers.ListField(child=serializers.CharField(max_length=20))
+    visibleTo = serializers.ListField(child=serializers.CharField(max_length=100))
     class Meta:
         model = Post
         fields = ('title','source','origin','description','contentType','content','author','categories','count','size','next','comments','published','id','visibility','visibleTo','unlisted')
@@ -54,14 +63,19 @@ class PostSerializer(serializers.ModelSerializer):
 
     def create(self,validated_data):
         comments = validated_data.pop('comments')
-        validated_data.pop('count')
-        validated_data.pop('size')
-        validated_data.pop('next')
+        if 'count' in validated_data:
+            validated_data.pop('count')
+        if 'next' in validated_data:
+            validated_data.pop('next')
+        if 'size' in validated_data:
+            validated_data.pop('size')
         author_data = validated_data.pop('author')
         author = get_or_create_author(author_data)
         categories = json.dumps(validated_data.pop('categories'))
         visibleTo = json.dumps(validated_data.pop('visibleTo'))
-        post = Post.objects.create(author=author, temp=True,categories=categories,visibleTo=visibleTo,**validated_data)
+        post_id = get_id(validated_data.pop('id'))
+
+        post = Post.objects.create(author=author, id=post_id,temp=True,categories=categories,visibleTo=visibleTo,**validated_data)
         for comment in comments:
             author_data = comment.pop('author')
             author = get_or_create_author(author_data)

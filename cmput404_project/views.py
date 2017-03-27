@@ -125,11 +125,12 @@ def home(request):
     posts= Post.objects.filter(unlisted=False)
 
     viewer = None
-    if(request.user.is_authenticated()):
-        viewer = request.user.author
-        posts = prunning(posts,viewer)
-    else:
-        posts = posts.filter(visibility='PUBLIC')
+    #if(request.user.is_authenticated()):
+     #   viewer = request.user.author
+      #  posts = prunning(posts,viewer)
+    #else:
+    #    posts = posts.filter(visibility='PUBLIC')
+    print posts
     author = viewer
     
     posts = posts.order_by('-published')

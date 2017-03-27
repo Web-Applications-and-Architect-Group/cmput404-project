@@ -12,8 +12,8 @@ accept = [
     ('text/plain', 'text/plain'),
     ('text/markdown', 'text/markdown'),
     ('application/base64', 'application/base64'),
-    ('image/png;base64', 'image/png;base64'),
-    ('image/jpeg;base64', 'image/jpeg;base64'),
+    ('image/png; base64', 'image/png;base64'),
+    ('image/jpeg; base64', 'image/jpeg;base64'),
     ]
 
 @python_2_unicode_compatible
@@ -62,15 +62,15 @@ class Post(models.Model):
     ]
 
     id=models.CharField(primary_key=True, default=uuid.uuid4,max_length=100)
-    visibility = models.CharField(choices=authority, default='text/plain',max_length=20)
-    contentType = models.CharField(choices=accept, default='PUBLIC',max_length=20)
+    visibility = models.CharField(choices=authority, default='PUBLIC',max_length=20)
+    contentType = models.CharField(choices=accept, default='text/plain',max_length=20)
     description = models.CharField(max_length=100,blank=True)
     #=================
-    title = models.CharField(max_length=50)
+    title = models.CharField(max_length=50,blank=True)
     source = models.URLField()
     origin = models.URLField()
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
-    content = models.TextField(max_length=1000)
+    content = models.TextField()
     published = models.DateTimeField(auto_now =True)
     #categories = models.TextField(null=True)
     #Extra material :  https://docs.djangoproject.com/en/1.10/ref/models/fields/UUIDField

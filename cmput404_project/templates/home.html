@@ -57,89 +57,67 @@
     {% else %}
     <div class="w3-col m7" style="width:85%; margin-top:-1em">
     {% endif %}
-      {% if posts %}
-      <ul style="list-style-type: none">
-      {%for post in posts%}
+    {% if posts %}
+    <ul style="list-style-type: none">
+    {%for post in posts%}
+        <div class="w3-container w3-card-2 w3-white w3-round w3-margin"><br>
+            <span class="w3-right w3-opacity">{{post.published}}</span>
+            <h3>
+            <img alt="user photo" class="img-rounded" height=48 width=48 src="{{ post.author.img.url }}" >
+            <a href="{% url 'profile' post.author.id %}" >{{ post.author.displayName }}</a></h3>
+            <span>Title:    </span><a href="{% url 'onePost' post.author.id post.id %}" > {{ post.title }}</a></br></br>
+            <span>Description:    </span>{{ post.description }}
+            <hr class="w3-clear">
+            <ul style="list-style: none">
+            <li>  </br>
+            {% if post.contentType == 'text/markdown' %}
+            {{ post.content|markdown }}
+            {% else %}
+            {{ post.content|urlize }}
+            {% endif %}
 
-          <!-- visible to certain friend -->
-          <!--
-            <p>author</p>{{author.url}}
-            <p>visibleTo</p>{{visi}}
-            {{v}} {{post.visibility}}
-          -->
-            {% if visi %}
-            {% for v in visi %}
-            <!-- if I am vivisible to this post -->
-             {% if v.post.author.displayName == post.author.displayName or post.author.displayName == request.user.username or post.visibility == 0%}
-             <div class="w3-container w3-card-2 w3-white w3-round w3-margin"><br>
-               <span class="w3-right w3-opacity">{{post.published}}</span>
-               <h3>
-               <img alt="user photo" class="img-rounded" height=48 width=48 src="{{ post.author.img.url }}" >
-               <a href="{% url 'profile' post.author.id %}" >{{ post.author.displayName }}</a></h3>
-               <span>Title:    </span><a href="{% url 'onePost' post.author.id post.id %}" > {{ post.title }}</a></br></br>
-               <span>Description:    </span>{{ post.description }}
-               <hr class="w3-clear">
-               <ul style="list-style: none">
-               <li>  </br>
-               {% if post.contentType == 'text/markdown' %}
-               {{ post.content|markdown }}
-               {% else %}
-               {{ post.content|urlize }}
-               {% endif %}
-
-             </br></br>
+            </br></br>
                <div class="w3-row-padding" style="margin:0 -16px">
                  <div class="w3-half">
                    <img src="/w3images/lights.jpg" style="width:100%" alt="Northern Lights" class="w3-margin-bottom">
                  </div>
-                 <div class="w3-half">
-                   <img src="/w3images/nature.jpg" style="width:100%" alt="Nature" class="w3-margin-bottom">
-               </div>
+                <div class="w3-half">
+                <img src="/w3images/nature.jpg" style="width:100%" alt="Nature" class="w3-margin-bottom">
              </div>
+        </div>
 
-             {% if post.unlisted %}
-           </br></br>
-               <p>This post is publicly shareable by URI only: <a href="{{ STATIC_URL }}/post/{{ post.id }}">{{ STATIC_URL }}/{{ post.author }}/{{ post.id }}</a></p>
-             {% endif %}
+        {% if post.unlisted %}
+        </br></br>
+        <p>This post is publicly shareable by URI only: <a href="{{ STATIC_URL }}/post/{{ post.id }}">{{ STATIC_URL }}/{{ post.author }}/{{ post.id }}</a></p>
+        {% endif %}
 
-             <div style="text-align:left">
-                 {% for comment in post.comments.all %}
-                   <hr class="w3-clear">
-                   comment by {{comment.author}}:
-                   {% if comment.contentType == 1 %}
-                   {{ comment.comment|markdown }}
-                   {% else %}
-                   {{ comment.comment|urlize }}
-                   {% endif %}
-                   ({{comment.published}})</br>
-                 {% endfor %}
-             </div></br>
-               <hr class="w3-clear">
-       <!--
-               <form action="{% url 'comment' %}" method="GET">
-                 <input hidden="hidden" name="github" value = "{{user.profile.github}}" id="githubID"/>
-                     {% csrf_token %}
-                       <input style= "width:80%" name="comment_text"/>
-                       <input hidden="hidden" name="post_id" value = "{{post.id }}"/>
-                       <input hidden="hidden" name="content_type" value = "{{contentType}}"/>
-                       <input type="submit" class="w3-button w3-theme-d2 w3-margin-bottom" value = "Comment"/>
-               </form></br>
-       -->
-               <button onclick="clickFun()"><i class="fa fa-plus"></i> Comment</button>
-             </br></br>
+        <div style="text-align:left">
+            {% for comment in post.comments.all %}
+                <hr class="w3-clear">
+                comment by {{comment.author}}:
+                {% if comment.contentType == 1 %}
+                {{ comment.comment|markdown }}
+                {% else %}
+                {{ comment.comment|urlize }}
+                {% endif %}
+                ({{comment.published}})</br>
+            {% endfor %}
+        </div></br>
+        <hr class="w3-clear">
+        <button onclick="clickFun()"><i class="fa fa-plus"></i> Comment</button>
+        </br></br>
 
-           <form action="{% url 'comment' %}" method="POST">
-                   <div class="editor" id="test" style="display:none">
-             <div class="editor-header">
-
-                   <div style="width:20%">
-                       <select name ="content_type" class="form-control" value = "{{commentType}}">
-                           <option value = 0 selected="true">Plain Text</option>
-                           <option value = 1>Markdown</option>
-                           <option value = 2>application/base64</option>
-                           <option value = 3>image/png;base64</option>
-                           <option value = 4>image/jpeg;base64</option>
-                           <option value = 5>github-activity</option>
+        <form action="{% url 'comment' %}" method="POST">
+        <div class="editor" id="test" style="display:none">
+            <div class="editor-header">
+                <div style="width:20%">
+                    <select name ="content_type" class="form-control" value = "{{commentType}}">
+                        <option value = 0 selected="true">Plain Text</option>
+                        <option value = 1>Markdown</option>
+                        <option value = 2>application/base64</option>
+                        <option value = 3>image/png;base64</option>
+                        <option value = 4>image/jpeg;base64</option>
+                        <option value = 5>github-activity</option>
                    </select>
                </div> <!-- /.form-group -->
              </div>
@@ -162,15 +140,11 @@
 
                      </li></br>
               <!-- else I am not -->
-              {% else %}
-
-             {% endif %}
-            {% endfor %}
 
 
 
-        <!-- else not specify certain friend can see -->
-        {% elif post.visibility == 0 or post.author.displayName == request.user.username %}
+
+
       <div class="w3-container w3-card-2 w3-white w3-round w3-margin"><br>
         <span class="w3-right w3-opacity">{{post.published}}</span>
         <h3>
@@ -264,7 +238,7 @@
 
       </div>
 
-    </li></br> {% endif %}
+    </li></br>
       {% endfor %}</ul>
       {% else %}
         <p>You do no have any stream to show yet.</p>
