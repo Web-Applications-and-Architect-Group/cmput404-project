@@ -67,7 +67,7 @@ urlpatterns = [
         name='friend_inquiry_by_ids'),                              # Allow [GET]. GET done
     # url(r'^service/author/(?P<author_id1>[a-zA-Z0-9-_]+)/friends/<service2>/author/(?P<author_id2>[a-zA-Z0-9-_]+)$',
     #     views.Post_list.as_view(), name='friend_inquiry_by_ids'), #TODO? Optional
-    url(r'^service/friendrequest$',                                         # Allow [POST]. POST Done
+    url(r'^service/friendrequest/$',                                         # Allow [POST]. POST Done
         api.Friendrequest_Handler.as_view(), name="make_friendrequest"),
 
     ### (END) API specify by
@@ -87,7 +87,7 @@ urlpatterns = [
 
 
     # url(r'^friendrequest$', views.handle_friendrequest.as_view(), name="make_friendrequest"),
-    url(r'^(?P<author_id>[a-zA-Z0-9-_]+)/$', views.stream, name="stream"),
+    url(r'^(?P<author_id>[a-zA-Z0-9-_]+)/stream$', views.stream, name="stream"),
     url(r'^create_post_html$', views.create_post_html, name="create_post_html"),
     url(r'^create_post$', views.create_post, name="create_post"),
     url(r'^$', views.home ,name="home"),
@@ -95,7 +95,6 @@ urlpatterns = [
     #url(r'^mystream$', views.ViewMyStream, name="ViewMyStream"),
     url(r'^(?P<author_id>[a-zA-Z0-9-_]+)/posts/(?P<post_id>[a-zA-Z0-9-_]+)/delete_post$', views.delete_post, name="delete_post"),
     url(r'^comment$', views.comment, name="comment"),
-    url(r'^unlistpost/(?P<post_id>[a-zA-z0-9-_]+)$', views.viewUnlistedPost, name="viewUnlistedPost"),
     url(r'^manage_post$', views.manage_post, name="manage_post"),
     url(r'^(?P<post_id>[a-zA-Z0-9-]+)/update_post$', views.update_post, name="update_post"),
     url(r'^Add_friend$', views.Add_friend, name="Add_friend"),
@@ -103,8 +102,9 @@ urlpatterns = [
     url(r'^AcceptFriendRequest/(?P<requester_id>[a-zA-z0-9-_]+)$', views.AcceptFriendRequest, name="AcceptFriendRequest"),
     url(r'^api_list_my_friend_request$', views.list_my_friend_request, name="list_my_friend_request"),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    url(r'^post/(?P<post_id>[a-zA-z0-9-_]+)$', views.viewUnlistedPost, name="viewUnlistedPost"),
-
-
 ]
 urlpatterns = format_suffix_patterns(urlpatterns)
+
+#http://stackoverflow.com/questions/29099404/ssl-insecureplatform-error-when-using-requests-package
+import requests.packages.urllib3
+requests.packages.urllib3.disable_warnings()

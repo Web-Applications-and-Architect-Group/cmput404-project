@@ -1,4 +1,5 @@
 {% load static %}
+{% load crispy_forms_tags %}
 <!DOCTYPE html>
 <html>
 <meta charset="UTF-8">
@@ -15,15 +16,9 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
-<style>
-html,body,h1,h2,h3,h4,h5 {font-family: "Open Sans", sans-serif}
-input[type="text"], textarea {
 
-  background-color : rgb(250, 255, 189);
-
-}
-</style>
 <head>
+  <title>Aname</title>
 </head>
 
 <body class="w3-theme-l5">
@@ -73,40 +68,28 @@ input[type="text"], textarea {
   <div class="modal-dialog">
 
     <!-- Modal content-->
-    <div class="modal-content">
+    <div class="modal-content w3-light-grey">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
-        {% if request.user.username %}
-        <h2 class="modal-title" style="text-align:center">Write A New Post</h2>
+        <strong><h1 class="modal-title center-block">Write A New Post</h2></strong>
       </div>
       <div class="modal-body">
-        <div style="border: 2px solid	#e9f2fc; padding:2em;
-                    text-align:center; background-color: #eaf2fb; font-family: verdana;" >
+        <div>
 
         <form method="post" enctype="multipart/form-data" action="{% url 'create_post' %}">
-        {% csrf_token %}
-        	<div class="selection">
-            <h1>New post</h1>
-
-            <h5><b>Categoies(separate by #):</b><input name="categoies" type="text" id="cate"></h5>
-            <h5><b>VisibleTo(separate by #):</b><input name="visibleTo" type="text" id="visiTo"></h5>
-
-            {{ form.as_p }}
-            <input type="file" name="files" multiple>
-            <button type="submit" class="save btn btn-success btn-sm" style="background:#4CAF50">Save</button>
-
-
+          {% csrf_token %}
+          {{ form|crispy }}
+          <input type="file" name="files" multiple>
+          <button type="submit" class="save btn btn-success" >Save</button>
         </form>
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-success btn-sm" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button>
       </div>
     </div>
 
   </div>
-  {% endif %}
-</div>
 </div>
 
 <script>

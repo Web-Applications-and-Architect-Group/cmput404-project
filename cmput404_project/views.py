@@ -5,7 +5,7 @@ from django.shortcuts import render, get_object_or_404,get_list_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 import os
-from .models import  Author,Post, friend_request, Comment,Notify,Friend,Category,PostImages,Node, VisibleTo
+from .models import  Author,Post, friend_request, Comment,Notify,Friend,PostImages,Node
 from .forms import ProfileForm,ImageForm,PostForm
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -19,11 +19,13 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import mixins,generics, status, permissions
 
-from .serializers import AuthorSerializer,PostSerializer,CommentSerializer,PostPagination,CommentPagination
+from .serializers import AuthorSerializer,PostSerializer,CommentSerializer,PostPagination,CommentPagination,AddCommentQuerySerializer
 from rest_framework.decorators import api_view
 from .permissions import IsAuthenticatedNodeOrAdmin
 from collections import OrderedDict
-from .settings import MAXIMUM_PAGE_SIZE
+from .settings import MAXIMUM_PAGE_SIZE,HOST_NAME
+from .comment_functions import getNodeAuth,getNodeAPIPrefix,friend_relation_validation
+
 
 
 
@@ -45,9 +47,15 @@ class Send_Friendrequest(LoginRequiredMixin, View):
     def post(self, request):
         # get the friend on remote server
         # r = requests.get('http://127.0.0.1:8000/service/author/diqiu') # for test
-        # print(request.POST["friend_url"])
+        friend_hostname = request.POST["friend_host"]
+        if friend_hostname[len(friend_hostname)-1]=="/":
+            friend_hostname = friend_hostname[0:len(friend_hostname)-1]
+        print friend_hostname
         # return
-        admin_auth=("admin", "nimabide")
+        print(getNodeAuth(friend_hostname))
+        admin_auth=getNodeAuth(friend_hostname)["auth"] #TODO
+        print(admin_auth)
+        # return
 
         r = requests.get(request.POST["friend_url"], auth=admin_auth)
         remote_friend = r.json()
@@ -67,8 +75,10 @@ class Send_Friendrequest(LoginRequiredMixin, View):
 
         # send friend request to remote server
         # r = requests.post(remote_friend["host"]+'service/friendrequest', data = remote_request)
+        print(friend_hostname+getNodeAPIPrefix(friend_hostname)["api_prefix"]+'friendrequest/')
+        # return
         r = requests.post(
-            remote_friend["host"]+'/service/friendrequest',
+            friend_hostname+getNodeAPIPrefix(friend_hostname)["api_prefix"]+'friendrequest/',
             json=remote_request,
             auth=admin_auth
         )
@@ -90,41 +100,62 @@ class Send_Friendrequest(LoginRequiredMixin, View):
         # return HttpResponse(json.dumps(remote_request), status=status.HTTP_200_OK)
         return HttpResponse(r, status=r.status_code)
 
-def home(request):
-    form = PostForm()
-    post= Post.objects.filter(visibility=0).order_by('-published') | Post.objects.filter(visibility=3).order_by('-published')
+def update():
+    Author.objects.filter(temp=True).delete()
+    Post.objects.filter(temp=True).delete()
+    Comment.objects.filter(temp=True).delete()
     for node in Node.objects.all():
-        r = requests.get(node.host+node.public_post_url, auth=(node.auth_username, node.auth_password))
+        r = requests.get(node.host+node.auth_post_url, auth=(node.auth_username, node.auth_password))
         if r.status_code == 200:
-            print "-----------------------------------------"
-            print(r.json())
             serializer = PostSerializer(data=r.json()['posts'],many=True)
             if serializer.is_valid():
-                posts = serializer.save()
-    author = None
-    visi = None
-    if(request.user.is_authenticated()):
-        author = request.user.author
-        visi = VisibleTo.objects.filter(visibleTo=author.url)
-        visi1=VisibleTo.objects.all()
+                serializer.save()
+            else:
+                print(serializer.errors) 
+        else:
+            print(r.status_code)
 
-    #print ("!!!!!!!!")
-    #print (visi)
-    #print (author.url)
-    #print (visi1)
-    #print (post[0])
+def can_see(post,author):
+    if author.url in json.loads(post.visibleTo):
+        return True
+    if post.visibility == 'PRIVATE' and post.author != author:
+        return False
+    return True
+
+def prunning(posts,author):
+    for post in posts.iterator():
+        if not can_see(post,author):
+            posts = posts.exclude(id =post.id)
+    return posts
+        
+def home(request):
+    update()
+    form = PostForm()
+    posts= Post.objects.filter(unlisted=False)
+
+    viewer = None
+    if(request.user.is_authenticated()):
+        viewer = request.user.author
+        posts = prunning(posts,viewer)
+    else:
+        posts = posts.filter(visibility='PUBLIC')
+    author = viewer
+    
+    posts = posts.order_by('-published')
 
     notify = Notify.objects.filter(requestee=author)
     images = PostImages.objects.all()
-    context = { 'posts': post ,'form': form,'author':author,'Friend_request':notify,'images':images, 'visi':visi}
+    context = { 'posts': posts ,'form': form,'author':author,'Friend_request':notify,'images':images,'viewer':viewer}
+
     return render(request,'home.html',context)
 
 def stream(request,author_id):
     author = get_object_or_404(Author,pk=author_id)
-    posts = Post.objects.filter(author=author).order_by('-published')
+    posts = Post.objects.filter(author=author).order_by('-published') | Post.objects.filter(visibility=3).order_by('-published')
     form = PostForm()
+    visi = None
     images = PostImages.objects.all()
-    context = { 'posts': posts ,'author':author,'form':form,'images':images}
+    context = { 'posts': posts ,'author':author,'form':form,'images':images, 'visi':visi}
     return render(request, 'self.html', context)
 
 
@@ -169,38 +200,21 @@ def create_post(request):
     if request.method == "POST":
         form = PostForm(request.POST)
         if form.is_valid():
-            new_post = form.save(commit=False)
-            author_X = Author.objects.get(user=request.user)
-            new_post.author = author_X
-            new_post.save()
-
-            #XXX:TODO Category
-            cates = request.POST['categoies']
-            cate_list = cates.split('#')
-            for cate in cate_list:
-                m=Category.objects.create(post=new_post,category=cate)
-                m.save()
-
-            #XXX:TODO VisibleTo
-            visiTo = request.POST['visibleTo']
-            visi_list = visiTo.split('#')
-            for visi in visi_list:
-                n = VisibleTo.objects.create(post=new_post,visibleTo=visi)
-                n.save()
-
-            new_post.source = "http://127.0.0.1:8000/service/posts/%s" %(new_post.id)
-            new_post.origin = "http://127.0.0.1:8000/service/posts/%s" %(new_post.id)
-            new_post.save()
-#https://www.youtube.com/watch?v=C9MDtQHwGYM
+            data = form.cleaned_data
+            data['id'] = uuid.uuid4()
+            url = reverse("a_single_post_detail",kwargs={"post_id":data['id']})
+            data['origin'] = url
+            data['source'] = url
+            new_post = Post.objects.create(author=request.user.author,**data)
+            
+            #https://www.youtube.com/watch?v=C9MDtQHwGYM
             for count,x in enumerate(request.FILES.getlist("files")):
                 image = PostImages.objects.create(post=new_post,post_image = x)
                 image.save()
 
-
-            return HttpResponseRedirect(reverse('home'))
         else:
+            print(form.errors)
             form = PostForm()
-            return render(request,'/',{'form': form})
     return HttpResponseRedirect(reverse('home'))
 
 
@@ -220,31 +234,14 @@ def manage_post(request):
 def update_post(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     if request.method == "POST":
-        print ("The value of unlisted is :" + request.POST['unlisted'])
         form = PostForm(request.POST, instance=post)
         if form.is_valid():
             post = form.save()
-
-            cates = request.POST['category']
-            cate_list = cates.split('#')
-            print cate_list
-            Category.objects.filter(post=post).delete()
-            for cate in cate_list:
-                if cate.strip() != "":
-                    Category.objects.create(post=post,category=cate)
-
-            visiTo = request.POST['visibleTo']
-            visi_list = visiTo.split('#')
-            VisibleTo.objects.filter(post=post).delete()
-            for visi in visi_list:
-                if visi.strip() != "":
-                    VisibleTo.objects.create(post=post,visibleTo=visi)
-
-
-            return HttpResponseRedirect(reverse('home'))
+        else:
+            print form.errors
     else:
         form = PostForm(instance=post)
-    return render(request,'/',{'form': form})
+    return HttpResponseRedirect(reverse('onePost',kwargs={'post_id':post_id,'author_id':post.author.id}))
 
 # @login_required
 # def update_post(request):
@@ -265,25 +262,27 @@ def update_post(request, post_id):
 
 @login_required
 def comment(request):
-    author = Author.objects.get(displayName = request.user.username)
-    comment_text = request.POST['comment_text']
-    comment_type = request.POST['content_type']
-    post_id= request.POST['post_id']
-    post = Post.objects.get(id = post_id)
+    if request.method == "POST":
+        author = get_object_or_404(Author,pk=request.user.author.id)
+        comment_text = request.POST['comment_text']
+        comment_type = request.POST['content_type']
+        post_id= request.POST['post_id']
+        post = Post.objects.get(id = post_id)
 
-    new_comment = Comment.create(author, comment_text, post, comment_type)
-    new_comment.save()
-
-    #post_type = request.GET['post_type']
-    post_type = post.contentType
-    context= postContent(post_type,request)
-    context["author"] = author
-
-    images = PostImages.objects.all()
-    context["images"] = images
-    context["form"] = PostForm()
-    return render(request, 'home.html', context)
-    #return HttpResponseRedirect(reverse('ViewMyStream'), kwargs={'post_type':post_type})
+        new_comment = Comment.objects.create(author=author,comment=comment_text,post=post,contentType=comment_type)
+        
+        host = post.author.host
+        if host != HOST_NAME:
+            data = OrderedDict()
+            data['query'] = 'addComment'
+            data['post'] = post.origin
+            data['comment'] = CommentSerializer(instance=new_comment).data
+            serializer = AddCommentQuerySerializer(data = data)
+            if serializer.is_valid():
+                print serializer.data
+            else:
+                print serializer.errors
+    return HttpResponseRedirect(reverse('home'))
 
 def postContent(post_type,request):
     comments = Comment.objects.all()
@@ -405,17 +404,6 @@ def get_object_by_uuid_or_404(model, uuid_pk):
         raise Http404(str(e))
     return get_object_or_404(model, pk=uuid_pk)
 
-"""
-Generic function for validating friend relationship status
-"""
-def friend_relation_validation(friend_url1, friend_url2):
-    # greb info from urls
-    author1 = requests.get(friend_url1)
-    author2 = requests.get(friend_url2)
-
-    # validate response from servers
-
-    return friend_status
 
 def friendList(request,author_id):
     author = Author.objects.get(pk=author_id)
@@ -429,9 +417,12 @@ def friendList(request,author_id):
     following_detail_list = []
     for f_author in following_list:
         # get the authentication of node
-        admin_auth=("admin", "nimabide")
+        # print(f_author.requester.host)
+        admin_auth=getNodeAuth(f_author.requester.host)["auth"]
 
         # get remote author info thr API
+        # print(f_author.requestee, admin_auth)
+        # return
         r = requests.get(f_author.requestee, auth=admin_auth)
         if r.status_code==200:
             a_remote_author = OrderedDict()
@@ -439,6 +430,16 @@ def friendList(request,author_id):
         else:
             continue
 
+        friend_validation = friend_relation_validation(author.url, author.host, a_remote_author["url"], a_remote_author["host"])
+        if friend_validation["success"] == True and friend_validation["friend_status"] == True:
+            a_remote_author["relationship"] = "friend"
+        elif friend_validation["success"] == True and friend_validation["friend_status"] == False:
+            a_remote_author["relationship"] = "follow"
+        else:
+            print(friend_validation["messages"])
+            continue
+
+        """
         # get remote author's following list
         r = requests.get(f_author.requestee+'/friends', auth=admin_auth)
         if r.status_code==200:
@@ -452,6 +453,8 @@ def friendList(request,author_id):
             following_detail_list.append(a_remote_author)
         else:
             continue
+        """
+        following_detail_list.append(a_remote_author)
 
     context = {
         'author':author,
@@ -466,12 +469,12 @@ def friendList(request,author_id):
 
 def onePost(request,author_id,post_id):
 	post = get_object_or_404(Post,pk = post_id,author=author_id)
-	user = Author.objects.get(pk = author_id).user
-	result = ""
-	visible = ""
-	for category in post.categories.all():
-	    result += "#"+ category.category
-	for visi in post.visibleTo.all():
-	    visible += "#"+ visi.visibleTo
-	context = {'post':post,'category':result,'user':user,'form':PostForm, 'visibleTo':visible}
+	author = get_object_or_404(Author,pk = author_id)
+	viewer = None
+	if request.user.is_authenticated:
+	    viewer = request.user.author
+	form = PostForm()
+	post.categories = '#'.join(json.loads(post.categories))
+	post.visibleTo = ';'.join(json.loads(post.visibleTo))
+	context = {'post':post,'author':author,'form':form,'viewer':viewer}
 	return render(request,'post/onePost.html',context)

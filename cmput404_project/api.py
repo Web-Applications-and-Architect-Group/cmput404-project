@@ -27,6 +27,8 @@ def handle_posts(posts,request):
         post['count'] = comments.count()
         post['size'] = MAXIMUM_PAGE_SIZE
         post['next'] = post.origin + '/comments'
+        post['categories'] = json.loads(post.categories)
+        post['visibleTo'] = json.loads(post.visibleTo)
     serializer = PostSerializer(result_posts, many=True)
     return paginator.get_paginated_response(serializer.data, size)
 
@@ -34,8 +36,8 @@ class Public_Post_List(APIView):
     """
     List all pulic posts
     """
-    queryset = Post.objects.filter(visibility=0)
-    permission_classes = (IsAuthenticatedNodeOrAdmin,)
+    queryset = Post.objects.filter(visibility='PUBLIC').filter(temp=False)
+    
     def get(self,request,format=None):
         return handle_posts(self.queryset,request)
 
@@ -44,7 +46,7 @@ class Post_Detail(APIView):
     List one post with given post id
     """
     queryset = Post.objects.all()
-    permission_classes = (IsAuthenticatedNodeOrAdmin,)
+    
 
     def failResponse(self, err_message, status_code):
         # generate fail response
@@ -56,7 +58,7 @@ class Post_Detail(APIView):
         # return Response(JSONRenderer().render(response), status=status_code)
 
     def get(self,request,post_id,format=None):
-        posts = get_list_or_404(Post,pk=post_id)
+        posts = get_list_or_404(Post.filter(temp=False),pk=post_id)
         return handle_posts(posts,request)
 
     def post(self, request, post_id, format=None):
@@ -81,7 +83,7 @@ class Post_Detail(APIView):
         #     )
 
         # get the requested post
-        post = get_object_or_404(Post, pk=post_id)
+        post = get_object_or_404(Post.filter(temp=False), pk=post_id)
         # get possible FOAF
         post_author_following_list = Friend.objects.filter(requester=post.author)
         possible_middle_friends = post_author_following_list.filter(requestee_id__in=data["friends"])
@@ -108,8 +110,8 @@ class All_Visible_Post_List_To_User(APIView):
     """
     List all posts that visible to an authenticated user.
     """
-    queryset = Post.objects.exclude(visibility=4)
-    permission_classes = (IsAuthenticatedNodeOrAdmin,)
+    queryset = Post.objects.exclude(visibility='SERVERONLY').filter(temp=False)
+    
     def get(self,request, format=None):
         return handle_posts(self.queryset,request)
 
@@ -117,10 +119,10 @@ class All_Visible_Post_List_From_An_Author_To_User(APIView):
     """
     List all posts from an author that visible to an authenticated user.
     """
-    queryset = Post.objects.exclude(visibility=4)
-    permission_classes = (IsAuthenticatedNodeOrAdmin,)
+    queryset = Post.objects.exclude(visibility='SERVERONLY').filter(temp=False)
+    
     def get(self,request, author_id, format=None):
-        author = get_object_or_404(Author,pk=author_id)
+        author = get_object_or_404(Author.filter(temp=False),pk=author_id)
         posts=self.queryset.filter(author = author_id)
         return handle_posts(posts,request)
 
@@ -138,9 +140,9 @@ class Comment_list(APIView):
     List all comments, or create a new comment.
     """
     queryset = Comment.objects.all()
-    permission_classes = (IsAuthenticatedNodeOrAdmin,)
+    
     def get(self,request,post_id,format=None):
-        post = get_object_or_404(Post,pk=post_id)
+        post = get_object_or_404(Post.filter(temp=False),pk=post_id)
         size = int(request.GET.get('size', 5))
         paginator = CommentPagination()
         paginator.page_size = size
@@ -155,16 +157,17 @@ class Comment_list(APIView):
         response = OrderedDict()
         response['query'] = 'addComment'
         data = request.data
-        data['post_id'] = post_id
         serializer = AddCommentQuerySerializer(data=data)
         if serializer.is_valid():
             serializer.save()
             response['success'] = True
             response['message'] = 'Comment Added'
+            code = status.HTTP_200_OK
         else:
             response['success'] = False
             response['message'] = serializer.errors
-        return Response(response)   # !!!!!!!!!!!!!!!!!!!!!!!!!!!! didn't response with a status code
+            code = status.HTTP_400_BAD_REQUEST
+        return Response(response,status=code)
 
 # ============ Comments API (END) ============= #
 
@@ -177,7 +180,7 @@ class Comment_list(APIView):
 # ============================================= #
 class AuthorView(APIView):
     queryset = Author.objects.all()
-    permission_classes = (IsAuthenticatedNodeOrAdmin,)
+    
     def get(self, request, author_id, format=None):
         author =  get_object_or_404(Author,pk=author_id)
         serializer = AuthorSerializer(author)

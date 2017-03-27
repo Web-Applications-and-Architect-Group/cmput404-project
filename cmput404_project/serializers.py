@@ -4,6 +4,21 @@ import json
 from rest_framework.response import Response
 from collections import OrderedDict
 
+def get_id(url):
+    ids = url.split('/')
+    for i in range(len(ids)-1,-1,-1):
+        aid = str(ids[i])
+        if aid != '':
+            break
+    return aid
+
+def get_or_create_author(author_data):
+    author_id = get_id(author_data.pop('id'))
+    try:
+        author = Author.objects.get(pk=author_id)
+    except Author.DoesNotExist:
+        author = Author.objects.create(id=author_id,temp=True,**author_data)
+    return author
 
 class AuthorSerializer(serializers.ModelSerializer):
 
@@ -13,70 +28,57 @@ class AuthorSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'id': {'validators':[]},
         }
-        
 
 
 class CommentSerializer(serializers.ModelSerializer):
 
     author = AuthorSerializer()
-    contentType = serializers.SerializerMethodField()
-
+    published = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S")
     class Meta:
         model = Comment
         fields = ('author','comment', 'contentType','published','id')
        	#read_only_fields = ('id','contentType','author')
 
-    def get_contentType(self,obj):
-    	return obj.get_contentType_display()
 
 
-    
+
 class PostSerializer(serializers.ModelSerializer):
 
     author = AuthorSerializer()
-    visibility = serializers.SerializerMethodField()
-    contentType = serializers.SerializerMethodField()
-    categories = serializers.SerializerMethodField()
+    categories = serializers.ListField(child=serializers.CharField(max_length=20),required=False)
     count = serializers.IntegerField()
-    size = serializers.IntegerField()
-    next = serializers.URLField()
+    size = serializers.IntegerField(required=False)
+    next = serializers.URLField(required=False)
     comments = CommentSerializer(many=True)
+    published = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S")
+    visibleTo = serializers.ListField(child=serializers.CharField(max_length=100))
     class Meta:
         model = Post
-        fields = ('title','source','origin','description','contentType','content','author','categories','count','size','next','comments','published','id','visibility','visibileTo','unlisted')
+        fields = ('title','source','origin','description','contentType','content','author','categories','count','size','next','comments','published','id','visibility','visibleTo','unlisted')
+        
 
-    
-    def get_contentType(self,obj):
-    	return obj.get_contentType_display()
-
-    def get_visibility(self,obj):
-    	return obj.get_visibility_display()
-
-    def get_visibileTo(self,obj):
-    	result = []
-    	for visibileTo in obj.visibileTo.all():
-    		result.append(author.visibileTo)
-    	return result
-
-    def get_categories(self,obj):
-    	result = []
-    	for category in obj.categories.all():
-    		result.append(category.category)
-    	return result
 
     def create(self,validated_data):
-        comment_data = validated_data.pop('comments')
-        validated_data.pop('count')
-        validated_data.pop('size')
-        validated_data.pop('next')
+        comments = validated_data.pop('comments')
+        if 'count' in validated_data:
+            validated_data.pop('count')
+        if 'next' in validated_data:
+            validated_data.pop('next')
+        if 'size' in validated_data:
+            validated_data.pop('size')
         author_data = validated_data.pop('author')
-        try:
-            author = Author.objects.get(pk=author_data['id'])
-        except Author.DoesNotExist:
-            author = Author.objects.create(**author_data)
-        post = Post.objects.create(author=author, **validated_data)
+        author = get_or_create_author(author_data)
+        categories = json.dumps(validated_data.pop('categories')) if 'categories' in validated_data else '[]'
+        visibleTo = json.dumps(validated_data.pop('visibleTo'))  if 'visibleTo' in validated_data else '[]'
+        post_id = get_id(validated_data.pop('id'))
+
+        post = Post.objects.create(author=author, id=post_id,temp=True,categories=categories,visibleTo=visibleTo,**validated_data)
+        for comment in comments:
+            author_data = comment.pop('author')
+            author = get_or_create_author(author_data)
+            Comment.objects.create(author=author,post=post,temp=True,**comment)
         return post
-    
+
 
 
 
@@ -118,24 +120,21 @@ class CommentPagination(pagination.PageNumberPagination):
             response['previous'] = previous_link
 
         return Response(response)
-        
+
 class AddCommentQuerySerializer(serializers.Serializer):
     query = serializers.CharField(max_length=10)
     post = serializers.URLField()
     comment = CommentSerializer()
-    post_id = serializers.CharField(max_length=100)
-    
+    #post_id = serializers.CharField(max_length=100)
+
     def create(self,validated_data):
         comment_data = validated_data.pop('comment')
-        comment_data['post'] = Post.objects.get(pk=validated_data.pop('post_id'))
+        comment_data['post'] = Post.objects.get(pk=get_id(validated_data.pop('post')))
         author_data = comment_data.pop('author')
-        try:
-            author = Author.objects.get(pk=author_data['id'])
-        except Author.DoesNotExist:
-            author = Author.objects.create(**author_data)
+        author = get_or_create_author(author_data)
         comment = Comment.objects.create(author=author, **comment_data)
         return comment
-    
+    '''
     def validate_post_id(self,value):
         """
         Check that the post_id exist
@@ -145,7 +144,7 @@ class AddCommentQuerySerializer(serializers.Serializer):
         except Post.DoesNotExist:
             raise serializers.ValidationError("Post with id"+value+" does not exist")
         return value
-    
+    '''
     def validate_query(self,value):
         """
         Check that the query is addComment
@@ -153,4 +152,3 @@ class AddCommentQuerySerializer(serializers.Serializer):
         if value != 'addComment':
             raise serializers.ValidationError("only accept query addComment")
         return value
-        

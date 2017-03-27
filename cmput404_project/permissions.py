@@ -19,7 +19,7 @@ class IsAuthenticatedNodeOrAdmin(permissions.BasePermission):
         if request.user.is_staff:
             return True
         try:
-            node = Node.objects.get(pk=request.user.id)
+            node = Node.objects.get(user=request.user.id)
         except Node.DoesNotExist:
             return False
         return True
