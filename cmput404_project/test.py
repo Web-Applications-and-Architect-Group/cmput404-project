@@ -148,7 +148,7 @@ class Comments_And_Friends_Test(TestCase):
         response = self.client.delete('/comments/%s/destroy' % self.comment_id)
         self.assertEqual(response.status_code, 204)
 
-    def test_send_friend_request(self):
+    def test_follow_friend(self):
         self.client = Client()
         #test to send a friend request
         response = self.client.post('/author/friend_request/%s' % self.uuid2, {}, format = 'json')
@@ -177,19 +177,17 @@ class Comments_And_Friends_Test(TestCase):
         self.assertEqual(response.status_code, 202)
 
         #test get the friend list for user 2 again,
-        response = self.client.get('/author/%s/network' % self.uid2, {}, format = 'json')
+        response = self.client.get('/author/%s/network' % self.uuid2, {}, format = 'json')
         self.assertEqual(response.status_code, 200)
         request = response.data['authors']
         self.assertTrue(request == [])
 
-
-    def test_reject_friend_requests(self):
+    def test_check_friend_relationship(self):
 
         self.client = Client()
         #test to send a friend request
         response = self.client.post('/author/friend_request/%s' % self.uuid2, {}, format = 'json')
         self.assertEqual(response.status_code, 202)
-
-        #test reject friend request
-        response = self.client.delete('/author/friend_request/reject/%s' % self.uuid1, {}, format = 'json')
-        self.assertEqual(response.status_code, 202)
+        fields = ['status', 'author', 'friend']
+        for field in fields:
+            self.assertTrue(field in response.data)
