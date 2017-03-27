@@ -90,30 +90,30 @@ class Send_Friendrequest(LoginRequiredMixin, View):
         # return HttpResponse(json.dumps(remote_request), status=status.HTTP_200_OK)
         return HttpResponse(r, status=r.status_code)
 
-def home(request):
-    form = PostForm()
-<<<<<<< HEAD
-    posts = set(Post.objects.filter(visibility=0).order_by('-published'))
-=======
-    post= Post.objects.filter(visibility=0).order_by('-published') | Post.objects.filter(visibility=3).order_by('-published')
->>>>>>> 089f99e5f03b27bdc5aa061d3e06f323bda44213
+def update():
+    Author.objects.filter(temp=True).delete()
+    Post.objects.filter(temp=True).delete()
+    Comment.objects.filter(temp=True).delete()
     for node in Node.objects.all():
-        r = requests.get(node.host+node.public_post_url, auth=(node.auth_username, node.auth_password))
+        r = requests.get(node.host+node.auth_post_url, auth=(node.auth_username, node.auth_password))
         if r.status_code == 200:
             serializer = PostSerializer(data=r.json()['posts'],many=True)
             if serializer.is_valid():
-                posts =  posts | set(serializer.save())
+                serializer.save()
             else:
                 print(serializer.errors)
         else:
             print(r.status_code)
+
+def home(request):
+    update()
+    form = PostForm()
+    post= Post.objects.filter(visibility=0).order_by('-published') | Post.objects.filter(visibility=3).order_by('-published')
+
     author = None
     visi = None
     if(request.user.is_authenticated()):
         author = request.user.author
-<<<<<<< HEAD
-    context = { 'posts': posts ,'form': PostForm(),'author':author}
-=======
         visi = VisibleTo.objects.filter(visibleTo=author.url)
         visi1=VisibleTo.objects.all()
 
@@ -126,7 +126,7 @@ def home(request):
     notify = Notify.objects.filter(requestee=author)
     images = PostImages.objects.all()
     context = { 'posts': post ,'form': form,'author':author,'Friend_request':notify,'images':images, 'visi':visi}
->>>>>>> 089f99e5f03b27bdc5aa061d3e06f323bda44213
+
     return render(request,'home.html',context)
 
 def stream(request,author_id):

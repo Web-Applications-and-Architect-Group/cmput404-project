@@ -25,7 +25,6 @@ class Node(models.Model):
     auth_password = models.CharField(max_length=50)
     public_post_url = models.CharField(max_length=50,default="/service/posts?format=json")
     auth_post_url = models.CharField(max_length=50,default="/service/author/posts?format=json")
-
     def __str__(self):
         return self.host
         
@@ -40,7 +39,7 @@ class Author(models.Model):
     id = models.CharField(primary_key=True,max_length=100)
     url = models.URLField()
     user = models.OneToOneField(User,on_delete=models.CASCADE,related_name='author',blank=True,null=True)
-
+    temp = models.BooleanField(default=False)
 
     def __str__(self):
         return self.displayName
@@ -77,6 +76,7 @@ class Post(models.Model):
     #categories = models.TextField(null=True)
     #Extra material :  https://docs.djangoproject.com/en/1.10/ref/models/fields/UUIDField
     unlisted = models.BooleanField(default=False)
+    temp = models.BooleanField(default=False)
     #=====================
     #image =  models.FileField(default =)
     #======================
@@ -141,7 +141,7 @@ class Notify(models.Model):
 @python_2_unicode_compatible
 class VisibleTo(models.Model):
     post = models.ForeignKey(Post,on_delete=models.CASCADE,related_name="visibleTo")
-    visibleTo = models.URLField()
+    visibleTo = models.CharField(max_length=50)
 
     def __str__(self):
         return self.visibleTo
@@ -151,6 +151,7 @@ class VisibleTo(models.Model):
 class Category(models.Model):
     post = models.ForeignKey(Post,on_delete=models.CASCADE,related_name='categories')
     category = models.CharField(max_length=20)
+    
     def __str__(self):
         return self.category
 
@@ -182,7 +183,8 @@ class Comment(models.Model):
     contentType = models.IntegerField(choices=accept, default=0)
     published = models.DateTimeField(auto_now=True)
     post = models.ForeignKey(Post, on_delete=models.CASCADE,related_name='comments')
-
+    temp = models.BooleanField(default=False)
+    
     @classmethod
     def create(cls, user, comment_text, post, comment_type):
         new_comment = cls(author=user, comment=comment_text, post=post, contentType=comment_type)
