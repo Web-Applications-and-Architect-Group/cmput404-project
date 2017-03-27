@@ -17,7 +17,7 @@ def get_or_create_author(author_data):
     try:
         author = Author.objects.get(pk=author_id)
     except Author.DoesNotExist:
-        author = Author.objects.create(id=author_id,temp=False,**author_data)
+        author = Author.objects.create(id=author_id,temp=True,**author_data)
     return author
 
 class AuthorSerializer(serializers.ModelSerializer):

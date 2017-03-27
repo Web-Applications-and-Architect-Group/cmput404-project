@@ -19,11 +19,11 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import mixins,generics, status, permissions
 
-from .serializers import AuthorSerializer,PostSerializer,CommentSerializer,PostPagination,CommentPagination
+from .serializers import AuthorSerializer,PostSerializer,CommentSerializer,PostPagination,CommentPagination,AddCommentQuerySerializer
 from rest_framework.decorators import api_view
 from .permissions import IsAuthenticatedNodeOrAdmin
 from collections import OrderedDict
-from .settings import MAXIMUM_PAGE_SIZE
+from .settings import MAXIMUM_PAGE_SIZE,HOST_NAME
 from .comment_functions import getNodeAuth,friend_relation_validation
 
 
@@ -261,8 +261,10 @@ def comment(request):
         post = Post.objects.get(id = post_id)
 
         new_comment = Comment(author, comment_text, post, comment_type)
-
+        
         host = post.author.host
+        print host
+        print HOST_NAME
         if host == HOST_NAME:
             new_comment.save()
         else:
