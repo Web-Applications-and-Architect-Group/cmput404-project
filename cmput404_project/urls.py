@@ -87,7 +87,7 @@ urlpatterns = [
 
 
     # url(r'^friendrequest$', views.handle_friendrequest.as_view(), name="make_friendrequest"),
-    url(r'^(?P<author_id>[a-zA-Z0-9-_]+)/$', views.stream, name="stream"),
+    url(r'^(?P<author_id>[a-zA-Z0-9-_]+)/stream$', views.stream, name="stream"),
     url(r'^create_post_html$', views.create_post_html, name="create_post_html"),
     url(r'^create_post$', views.create_post, name="create_post"),
     url(r'^$', views.home ,name="home"),

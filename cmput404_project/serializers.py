@@ -4,6 +4,12 @@ import json
 from rest_framework.response import Response
 from collections import OrderedDict
 
+def get_or_create_author(author_data):
+    try:
+        author = Author.objects.get(pk=author_data['id'])
+    except Author.DoesNotExist:
+        author = Author.objects.create(temp=False,**author_data)
+    return author
 
 class AuthorSerializer(serializers.ModelSerializer):
 
@@ -41,6 +47,8 @@ class PostSerializer(serializers.ModelSerializer):
     size = serializers.IntegerField()
     next = serializers.URLField()
     comments = CommentSerializer(many=True)
+    published = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S")
+    visibleTo = serializers.SerializerMethodField()
     class Meta:
         model = Post
         fields = ('title','source','origin','description','contentType','content','author','categories','count','size','next','comments','published','id','visibility','visibleTo','unlisted')
@@ -55,7 +63,7 @@ class PostSerializer(serializers.ModelSerializer):
     def get_visibleTo(self,obj):
     	result = []
     	for visibleTo in obj.visibleTo.all():
-    		result.append(author.visbileTo)
+    		result.append(visibleTo.visbileTo)
     	return result
 
     def get_categories(self,obj):
@@ -65,16 +73,18 @@ class PostSerializer(serializers.ModelSerializer):
     	return result
 
     def create(self,validated_data):
-        comment_data = validated_data.pop('comments')
+        comments = validated_data.pop('comments')
         validated_data.pop('count')
         validated_data.pop('size')
         validated_data.pop('next')
         author_data = validated_data.pop('author')
-        try:
-            author = Author.objects.get(pk=author_data['id'])
-        except Author.DoesNotExist:
-            author = Author.objects.create(**author_data)
-        post = Post.objects.create(author=author, **validated_data)
+        author = get_or_create_author(author_data)
+        
+        post = Post.objects.create(author=author, temp=True,**validated_data)
+        for comment in comments:
+            author_data = comment.pop('author')
+            author = get_or_create_author(author_data)
+            Comment.objects.create(author=author,post=post,temp=True,**comment)
         return post
 
 
