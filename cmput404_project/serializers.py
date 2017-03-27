@@ -17,7 +17,7 @@ def get_or_create_author(author_data):
     try:
         author = Author.objects.get(pk=author_id)
     except Author.DoesNotExist:
-        author = Author.objects.create(id=author_id,temp=False,**author_data)
+        author = Author.objects.create(id=author_id,temp=True,**author_data)
     return author
 
 class AuthorSerializer(serializers.ModelSerializer):
@@ -33,15 +33,12 @@ class AuthorSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
 
     author = AuthorSerializer()
-    contentType = serializers.SerializerMethodField()
     published = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S")
     class Meta:
         model = Comment
         fields = ('author','comment', 'contentType','published','id')
        	#read_only_fields = ('id','contentType','author')
 
-    def get_contentType(self,obj):
-    	return obj.get_contentType_display()
 
 
 

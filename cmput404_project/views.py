@@ -19,12 +19,13 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import mixins,generics, status, permissions
 
-from .serializers import AuthorSerializer,PostSerializer,CommentSerializer,PostPagination,CommentPagination
+from .serializers import AuthorSerializer,PostSerializer,CommentSerializer,PostPagination,CommentPagination,AddCommentQuerySerializer
 from rest_framework.decorators import api_view
 from .permissions import IsAuthenticatedNodeOrAdmin
 from collections import OrderedDict
-from .settings import MAXIMUM_PAGE_SIZE
+from .settings import MAXIMUM_PAGE_SIZE,HOST_NAME
 from .comment_functions import getNodeAuth,getNodeAPIPrefix,friend_relation_validation
+
 
 
 
@@ -106,9 +107,6 @@ def update():
     for node in Node.objects.all():
         r = requests.get(node.host+node.auth_post_url, auth=(node.auth_username, node.auth_password))
         if r.status_code == 200:
-            print ("========================")
-            print (r.json()['posts'][0])
-            print ("=========================")
             serializer = PostSerializer(data=r.json()['posts'],many=True)
             if serializer.is_valid():
                 serializer.save()
@@ -271,14 +269,19 @@ def comment(request):
         post_id= request.POST['post_id']
         post = Post.objects.get(id = post_id)
 
-        new_comment = Comment(author, comment_text, post, comment_type)
-
+        new_comment = Comment.objects.create(author=author,comment=comment_text,post=post,contentType=comment_type)
+        
         host = post.author.host
-        if host == HOST_NAME:
-            new_comment.save()
-        else:
-            serializer = AddCommentQuerySerializer(data={'query':'addComment','post':post.origin,'comment':new_comment})
-            print serializer.data
+        if host != HOST_NAME:
+            data = OrderedDict()
+            data['query'] = 'addComment'
+            data['post'] = post.origin
+            data['comment'] = CommentSerializer(instance=new_comment).data
+            serializer = AddCommentQuerySerializer(data = data)
+            if serializer.is_valid():
+                print serializer.data
+            else:
+                print serializer.errors
     return HttpResponseRedirect(reverse('home'))
 
 def postContent(post_type,request):
