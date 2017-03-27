@@ -67,8 +67,8 @@ class Post(models.Model):
     description = models.CharField(max_length=100,blank=True)
     #=================
     title = models.CharField(max_length=50)
-    source = models.URLField(default=HOST_NAME)
-    origin = models.URLField(default=HOST_NAME)
+    source = models.URLField()
+    origin = models.URLField()
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
     content = models.TextField(max_length=1000)
     published = models.DateTimeField(auto_now =True)

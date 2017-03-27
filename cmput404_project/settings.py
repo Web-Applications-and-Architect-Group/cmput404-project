@@ -113,9 +113,14 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
+    'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
-    ]
+        'cmput404_project.permissions.IsAuthenticatedNodeOrAdmin',
+    ),
+        
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.BasicAuthentication',
+    )
 }
 
 
@@ -167,6 +172,7 @@ STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
 # change those settings before put on herok
 # HOST_NAME = "https://cloud-dingkai.c9users.io"
-HOST_NAME = "http://127.0.0.1:8000"
+
+HOST_NAME = "https://cloud-dingkai.c9users.io"
 MAXIMUM_PAGE_SIZE = 50
 

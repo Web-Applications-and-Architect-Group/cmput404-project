@@ -16,7 +16,9 @@ class AuthorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Author
         fields = ('id', 'host','displayName','url','github','bio')
-
+        extra_kwargs = {
+            'id': {'validators':[]},
+        }
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -47,7 +49,7 @@ class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ('title','source','origin','description','contentType','content','author','categories','count','size','next','comments','published','id','visibility','visibleTo','unlisted')
-
+        
 
 
     def create(self,validated_data):
@@ -57,8 +59,9 @@ class PostSerializer(serializers.ModelSerializer):
         validated_data.pop('next')
         author_data = validated_data.pop('author')
         author = get_or_create_author(author_data)
-        
-        post = Post.objects.create(author=author, temp=True,**validated_data)
+        categories = json.dumps(validated_data.pop('categories'))
+        visibleTo = json.dumps(validated_data.pop('visibleTo'))
+        post = Post.objects.create(author=author, temp=True,categories=categories,visibleTo=visibleTo,**validated_data)
         for comment in comments:
             author_data = comment.pop('author')
             author = get_or_create_author(author_data)

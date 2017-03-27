@@ -106,20 +106,37 @@ def update():
         else:
             print(r.status_code)
 
+def can_see(post,author):
+    if author.url in json.loads(post.visibleTo):
+        return True
+    if post.visibility == 'PRIVATE' and post.author != author:
+        return False
+    return True
+
+def prunning(posts,author):
+    for post in posts.iterator():
+        if not can_see(post,author):
+            posts = posts.exclude(id =post.id)
+    return posts
+        
 def home(request):
     update()
     form = PostForm()
-    post= Post.objects.filter(visibility='PUBLIC').order_by('-published')
+    posts= Post.objects.filter(unlisted=False)
 
     viewer = None
     if(request.user.is_authenticated()):
         viewer = request.user.author
+        posts = prunning(posts,viewer)
+    else:
+        posts = posts.filter(visibility='PUBLIC')
     author = viewer
-
+    
+    posts = posts.order_by('-published')
 
     notify = Notify.objects.filter(requestee=author)
     images = PostImages.objects.all()
-    context = { 'posts': post ,'form': form,'author':author,'Friend_request':notify,'images':images,'viewer':viewer}
+    context = { 'posts': posts ,'form': form,'author':author,'Friend_request':notify,'images':images,'viewer':viewer}
 
     return render(request,'home.html',context)
 
@@ -174,7 +191,12 @@ def create_post(request):
     if request.method == "POST":
         form = PostForm(request.POST)
         if form.is_valid():
-            Post.objects.create(author=request.user.author,**form.cleaned_data)
+            data = form.cleaned_data
+            data['id'] = uuid.uuid4()
+            url = reverse("a_single_post_detail",kwargs={"post_id":data['id']})
+            data['origin'] = url
+            data['source'] = url
+            new_post = Post.objects.create(author=request.user.author,**data)
             
             #https://www.youtube.com/watch?v=C9MDtQHwGYM
             for count,x in enumerate(request.FILES.getlist("files")):
