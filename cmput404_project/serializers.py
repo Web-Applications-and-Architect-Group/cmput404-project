@@ -48,7 +48,7 @@ class CommentSerializer(serializers.ModelSerializer):
 class PostSerializer(serializers.ModelSerializer):
 
     author = AuthorSerializer()
-    categories = serializers.ListField(child=serializers.CharField(max_length=20))
+    categories = serializers.ListField(child=serializers.CharField(max_length=20),required=False)
     count = serializers.IntegerField()
     size = serializers.IntegerField(required=False)
     next = serializers.URLField(required=False)
@@ -71,8 +71,8 @@ class PostSerializer(serializers.ModelSerializer):
             validated_data.pop('size')
         author_data = validated_data.pop('author')
         author = get_or_create_author(author_data)
-        categories = json.dumps(validated_data.pop('categories'))
-        visibleTo = json.dumps(validated_data.pop('visibleTo'))
+        categories = json.dumps(validated_data.pop('categories')) if 'categories' in validated_data else '[]'
+        visibleTo = json.dumps(validated_data.pop('visibleTo'))  if 'visibleTo' in validated_data else '[]'
         post_id = get_id(validated_data.pop('id'))
 
         post = Post.objects.create(author=author, id=post_id,temp=True,categories=categories,visibleTo=visibleTo,**validated_data)
@@ -128,19 +128,16 @@ class AddCommentQuerySerializer(serializers.Serializer):
     query = serializers.CharField(max_length=10)
     post = serializers.URLField()
     comment = CommentSerializer()
-    post_id = serializers.CharField(max_length=100)
+    #post_id = serializers.CharField(max_length=100)
 
     def create(self,validated_data):
         comment_data = validated_data.pop('comment')
-        comment_data['post'] = Post.objects.get(pk=validated_data.pop('post_id'))
+        comment_data['post'] = Post.objects.get(pk=get_id(validated_data.pop('post')))
         author_data = comment_data.pop('author')
-        try:
-            author = Author.objects.get(pk=author_data['id'])
-        except Author.DoesNotExist:
-            author = Author.objects.create(**author_data)
+        author = get_or_create_author(author_data)
         comment = Comment.objects.create(author=author, **comment_data)
         return comment
-
+    '''
     def validate_post_id(self,value):
         """
         Check that the post_id exist
@@ -150,7 +147,7 @@ class AddCommentQuerySerializer(serializers.Serializer):
         except Post.DoesNotExist:
             raise serializers.ValidationError("Post with id"+value+" does not exist")
         return value
-
+    '''
     def validate_query(self,value):
         """
         Check that the query is addComment

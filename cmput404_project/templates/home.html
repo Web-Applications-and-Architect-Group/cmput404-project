@@ -77,6 +77,16 @@
             {{ post.content|urlize }}
             {% endif %}
 
+
+        <div class="w3-row-padding" style="margin:0 -16px">
+         {% for image in images%}
+          {% if post.id == image.post.id%}
+          <div class="w3-half">
+            <img src="{{image.post_image.url}}" style="width:40%" alt="POST IMAGE" class="w3-margin-bottom">
+          </div>
+          {%endif%}
+          {% endfor %}
+      </div>
             </br></br>
 
 
