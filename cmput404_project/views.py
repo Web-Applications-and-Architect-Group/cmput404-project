@@ -413,6 +413,31 @@ def AcceptFriendRequest(request,requester_id):
     # return render(request,'friend/friendList.html',context)
     return HttpResponseRedirect(reverse('friendList',kwargs={'author_id': request.user.author.id}))
 
+@login_required
+def DeleteFriend(request,requester_id):
+    author = Author.objects.get(user=request.user)
+
+    friend = Friend.objects.get(requester= author, requestee_id= requester_id)
+    if friend:
+        friend.delete()
+        print ("success")
+    '''
+    author_id= author.id
+    requester = Author.objects.get(id= requester_id)
+    friend = Friend.objects.get(requester= requester, requestee_id= author_id)
+    if friend:
+        friend.delete()
+        print ("ssssssss")
+    #notify = Notify.objects.get(requestee=author,requester_id=requester_id)
+    #friend = Friend.objects.create(requester=author,requestee=notify.requester,requestee_id = notify.requester_id)
+    #notify.delete()
+    #friend.save()
+    '''
+    #notify = Notify.objects.filter(requestee=author)
+    context={'user':request.user,'form':PostForm(),'author':author}
+    # return render(request,'friend/friendList.html',context)
+    return HttpResponseRedirect(reverse('friendList',kwargs={'author_id': request.user.author.id}))
+
 
 
 def viewUnlistedPost(request, post_id):
