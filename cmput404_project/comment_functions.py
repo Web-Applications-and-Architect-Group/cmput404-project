@@ -33,7 +33,8 @@ def getNodeAuth(host_root):
     if host_root==HOST_NAME:
         return {
             "success": True,
-            "auth": ("admin","nimabide")
+            "auth": ("api-testing","nimabide1")
+            # "auth": ("admin","nimabide")
         }
     else:
         host_root = host_root + '/'
@@ -101,8 +102,8 @@ def friend_relation_validation(friend_url1, friend_host1, friend_url2, friend_ho
         return {
             "success": False,
             "messages": "A server not response author info properly. \n\
-                Server1 status: " + str(response1.status_code) + "\n\
-                Server2 status: " + str(response2.status_code)
+                Server1 status: " + str(response1.status_code) + " at " + friend_url1 + "\n\
+                Server2 status: " + str(response2.status_code) + " at " + friend_url2
         }
 
     try:

@@ -129,6 +129,21 @@ def can_see(post,author):
         return True
     if post.visibility == 'PRIVATE' and post.author != author:
         return False
+    if post.visibility == 'FRIENDS' and post.author != author:
+        # print "==============="
+        # print(post.author.url, post.author.host)
+        # print "==============="
+        friend_validation = friend_relation_validation(author.url, author.host, post.author.url, post.author.host)
+        if friend_validation["success"] == True and friend_validation["friend_status"] == True:
+            # a_remote_author["relationship"] = "friend"
+            return True
+        elif friend_validation["success"] == True and friend_validation["friend_status"] == False:
+            # a_remote_author["relationship"] = "follow"
+            # print("They are not friends",author.url, author.host, post.author.url, post.author.host)
+            return False
+        else:
+            print("Error! friend validation:",friend_validation["messages"])
+
     return True
 
 def prunning(posts,author):
