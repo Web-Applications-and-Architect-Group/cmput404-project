@@ -110,11 +110,10 @@ class Send_Friendrequest(LoginRequiredMixin, View):
         return HttpResponse(r, status=r.status_code)
 
 def update():
-    Author.objects.filter(temp=True).delete()
     Post.objects.filter(temp=True).delete()
-    Comment.objects.filter(temp=True).delete()
     for node in Node.objects.all():
-        r = requests.get(node.host+node.auth_post_url, auth=(node.auth_username, node.auth_password))
+        url = node.host+node.api_prefix+node.auth_post_url
+        r = requests.get(url, auth=(node.auth_username, node.auth_password))
         if r.status_code == 200:
             serializer = PostSerializer(data=r.json()['posts'],many=True)
             if serializer.is_valid():
@@ -303,11 +302,20 @@ def comment(request):
             data['comment'] = CommentSerializer(instance=new_comment).data
             serializer = AddCommentQuerySerializer(data = data)
             if serializer.is_valid():
-                print serializer.data
+                if host[-1] == '/':
+                    host = host[:-1]
+                try:
+                    node = Node.objects.get(host=host)
+                except Node.DoesNotExist:
+                    print host + ' is not a conecting node'
+                else:
+                    r = requests.post(post.origin+'/comments/', auth=(node.auth_username, node.auth_password),json=serializer.data)
+                    if r.status_code//100 != 2:
+                        print r.status_code
             else:
                 print serializer.errors
     return HttpResponseRedirect(reverse('home'))
-
+'''
 def postContent(post_type,request):
     comments = Comment.objects.all()
 
@@ -333,7 +341,7 @@ def postContent(post_type,request):
     context = { 'posts': post , 'comments': comments, 'post_type': post_type}
 
     return context
-
+'''
 
 # @login_required
 # def ViewMyStream(request):

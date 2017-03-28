@@ -16,8 +16,14 @@ def get_or_create_author(author_data):
     author_id = get_id(author_data.pop('id'))
     try:
         author = Author.objects.get(pk=author_id)
+        if author.temp:
+            serializer = AuthorSerializer(author,data=author_data)
+        else:
+            return author
     except Author.DoesNotExist:
-        author = Author.objects.create(id=author_id,temp=True,**author_data)
+        serializer = AuthorSerializer(data=author_data)
+    if serializer.is_valid():
+        author = serializer.save()
     return author
 
 class AuthorSerializer(serializers.ModelSerializer):
@@ -28,8 +34,7 @@ class AuthorSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'id': {'validators':[]},
         }
-
-
+        
 class CommentSerializer(serializers.ModelSerializer):
 
     author = AuthorSerializer()
@@ -37,7 +42,9 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ('author','comment', 'contentType','published','id')
-       	#read_only_fields = ('id','contentType','author')
+        extra_kwargs = {
+            'id': {'validators':[]},
+        }
 
 
 
@@ -76,7 +83,7 @@ class PostSerializer(serializers.ModelSerializer):
         for comment in comments:
             author_data = comment.pop('author')
             author = get_or_create_author(author_data)
-            Comment.objects.create(author=author,post=post,temp=True,**comment)
+            Comment.objects.create(author=author,post=post,**comment)
         return post
 
 

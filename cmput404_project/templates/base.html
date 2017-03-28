@@ -4,7 +4,6 @@
 <html>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="{% static 'css/bootstrap-theme.min.css' %}">
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/3/w3.css">
 <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-blue-grey.css">
 <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Open+Sans'>
@@ -30,6 +29,9 @@
   <a href="{% url 'home' %}" class="w3-bar-item w3-button w3-padding-large w3-theme-d4"><i class="fa fa-home w3-margin-right"></i>Home</a>
   {% if request.user.username %}
   <button type="button" class="w3-bar-item w3-button w3-padding-large w3-theme-d4" data-toggle="modal" data-target="#myModal"><i class="fa fa-pencil"></i> Post</button>
+  {% if request.user.is_staff%}
+  <a href="/admin/" class="w3-bar-item w3-button w3-padding-large w3-theme-d4"><i class="fa fa-user-secret w3-margin-right"></i>Admin</a>
+  {% endif %}
   <div class="w3-dropdown-hover w3-hide-small w3-right">
     <button class="w3-button w3-padding-large " title="Edit Profile"><i class="fa fa-user"></i><span class="w3-badge w3-right w3-small w3-green"></span></button>
     <div class="w3-dropdown-content w3-card-4 w3-bar-block" style="width:180px;font-size:80%">

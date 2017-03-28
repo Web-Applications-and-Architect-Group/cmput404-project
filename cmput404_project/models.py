@@ -9,11 +9,11 @@ from .settings import HOST_NAME
 
 
 accept = [
-    ('text/plain', 'text/plain'),
-    ('text/markdown', 'text/markdown'),
-    ('application/base64', 'application/base64'),
-    ('image/png; base64', 'image/png;base64'),
-    ('image/jpeg; base64', 'image/jpeg;base64'),
+    ('text/plain', 'Plain'),
+    ('text/markdown', 'Markdown'),
+    ('application/base64', 'Github'),
+    ('image/png; base64', 'PNG'),
+    ('image/jpeg; base64', 'JPEG'),
     ]
 
 @python_2_unicode_compatible
@@ -22,9 +22,11 @@ class Node(models.Model):
     host = models.URLField(unique=True)
     auth_username = models.CharField(max_length=50)
     auth_password = models.CharField(max_length=50)
-    api_prefix = models.CharField(max_length=50,default="/service")
-    public_post_url = models.CharField(max_length=50,default="/service/posts?format=json")
-    auth_post_url = models.CharField(max_length=50,default="/service/author/posts?format=json")
+    api_prefix = models.CharField(max_length=50,default="/service",blank=True)
+    shareImage = models.BooleanField(default=True)
+    auth_post_url = models.CharField(max_length=20,default="/author/post/?format=json")
+    
+    
     def __str__(self):
         return self.host
 
@@ -109,7 +111,6 @@ class Comment(models.Model):
     contentType = models.CharField(choices=accept, default='PUBLIC',max_length=20)
     published = models.DateTimeField(auto_now=True)
     post = models.ForeignKey(Post, on_delete=models.CASCADE,related_name='comments')
-    temp = models.BooleanField(default=False)
 
     @classmethod
     def create(cls, user, comment_text, post, comment_type):
