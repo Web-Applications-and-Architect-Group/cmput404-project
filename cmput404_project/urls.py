@@ -100,6 +100,7 @@ urlpatterns = [
     url(r'^Add_friend$', views.Add_friend, name="Add_friend"),
     #url(r'^accept_friend$', views.accept_friend, name="accept_friend"),
     url(r'^AcceptFriendRequest/(?P<requester_id>[a-zA-z0-9-_]+)$', views.AcceptFriendRequest, name="AcceptFriendRequest"),
+    url(r'^DeleteFriend/(?P<requester_id>[a-zA-z0-9-_]+)$', views.DeleteFriend, name="DeleteFriend"),
     url(r'^api_list_my_friend_request$', views.list_my_friend_request, name="list_my_friend_request"),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]

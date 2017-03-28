@@ -30,7 +30,7 @@
   </div>
 </div>
 
-<div class="list-group col-md-4">
+<div class="list-group col-md-3">
   <h3 class="text-center"> Friend Request</h3>
   {% for f_request in friend_requests %}
   <a href="
@@ -48,21 +48,26 @@
 </div>
 
 
-
-
-<div class="list-group col-md-4">
-  <h3 class="text-center"> Following and Friends</h3>
+<div class="list-group col-md-3">
+  <h3 class="text-center">Friends</h3>
   {% for author in following_list %}
-  <a href="#" class="list-group-item "> {{ author.displayName }}
+    <a href="{% url 'DeleteFriend' author.id %}" class="list-group-item ">  {{ author.displayName }}
     {% if author.relationship == 'friend' %}
-	<button type="button" class="btn btn-success btn-xs pull-right">
-	<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Friend</button></a>
+	<button type="button" class="btn btn-danger btn-xs pull-right">
+	<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> unFriend</button></a>
     {% else %}
-    <button type="button" class="btn btn-info btn-xs pull-right">
-  	<span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Following</button></a>
+
     {% endif %}
   {% endfor %}
 
+</div>
+
+<div class="list-group col-md-3">
+  <h3 class="text-center">Following</h3>
+  {% for author in following_list %}
+  <a href="#" class="list-group-item "> {{ author.displayName }} </a>
+
+  {% endfor %}
 </div>
 
 </div>
