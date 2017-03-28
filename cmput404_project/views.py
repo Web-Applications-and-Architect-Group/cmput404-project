@@ -50,15 +50,24 @@ class Send_Friendrequest(LoginRequiredMixin, View):
         friend_hostname = request.POST["friend_host"]
         if friend_hostname[len(friend_hostname)-1]=="/":
             friend_hostname = friend_hostname[0:len(friend_hostname)-1]
-        print friend_hostname
+        # print friend_hostname
         # return
-        print(getNodeAuth(friend_hostname))
-        admin_auth=getNodeAuth(friend_hostname)["auth"] #TODO
-        print(admin_auth)
+        # print(getNodeAuth(friend_hostname))
+        admin_auth=getNodeAuth(friend_hostname)
+        if(admin_auth["success"]):
+            admin_auth = admin_auth["auth"]
+        else:
+            print("Error! getting remote server auth",friend_hostname,admin_auth["messages"])
+            return
+        # print(admin_auth)
         # return
 
         r = requests.get(request.POST["friend_url"], auth=admin_auth)
-        remote_friend = r.json()
+        if r.status_code==200:
+            remote_friend = r.json()
+        else:
+            print("Error! pulling author info from remote server",request.POST["friend_url"],r.status_code)
+            return HttpResponse(r, status=r.status_code)
         # print(remote_friend)
         # return
 
@@ -85,7 +94,7 @@ class Send_Friendrequest(LoginRequiredMixin, View):
 
         # store the follow relationship if success
         # print(r.status_code)
-        if (r.status_code==200):
+        if (r.status_code==200 or r.status_code==201):
             # varify if there is already an exist friend requests
             varify_result = Friend.objects.all()
             varify_result = varify_result.filter(requestee=remote_friend["url"])
@@ -93,7 +102,7 @@ class Send_Friendrequest(LoginRequiredMixin, View):
             varify_result = varify_result.filter(requester=author)
 
             if(len(varify_result)<1):
-                new_friend = Friend.objects.create(requestee=remote_friend["url"], requestee_id=remote_friend["id"], requester=author)
+                new_friend = Friend.objects.create(requestee=remote_friend["url"], requestee_id=remote_friend["id"], requestee_host=remote_friend["host"], requester=author)
                 new_friend.save()
 
         # return HttpResponse(json.dumps(serializer.data), status=status.HTTP_200_OK)
@@ -111,7 +120,7 @@ def update():
             if serializer.is_valid():
                 serializer.save()
             else:
-                print(serializer.errors) 
+                print(serializer.errors)
         else:
             print(r.status_code)
 
@@ -127,7 +136,7 @@ def prunning(posts,author):
         if not can_see(post,author):
             posts = posts.exclude(id =post.id)
     return posts
-        
+
 def home(request):
     update()
     form = PostForm()
@@ -140,7 +149,7 @@ def home(request):
     else:
         posts = posts.filter(visibility='PUBLIC')
     author = viewer
-    
+
     posts = posts.order_by('-published')
 
     notify = Notify.objects.filter(requestee=author)
@@ -206,7 +215,7 @@ def create_post(request):
             data['origin'] = url
             data['source'] = url
             new_post = Post.objects.create(author=request.user.author,**data)
-            
+
             #https://www.youtube.com/watch?v=C9MDtQHwGYM
             for count,x in enumerate(request.FILES.getlist("files")):
                 image = PostImages.objects.create(post=new_post,post_image = x)
@@ -270,7 +279,7 @@ def comment(request):
         post = Post.objects.get(id = post_id)
 
         new_comment = Comment.objects.create(author=author,comment=comment_text,post=post,contentType=comment_type)
-        
+
         host = post.author.host
         if host != HOST_NAME:
             data = OrderedDict()
@@ -418,7 +427,12 @@ def friendList(request,author_id):
     for f_author in following_list:
         # get the authentication of node
         # print(f_author.requester.host)
-        admin_auth=getNodeAuth(f_author.requester.host)["auth"]
+        admin_auth=getNodeAuth(f_author.requestee_host)
+        if admin_auth["success"]:
+            admin_auth = admin_auth["auth"]
+        else:
+            print(admin_auth["messages"])
+            continue 
 
         # get remote author info thr API
         # print(f_author.requestee, admin_auth)
@@ -428,6 +442,7 @@ def friendList(request,author_id):
             a_remote_author = OrderedDict()
             a_remote_author = r.json()
         else:
+            print("Error! getting author info from remote server",f_author.requestee, r.status_code)
             continue
 
         friend_validation = friend_relation_validation(author.url, author.host, a_remote_author["url"], a_remote_author["host"])

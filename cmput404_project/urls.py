@@ -60,7 +60,7 @@ urlpatterns = [
     # """
     # Friend API
     # """
-    url(r'^service/author/(?P<author_id>[a-zA-Z0-9-_]+)/friends$',  # Allow [GET, POST]. GET, POST Done
+    url(r'^service/author/(?P<author_id>[a-zA-Z0-9-_]+)/friends/$',  # Allow [GET, POST]. GET, POST Done
         api.Friend_Inquiry_Handler.as_view(), name='friend_inquiry'),
     url(r'^service/author/(?P<author_id1>[a-zA-Z0-9-_]+)/friends/(?P<author_id2>[a-zA-Z0-9-_]+)$',
         api.Accurate_Friend_Inquiry_Handler.as_view(),
