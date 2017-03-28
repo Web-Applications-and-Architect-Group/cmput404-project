@@ -28,12 +28,18 @@ from .settings import MAXIMUM_PAGE_SIZE, HOST_NAME
 
 
 def getNodeAuth(host_root):
+    if host_root[len(host_root)-1]=="/":
+        host_root = host_root[0:len(host_root)-1]
     if host_root==HOST_NAME:
         return {
             "success": True,
-            "auth": ("admin","nimabide")
+            "auth": ("api-testing","nimabide1")
+            # "auth": ("admin","nimabide")
         }
-    
+    else:
+        host_root = host_root + '/'
+    print("debug! getNodeAuth function! host", host_root)
+
     try:
         node = Node.objects.get(host=host_root)
     except Node.DoesNotExist:
@@ -50,11 +56,15 @@ def getNodeAuth(host_root):
     # return ("admin", "nimabide")
 
 def getNodeAPIPrefix(host_root):
+    if host_root[len(host_root)-1]=="/":
+        host_root = host_root[0:len(host_root)-1]
     if host_root==HOST_NAME:
         return {
             "success": True,
             "api_prefix": "/service/"
         }
+    else:
+        host_root = host_root + '/'
 
     try:
         node = Node.objects.get(host=host_root)
@@ -92,8 +102,8 @@ def friend_relation_validation(friend_url1, friend_host1, friend_url2, friend_ho
         return {
             "success": False,
             "messages": "A server not response author info properly. \n\
-                Server1 status: " + str(response1.status_code) + "\n\
-                Server2 status: " + str(response2.status_code)
+                Server1 status: " + str(response1.status_code) + " at " + friend_url1 + "\n\
+                Server2 status: " + str(response2.status_code) + " at " + friend_url2
         }
 
     try:
@@ -105,11 +115,17 @@ def friend_relation_validation(friend_url1, friend_host1, friend_url2, friend_ho
             "messages": "A server's author info response has not field [id]."
         }
 
+    # normalize friend_urls
+    if friend_url1[len(friend_url1)-1]=="/":
+        friend_url1 = friend_url1[0:len(friend_url1)-1]
+    if friend_url2[len(friend_url2)-1]=="/":
+        friend_url2 = friend_url2[0:len(friend_url2)-1]
+
     # pull following list from both server
     # response1 = requests.get(friend_host1+getNodeAPIPrefix(friend_host1)+"/friends", auth=node_auth1)
     # response2 = requests.get(friend_host2+getNodeAPIPrefix(friend_host2)+"/friends", auth=node_auth2)
-    response1 = requests.get(friend_url1+"/friends", auth=node_auth1)
-    response2 = requests.get(friend_url2+"/friends", auth=node_auth2)
+    response1 = requests.get(friend_url1+"/friends/", auth=node_auth1)
+    response2 = requests.get(friend_url2+"/friends/", auth=node_auth2)
 
     # validate the second response from servers
     if response1.status_code==200 and response2.status_code==200:
@@ -119,8 +135,8 @@ def friend_relation_validation(friend_url1, friend_host1, friend_url2, friend_ho
         return {
             "success": False,
             "messages": "A server not response following list properly. \n\
-                Server1 status: " + str(response1.status_code) + "\n\
-                Server2 status: " + str(response2.status_code)
+                Server1 status: " + str(response1.status_code) + " at " + friend_url1 + "/friends/\n\
+                Server2 status: " + str(response2.status_code) + " at " + friend_url2 + "/friends/"
         }
 
     try:

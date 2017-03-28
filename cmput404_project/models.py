@@ -97,10 +97,10 @@ class Post(models.Model):
 
     def __getitem__(self, key):
         return getattr(self, key)
-    
-        
-        
-        
+
+
+
+
 @python_2_unicode_compatible
 class Comment(models.Model):
     id = models.CharField(primary_key=True, default=uuid.uuid4,max_length=100)
@@ -110,7 +110,7 @@ class Comment(models.Model):
     published = models.DateTimeField(auto_now=True)
     post = models.ForeignKey(Post, on_delete=models.CASCADE,related_name='comments')
     temp = models.BooleanField(default=False)
-    
+
     @classmethod
     def create(cls, user, comment_text, post, comment_type):
         new_comment = cls(author=user, comment=comment_text, post=post, contentType=comment_type)
@@ -125,8 +125,8 @@ class Comment(models.Model):
 
     def __getitem__(self, key):
         return json.loads(getattr(self, key))
-        
-        
+
+
 #https://www.youtube.com/watch?v=C9MDtQHwGYM
 def content_file_name(instance, filename):
     return '/'.join(['images', str(str(instance.post.id) + filename)])
@@ -145,10 +145,11 @@ class Friend(models.Model):
     requester = models.ForeignKey(Author,on_delete=models.CASCADE,related_name="follow")
     requestee = models.URLField()
     requestee_id = models.CharField(max_length=200)
+    requestee_host = models.CharField(max_length=100,default="Host")
 
     @classmethod
     def create(cls, requester, requestee, requestee_id):
-        new_post = cls(requester=requester, requestee=requestee, requestee_id=requestee_id)
+        new_post = cls(requester=requester, requestee=requestee, requestee_id=requestee_id, requestee_host=requestee_host)
         return new_post
 
     def __str__(self):
@@ -187,6 +188,3 @@ class friend_request(models.Model):
 
     def __str__(self):
         return self.request_sender.username
-
-
-

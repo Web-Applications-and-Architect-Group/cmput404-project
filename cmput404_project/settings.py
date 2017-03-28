@@ -117,7 +117,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
         'cmput404_project.permissions.IsAuthenticatedNodeOrAdmin',
     ),
-        
+
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.BasicAuthentication',
     )
@@ -172,7 +172,7 @@ STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
 # change those settings before put on herok
 # HOST_NAME = "https://cloud-dingkai.c9users.io"
-
 HOST_NAME = "http://127.0.0.1:8000"
-MAXIMUM_PAGE_SIZE = 50
 
+# HOST_NAME = "https://blooming-mountain-69467.herokuapp.com"
+MAXIMUM_PAGE_SIZE = 50
