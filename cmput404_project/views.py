@@ -212,8 +212,8 @@ def create_post(request):
             data = form.cleaned_data
             data['id'] = uuid.uuid4()
             url = reverse("a_single_post_detail",kwargs={"post_id":data['id']})
-            data['origin'] = url
-            data['source'] = url
+            data['origin'] = HOST_NAME + url
+            data['source'] = HOST_NAME + url
             new_post = Post.objects.create(author=request.user.author,**data)
 
             #https://www.youtube.com/watch?v=C9MDtQHwGYM
@@ -381,7 +381,7 @@ def accept_friend(request):
 def AcceptFriendRequest(request,requester_id):
     author = Author.objects.get(user=request.user)
     notify = Notify.objects.get(requestee=author,requester_id=requester_id)
-    friend = Friend.objects.create(requester=author,requestee=notify.requester,requestee_id = notify.requester_id)
+    friend = Friend.objects.create(requester=author,requestee=notify.requester,requestee_id = notify.requester_id,requestee_host = notify.requester_host)
     notify.delete()
     friend.save()
 
@@ -432,7 +432,7 @@ def friendList(request,author_id):
             admin_auth = admin_auth["auth"]
         else:
             print(admin_auth["messages"])
-            continue 
+            continue
 
         # get remote author info thr API
         # print(f_author.requestee, admin_auth)

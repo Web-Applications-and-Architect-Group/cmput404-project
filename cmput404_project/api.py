@@ -37,7 +37,7 @@ class Public_Post_List(APIView):
     List all pulic posts
     """
     queryset = Post.objects.filter(visibility='PUBLIC').filter(temp=False)
-    
+
     def get(self,request,format=None):
         return handle_posts(self.queryset,request)
 
@@ -46,7 +46,7 @@ class Post_Detail(APIView):
     List one post with given post id
     """
     queryset = Post.objects.all()
-    
+
 
     def failResponse(self, err_message, status_code):
         # generate fail response
@@ -58,7 +58,7 @@ class Post_Detail(APIView):
         # return Response(JSONRenderer().render(response), status=status_code)
 
     def get(self,request,post_id,format=None):
-        posts = get_list_or_404(Post.filter(temp=False),pk=post_id)
+        posts = get_list_or_404(Post.objects.filter(temp=False),pk=post_id)
         return handle_posts(posts,request)
 
     def post(self, request, post_id, format=None):
@@ -111,7 +111,7 @@ class All_Visible_Post_List_To_User(APIView):
     List all posts that visible to an authenticated user.
     """
     queryset = Post.objects.exclude(visibility='SERVERONLY').filter(temp=False)
-    
+
     def get(self,request, format=None):
         return handle_posts(self.queryset,request)
 
@@ -120,7 +120,7 @@ class All_Visible_Post_List_From_An_Author_To_User(APIView):
     List all posts from an author that visible to an authenticated user.
     """
     queryset = Post.objects.exclude(visibility='SERVERONLY').filter(temp=False)
-    
+
     def get(self,request, author_id, format=None):
         author = get_object_or_404(Author.filter(temp=False),pk=author_id)
         posts=self.queryset.filter(author = author_id)
@@ -140,7 +140,7 @@ class Comment_list(APIView):
     List all comments, or create a new comment.
     """
     queryset = Comment.objects.all()
-    
+
     def get(self,request,post_id,format=None):
         post = get_object_or_404(Post.filter(temp=False),pk=post_id)
         size = int(request.GET.get('size', 5))
@@ -180,7 +180,7 @@ class Comment_list(APIView):
 # ============================================= #
 class AuthorView(APIView):
     queryset = Author.objects.all()
-    
+
     def get(self, request, author_id, format=None):
         author =  get_object_or_404(Author,pk=author_id)
         serializer = AuthorSerializer(author)
