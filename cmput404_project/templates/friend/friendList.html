@@ -54,14 +54,14 @@
     {% if author.relationship == 'friend' %}
 
 
-  <form action="{% url 'DeleteFriend' %}" method="post" >
-{% csrf_token %}
-  <input type="hidden" name="author_id" value="{{ author.id }}" /> 
-   <input type="submit" class="w3-button w3-theme-d2 w3-margin-bottom" value = "unFriend {{ author.displayName }}" />
-  </form>
-	<!-- <button type="button" class="btn btn-danger btn-xs pull-right"> -->
-<!-- 	<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> unFriend</button>
- -->
+        <form action="{% url 'DeleteFriend' %}" method="post" >
+      {% csrf_token %}
+        <input type="hidden" name="author_id" value="{{ author.id }}" /> 
+         <input type="submit" class="w3-button w3-theme-d2 w3-margin-bottom" value = "unFriend {{ author.displayName }}" />
+        </form>
+      	<!-- <button type="button" class="btn btn-danger btn-xs pull-right"> -->
+      <!-- 	<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> unFriend</button>
+       -->
 
     {% else %}
 
