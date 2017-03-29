@@ -111,6 +111,7 @@ class Send_Friendrequest(LoginRequiredMixin, View):
 
 def update():
     Post.objects.filter(temp=True).delete()
+    Author.objects.filter(temp=True).delete()
     for node in Node.objects.all():
         url = node.host+node.api_prefix+node.auth_post_url
         r = requests.get(url, auth=(node.auth_username, node.auth_password))

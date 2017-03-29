@@ -21,10 +21,13 @@ def get_or_create_author(author_data):
         else:
             return author
     except Author.DoesNotExist:
+        author_data['id'] = author_id
         serializer = AuthorSerializer(data=author_data)
     if serializer.is_valid():
         author = serializer.save()
-    return author
+        return author
+    else:
+        print serializer.errors
 
 class AuthorSerializer(serializers.ModelSerializer):
 
