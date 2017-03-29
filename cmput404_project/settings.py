@@ -32,7 +32,8 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     '192.168.31.109',
     "0.0.0.0",
-    "blooming-mountain-69467.herokuapp.com"
+    "blooming-mountain-69467.herokuapp.com",
+    "safe-lake-64013.herokuapp.com"
 ]
 
 
