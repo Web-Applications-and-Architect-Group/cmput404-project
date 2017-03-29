@@ -33,11 +33,11 @@ def getNodeAuth(host_root):
     if host_root==HOST_NAME:
         return {
             "success": True,
-            "auth": ("api-testing","nimabide1")
+            "auth": ("admin","1234qwer")
             # "auth": ("admin","nimabide")
         }
-    else:
-        host_root = host_root + '/'
+    # else:
+    #     host_root = host_root + '/'
     print("debug! getNodeAuth function! host", host_root)
 
     try:
@@ -63,8 +63,8 @@ def getNodeAPIPrefix(host_root):
             "success": True,
             "api_prefix": "/service/"
         }
-    else:
-        host_root = host_root + '/'
+    # else:
+    #     host_root = host_root + '/'
 
     try:
         node = Node.objects.get(host=host_root)

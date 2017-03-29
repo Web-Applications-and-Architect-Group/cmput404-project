@@ -84,7 +84,7 @@ class Send_Friendrequest(LoginRequiredMixin, View):
 
         # send friend request to remote server
         # r = requests.post(remote_friend["host"]+'service/friendrequest', data = remote_request)
-        print(friend_hostname+getNodeAPIPrefix(friend_hostname)["api_prefix"]+'friendrequest/')
+        print("sending request to",friend_hostname+getNodeAPIPrefix(friend_hostname)["api_prefix"]+'friendrequest/')
         # return
         r = requests.post(
             friend_hostname+getNodeAPIPrefix(friend_hostname)["api_prefix"]+'friendrequest/',
@@ -414,10 +414,11 @@ def AcceptFriendRequest(request,requester_id):
     return HttpResponseRedirect(reverse('friendList',kwargs={'author_id': request.user.author.id}))
 
 @login_required
-def DeleteFriend(request,requester_id):
-    author = Author.objects.get(user=request.user)
+def DeleteFriend(request):
+    if request.method == "POST":
+        author_id = request.POST["author_id"]
 
-    friend = Friend.objects.get(requester= author, requestee_id= requester_id)
+    friend = Friend.objects.get(requester= request.user.author, requestee_id= author_id)
     if friend:
         friend.delete()
         print ("success")
@@ -434,7 +435,7 @@ def DeleteFriend(request,requester_id):
     #friend.save()
     '''
     #notify = Notify.objects.filter(requestee=author)
-    context={'user':request.user,'form':PostForm(),'author':author}
+    context={'user':request.user,'form':PostForm()}
     # return render(request,'friend/friendList.html',context)
     return HttpResponseRedirect(reverse('friendList',kwargs={'author_id': request.user.author.id}))
 

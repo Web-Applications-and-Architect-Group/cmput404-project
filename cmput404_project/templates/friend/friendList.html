@@ -51,7 +51,12 @@
 <div class="list-group col-md-3">
   <h3 class="text-center">Friends</h3>
   {% for author in following_list %}
-    <a href="{% url 'DeleteFriend' author.id %}" class="list-group-item ">  {{ author.displayName }}
+
+  <form action="{% url 'DeleteFriend' %}" method="post" >
+{% csrf_token %}
+  <input type="hidden" name="author_id" value="{{ author.id }}" />  {{ author.displayName }}
+   <input type="submit" class="w3-button w3-theme-d2 w3-margin-bottom" value = "Delete Friend" />
+  </form>
     {% if author.relationship == 'friend' %}
 	<button type="button" class="btn btn-danger btn-xs pull-right">
 	<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> unFriend</button></a>
