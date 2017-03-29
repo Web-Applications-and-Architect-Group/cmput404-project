@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils import timezone
 from django.contrib.auth.models import User
 import datetime
 from django.utils import timezone
@@ -74,7 +75,7 @@ class Post(models.Model):
     origin = models.URLField()
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
     content = models.TextField()
-    published = models.DateTimeField(auto_now =True)
+    published = models.DateTimeField(default=timezone.now)
     #categories = models.TextField(null=True)
     #Extra material :  https://docs.djangoproject.com/en/1.10/ref/models/fields/UUIDField
     unlisted = models.BooleanField(default=False)
@@ -109,7 +110,7 @@ class Comment(models.Model):
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
     comment = models.TextField()
     contentType = models.CharField(choices=accept, default='PUBLIC',max_length=20)
-    published = models.DateTimeField(auto_now=True)
+    published = models.DateTimeField(default=timezone.now)
     post = models.ForeignKey(Post, on_delete=models.CASCADE,related_name='comments')
 
     @classmethod
