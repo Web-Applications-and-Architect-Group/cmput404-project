@@ -41,7 +41,6 @@ class AuthorSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
 
     author = AuthorSerializer()
-    published = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S")
     class Meta:
         model = Comment
         fields = ('author','comment', 'contentType','published','id')
@@ -60,12 +59,10 @@ class PostSerializer(serializers.ModelSerializer):
     size = serializers.IntegerField(required=False)
     next = serializers.URLField(required=False)
     comments = CommentSerializer(many=True)
-    published = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S")
     visibleTo = serializers.ListField(child=serializers.CharField(max_length=100))
     class Meta:
         model = Post
         fields = ('title','source','origin','description','contentType','content','author','categories','count','size','next','comments','published','id','visibility','visibleTo','unlisted')
-        
 
 
     def create(self,validated_data):

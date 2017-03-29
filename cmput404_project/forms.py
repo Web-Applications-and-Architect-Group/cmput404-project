@@ -33,6 +33,3 @@ class PostForm(forms.ModelForm):
         data = filter(lambda a: a != '',data.strip().split('#'))
         data = json.dumps(data)
         return data
-	    
-
-	
