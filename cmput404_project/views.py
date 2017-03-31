@@ -50,6 +50,8 @@ class Send_Friendrequest(LoginRequiredMixin, View):
         friend_hostname = request.POST["friend_host"]
         if friend_hostname[len(friend_hostname)-1]=="/":
             friend_hostname = friend_hostname[0:len(friend_hostname)-1]
+        if "/api" in friend_hostname :
+            friend_hostname = friend_hostname[0:len(friend_hostname)-3]  
         # print friend_hostname
         # return
         # print(getNodeAuth(friend_hostname))
@@ -61,7 +63,6 @@ class Send_Friendrequest(LoginRequiredMixin, View):
             return
         # print(admin_auth)
         # return
-
         r = requests.get(request.POST["friend_url"], auth=admin_auth)
         if r.status_code==200:
             remote_friend = r.json()

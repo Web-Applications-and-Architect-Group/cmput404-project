@@ -54,7 +54,7 @@ urlpatterns = [
     # """
     # Comments API
     # """
-    url(r'^service/posts/(?P<post_id>[a-zA-Z0-9-_]+)/comments$',
+    url(r'^service/posts/(?P<post_id>[a-zA-Z0-9-_]+)/comments/$',
         api.Comment_list.as_view(),name='comments_in_a_post'),      # Allow [GET, POST] Done
 
     # """
@@ -62,7 +62,7 @@ urlpatterns = [
     # """
     url(r'^service/author/(?P<author_id>[a-zA-Z0-9-_]+)/friends/$',  # Allow [GET, POST]. GET, POST Done
         api.Friend_Inquiry_Handler.as_view(), name='friend_inquiry'),
-    url(r'^service/author/(?P<author_id1>[a-zA-Z0-9-_]+)/friends/(?P<author_id2>[a-zA-Z0-9-_]+)$',
+    url(r'^service/author/(?P<author_id1>[a-zA-Z0-9-_]+)/friends/(?P<author_id2>[a-zA-Z0-9-_]+)/$',
         api.Accurate_Friend_Inquiry_Handler.as_view(),
         name='friend_inquiry_by_ids'),                              # Allow [GET]. GET done
     # url(r'^service/author/(?P<author_id1>[a-zA-Z0-9-_]+)/friends/<service2>/author/(?P<author_id2>[a-zA-Z0-9-_]+)$',
