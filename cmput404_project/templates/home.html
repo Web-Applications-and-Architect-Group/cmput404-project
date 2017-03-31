@@ -191,12 +191,23 @@ if (document.getElementById('logged').value == "Yes")
                 myNode.removeChild(myNode.firstChild);
             }
 
+            //var matches = /"requester_displayName"\:(.+),/gi.exec(friend_list);
 
-            for(var i = 0; i < 1; i++) 
+            while (friend_list.length >0)
             {
-                var obj = friend_list[0];
+                //var obj = matches[1];
+                var first = friend_list.indexOf("requester_displayName");
+                friend_list = friend_list.substr(first+25);
+                var second = friend_list.indexOf("requester_host");
+                friend_list2 = friend_list.substr(0,second-4);
+                var obj = friend_list2;
+                if (friend_list2 == "")
+                {
+                  break;
+                }
                 var node = document.createElement("DIV");
-                var textnode = document.createTextNode(obj);
+                var textnode = document.createTextNode(obj.concat(" wants to be your friend"));
+                node.style.fontSize = "large";
                 node.appendChild(textnode);
                 document.getElementById("FRID").appendChild(node);
             }

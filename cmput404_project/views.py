@@ -474,7 +474,7 @@ def friend_request_list(request):
     author = request.user.author
     friend_requests = author.notify.all()
     friend_requests = serializers.serialize('json',friend_requests)
-    print (friend_requests)
+
     return JsonResponse(friend_requests,safe=False)
     
 def friendList(request,author_id):
