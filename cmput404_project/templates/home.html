@@ -27,21 +27,10 @@
         </div>
       </div>
       <br>
-      <div class="w3-card-2 w3-round w3-white w3-center">
-        {% for f_request in Friend_request%}
-        <div class="w3-container">
-          <p>Friend Request</p>
-          <!-- <img  src="{{ post.author.profile.img.url }}" alt="Avatar" style="width:50%"><br> -->
-          <span>{{f_request.requester_displayName}}</span>
-          <div class="w3-row w3-opacity">
-            <div class="w3-half">
-              <a href="{% url 'AcceptFriendRequest' f_request.requester_id %}"><button class="w3-button w3-block w3-green w3-section" title="Accept"><i class="fa fa-check"></i></button></a>
-            </div>
+      <div id = "FRID" class="w3-card-2 w3-round w3-white w3-center">
 
-          </div>
-        </div>
 
-        {% endfor %}
+
       </div>
       <br>
 
@@ -49,7 +38,9 @@
 
     </div>
     <!-- End Left Column -->
-
+      <input hidden="hidden" id="logged" value = "Yes"/>
+    {% else %}
+      <input hidden="hidden" id="logged" value = "No"/>
     {% endif %}
 
     <!-- Middle Column -->
@@ -156,6 +147,8 @@
 {%block javascript%}
 <script>
 //alert('x');
+var friend_list = {};
+
 function clickFun() {
   var elm = document.getElementsByClassName("editor");
   //alert(elm.length);
@@ -167,5 +160,63 @@ function clickFun() {
     }
   }
 }
+
+function getXMLHTTPRequest(url) 
+{ //This code was taken directly from professor's slides.
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', url)
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState == 4) {
+            try {
+                if (xhr.status==200) {
+                    friend_list = JSON.parse(xhr.responseText);
+                }   
+            } catch(e) {
+                alert('XML Get Error: ' + e.name);
+            }
+        }
+    };   
+    xhr.send();
+}
+
+if (document.getElementById('logged').value == "Yes")
+{
+
+        function update() 
+        {
+            getXMLHTTPRequest('/friend_request_list');
+            var myNode = document.getElementById("FRID");
+            while (myNode.firstChild) 
+            {
+                myNode.removeChild(myNode.firstChild);
+            }
+
+            //var matches = /"requester_displayName"\:(.+),/gi.exec(friend_list);
+
+            while (friend_list.length >0)
+            {
+                //var obj = matches[1];
+                var first = friend_list.indexOf("requester_displayName");
+                friend_list = friend_list.substr(first+25);
+                var second = friend_list.indexOf("requester_host");
+                friend_list2 = friend_list.substr(0,second-4);
+                var obj = friend_list2;
+                if (friend_list2 == "")
+                {
+                  break;
+                }
+                var node = document.createElement("DIV");
+                var textnode = document.createTextNode(obj.concat(" wants to be your friend"));
+                node.style.fontSize = "large";
+                node.appendChild(textnode);
+                document.getElementById("FRID").appendChild(node);
+            }
+        }
+        //https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_node_appendchild
+        //30 frames per second
+        setInterval(update, 30000/30.0);
+
+}
+
 </script>
 {% endblock %}

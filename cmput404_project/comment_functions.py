@@ -45,7 +45,7 @@ def getNodeAuth(host_root):
     except Node.DoesNotExist:
         return {
             "success":False,
-            "messages": "Attempt to connect an untrusted host."
+            "messages": "Attempt to connect an untrusted host"
         }
     else:
         auth = (node.auth_username, node.auth_password)

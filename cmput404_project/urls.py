@@ -54,7 +54,7 @@ urlpatterns = [
     # """
     # Comments API
     # """
-    url(r'^service/posts/(?P<post_id>[a-zA-Z0-9-_]+)/comments$',
+    url(r'^service/posts/(?P<post_id>[a-zA-Z0-9-_]+)/comments/$',
         api.Comment_list.as_view(),name='comments_in_a_post'),      # Allow [GET, POST] Done
 
     # """
@@ -62,7 +62,7 @@ urlpatterns = [
     # """
     url(r'^service/author/(?P<author_id>[a-zA-Z0-9-_]+)/friends/$',  # Allow [GET, POST]. GET, POST Done
         api.Friend_Inquiry_Handler.as_view(), name='friend_inquiry'),
-    url(r'^service/author/(?P<author_id1>[a-zA-Z0-9-_]+)/friends/(?P<author_id2>[a-zA-Z0-9-_]+)$',
+    url(r'^service/author/(?P<author_id1>[a-zA-Z0-9-_]+)/friends/(?P<author_id2>[a-zA-Z0-9-_]+)/$',
         api.Accurate_Friend_Inquiry_Handler.as_view(),
         name='friend_inquiry_by_ids'),                              # Allow [GET]. GET done
     # url(r'^service/author/(?P<author_id1>[a-zA-Z0-9-_]+)/friends/<service2>/author/(?P<author_id2>[a-zA-Z0-9-_]+)$',
@@ -99,7 +99,8 @@ urlpatterns = [
     url(r'^(?P<post_id>[a-zA-Z0-9-]+)/update_post$', views.update_post, name="update_post"),
     url(r'^Add_friend$', views.Add_friend, name="Add_friend"),
     #url(r'^accept_friend$', views.accept_friend, name="accept_friend"),
-    url(r'^AcceptFriendRequest/(?P<requester_id>[a-zA-z0-9-_]+)$', views.AcceptFriendRequest, name="AcceptFriendRequest"),
+    url(r'^AcceptFriendRequest/$', views.AcceptFriendRequest, name="AcceptFriendRequest"),
+    url(r'^friend_request_list/$', views.friend_request_list, name="friend_request_list"),
     url(r'^DeleteFriend/$', views.DeleteFriend, name="DeleteFriend"),
     url(r'^api_list_my_friend_request$', views.list_my_friend_request, name="list_my_friend_request"),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
