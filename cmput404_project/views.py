@@ -422,7 +422,7 @@ def AcceptFriendRequest(request):
         notify.delete()
         return HttpResponseRedirect(reverse('friendList',kwargs={'author_id': request.user.author.id}))
 
-    friend = Friend.objects.create(requester=author,requestee=notify.requester,requestee_id = notify.requester_id,requestee_host = notify.requester_host)
+    friend = Friend.objects.create(requester=author,requestee=notify.requester,requestee_id = notify.requester_id,requestee_host = notify.requester_host,requestee_displayName= notify.requester_displayName)
     notify.delete()
     friend.save()
 
