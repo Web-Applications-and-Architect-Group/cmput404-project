@@ -30,6 +30,8 @@ from .settings import MAXIMUM_PAGE_SIZE, HOST_NAME
 def getNodeAuth(host_root):
     if host_root[len(host_root)-1]=="/":
         host_root = host_root[0:len(host_root)-1]
+    if "/api" in host_root:
+        host_root = host_root[0:len(host_root)-4]
     if host_root==HOST_NAME:
         return {
             "success": True,
