@@ -103,7 +103,7 @@ class Send_Friendrequest(LoginRequiredMixin, View):
             varify_result = varify_result.filter(requester=author)
 
             if(len(varify_result)<1):
-                new_friend = Friend.objects.create(requestee=remote_friend["url"], requestee_id=remote_friend["id"], requestee_host=remote_friend["host"], requester=author)
+                new_friend = Friend.objects.create(requestee=remote_friend["url"], requestee_id=remote_friend["id"], requestee_host=remote_friend["host"], requestee_displayName=remote_friend["displayName"],requester=author)
                 new_friend.save()
 
         # return HttpResponse(json.dumps(serializer.data), status=status.HTTP_200_OK)
