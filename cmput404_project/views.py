@@ -117,6 +117,12 @@ def update():
         url = node.host+node.api_prefix+node.auth_post_url
         r = requests.get(url, auth=(node.auth_username, node.auth_password))
         if r.status_code == 200:
+
+            # datajson = json.dumps(r.json())
+            # datajson = json.loads(datajson)
+            # postjson = datajson['posts']
+            # serializer = PostSerializer(data=postjson,many=True)
+
             serializer = PostSerializer(data=r.json()['posts'],many=True)
             if serializer.is_valid():
                 serializer.save()
@@ -408,9 +414,14 @@ def accept_friend(request):
 
 @login_required
 def AcceptFriendRequest(request):
+    decide = request.POST['decide']
     requester_id = request.POST['requester_id']
     author = Author.objects.get(user=request.user)
     notify = Notify.objects.get(requestee=author,requester_id=requester_id)
+    if decide == "Decline" :
+        notify.delete()
+        return HttpResponseRedirect(reverse('friendList',kwargs={'author_id': request.user.author.id}))
+
     friend = Friend.objects.create(requester=author,requestee=notify.requester,requestee_id = notify.requester_id,requestee_host = notify.requester_host)
     notify.delete()
     friend.save()

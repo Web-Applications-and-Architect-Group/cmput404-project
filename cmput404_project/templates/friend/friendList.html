@@ -36,16 +36,22 @@
 
           <form action="{% url 'AcceptFriendRequest' %}" method="post" >
           {% csrf_token %}
-          <input type="hidden" name="requester_id" value="{{ f_request.requester_id }}" /> 
+          <input type="hidden" name="requester_id" value="{{ f_request.requester_id }}" />
+          <input type="hidden" name="decide" value="Accept" /> 
+          {% if author.id == viewer.id %}
+          {{f_request.requester_displayName}}
+          <button type="submit" class="btn btn-success btn-xs">
+          <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Accept</button>
+          </form>
 
-
-  {% if author.id == viewer.id %}
-   {{f_request.requester_displayName}}
-  <button type="submit" class="btn btn-success btn-xs pull-right">
-  <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Accept</button>
-  </form>
-  {% endif %}
-
+          <form action="{% url 'AcceptFriendRequest' %}" method="post" >
+          {% csrf_token %}
+          <input type="hidden" name="requester_id" value="{{ f_request.requester_id }}" />
+          <input type="hidden" name="decide" value="Decline" />  
+          <button type="submit" class="btn btn-success btn-xs">
+          <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Decline</button>
+          </form>
+          {% endif %}
   {% endfor %}
 
 </div>
