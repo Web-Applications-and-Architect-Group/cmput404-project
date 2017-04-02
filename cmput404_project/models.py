@@ -148,10 +148,10 @@ class Friend(models.Model):
     requestee = models.URLField()
     requestee_id = models.CharField(max_length=200)
     requestee_host = models.CharField(max_length=100,default="Host")
-
+    requestee_displayName = models.CharField(max_length=30,default ="AuthorName")
     @classmethod
-    def create(cls, requester, requestee, requestee_id):
-        new_post = cls(requester=requester, requestee=requestee, requestee_id=requestee_id, requestee_host=requestee_host)
+    def create(cls, requester, requestee, requestee_id,requestee_displayName):
+        new_post = cls(requester=requester, requestee=requestee, requestee_id=requestee_id, requestee_host=requestee_host,requestee_displayName= requestee_displayName)
         return new_post
 
     def __str__(self):

@@ -33,16 +33,25 @@
 <div class="list-group col-md-3">
   <h3 class="text-center"> Friend Request</h3>
   {% for f_request in friend_requests %}
-  <a href="
-  {% if author.id == viewer.id %}
-    {% url 'AcceptFriendRequest' f_request.requester_id %}
-  {% endif %}" class="list-group-item "> {{f_request.requester_displayName}}
 
-  {% if author.id == viewer.id %}
-  <button type="button" class="btn btn-success btn-xs pull-right">
-  <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Accept</button>
-  {% endif %}
-</a>
+          <form action="{% url 'AcceptFriendRequest' %}" method="post" >
+          {% csrf_token %}
+          <input type="hidden" name="requester_id" value="{{ f_request.requester_id }}" />
+          <input type="hidden" name="decide" value="Accept" /> 
+          {% if author.id == viewer.id %}
+          {{f_request.requester_displayName}}
+          <button type="submit" class="btn btn-success btn-xs">
+          <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Accept</button>
+          </form>
+
+          <form action="{% url 'AcceptFriendRequest' %}" method="post" >
+          {% csrf_token %}
+          <input type="hidden" name="requester_id" value="{{ f_request.requester_id }}" />
+          <input type="hidden" name="decide" value="Decline" />  
+          <button type="submit" class="btn btn-success btn-xs">
+          <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Decline</button>
+          </form>
+          {% endif %}
   {% endfor %}
 
 </div>
@@ -57,7 +66,7 @@
         <form action="{% url 'DeleteFriend' %}" method="post" >
       {% csrf_token %}
         <input type="hidden" name="author_id" value="{{ author.id }}" /> 
-         <input type="submit" class="w3-button w3-theme-d2 w3-margin-bottom" value = "unFriend {{ author.displayName }}" />
+         <input type="submit" class="list-group-item " value = "un-friend {{ author.displayName }}" />
         </form>
       	<!-- <button type="button" class="btn btn-danger btn-xs pull-right"> -->
       <!-- 	<span class="glyphicon glyphicon-remove" aria-hidden="true"></span> unFriend</button>

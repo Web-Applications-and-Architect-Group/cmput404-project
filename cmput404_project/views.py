@@ -15,7 +15,7 @@ import uuid
 import requests
 import datetime
 from rest_framework.views import APIView
-
+from django.core import serializers
 from rest_framework.response import Response
 from rest_framework import mixins,generics, status, permissions
 
@@ -117,6 +117,12 @@ def update():
         url = node.host+node.api_prefix+node.auth_post_url
         r = requests.get(url, auth=(node.auth_username, node.auth_password))
         if r.status_code == 200:
+
+            # datajson = json.dumps(r.json())
+            # datajson = json.loads(datajson)
+            # postjson = datajson['posts']
+            # serializer = PostSerializer(data=postjson,many=True)
+
             serializer = PostSerializer(data=r.json()['posts'],many=True)
             if serializer.is_valid():
                 serializer.save()
@@ -173,6 +179,10 @@ def home(request):
     context = { 'posts': posts ,'form': form,'author':author,'Friend_request':notify,'images':images,'viewer':viewer}
 
     return render(request,'home.html',context)
+
+def getFriendrequest(request):
+    notify = Notify.objects.filter(requestee=request.user.author)
+
 
 def stream(request,author_id):
     author = get_object_or_404(Author,pk=author_id)
@@ -403,10 +413,16 @@ def accept_friend(request):
 
 
 @login_required
-def AcceptFriendRequest(request,requester_id):
+def AcceptFriendRequest(request):
+    decide = request.POST['decide']
+    requester_id = request.POST['requester_id']
     author = Author.objects.get(user=request.user)
     notify = Notify.objects.get(requestee=author,requester_id=requester_id)
-    friend = Friend.objects.create(requester=author,requestee=notify.requester,requestee_id = notify.requester_id,requestee_host = notify.requester_host)
+    if decide == "Decline" :
+        notify.delete()
+        return HttpResponseRedirect(reverse('friendList',kwargs={'author_id': request.user.author.id}))
+
+    friend = Friend.objects.create(requester=author,requestee=notify.requester,requestee_id = notify.requester_id,requestee_host = notify.requester_host,requestee_displayName= notify.requester_displayName)
     notify.delete()
     friend.save()
 
@@ -464,7 +480,14 @@ def get_object_by_uuid_or_404(model, uuid_pk):
         raise Http404(str(e))
     return get_object_or_404(model, pk=uuid_pk)
 
+@login_required
+def friend_request_list(request):
+    author = request.user.author
+    friend_requests = author.notify.all()
+    friend_requests = serializers.serialize('json',friend_requests)
 
+    return JsonResponse(friend_requests,safe=False)
+    
 def friendList(request,author_id):
     author = Author.objects.get(pk=author_id)
     friend_requests = author.notify.all()
