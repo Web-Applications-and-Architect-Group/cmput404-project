@@ -27,7 +27,7 @@
  <div class="w3-bar w3-theme-d2 w3-left-align w3-large">
   <a class="w3-bar-item w3-button w3-hide-medium w3-hide-large w3-right w3-padding-large w3-hover-white w3-large w3-theme-d2" href="javascript:void(0);" onclick="openNav()"><i class="fa fa-bars"></i></a>
   <a href="{% url 'home' %}" class="w3-bar-item w3-button w3-padding-large w3-theme-d4"><i class="fa fa-home w3-margin-right"></i>Home</a>
-  {% if request.user.username %}
+  {% if request.user.username and author.is_active%}
   <button type="button" class="w3-bar-item w3-button w3-padding-large w3-theme-d4" data-toggle="modal" data-target="#myModal"><i class="fa fa-pencil"></i> Post</button>
   {% if request.user.is_staff%}
   <a href="/admin/" class="w3-bar-item w3-button w3-padding-large w3-theme-d4"><i class="fa fa-user-secret w3-margin-right"></i>Admin</a>
@@ -52,8 +52,15 @@
     </div>
   </div>
   {% else %}
+
+  {% if not author.is_active and request.user.username%}
+  <a href="#" class="w3-bar-item w3-button w3-hide-small w3-right w3-padding-large w3-hover-white" title="NotActive">Awaiting Activation</a>
+  <a href="/logout/" class="w3-bar-item w3-button w3-hide-small w3-right w3-padding-large w3-hover-white" title="logout">Log out</a>
+  {% else %}
   <a href="/login/" class="w3-bar-item w3-button w3-hide-small w3-right w3-padding-large w3-hover-white" title="logout">Log in</a>
   <a href="/register/" class="w3-bar-item w3-button w3-hide-small w3-right w3-padding-large w3-hover-white" title="logout">Sign up</a>
+  {% endif %}
+
   {% endif %}
  </div>
 </div>

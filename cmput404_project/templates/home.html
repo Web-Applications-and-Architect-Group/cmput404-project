@@ -24,6 +24,12 @@
          <p><i class="fa fa-envelope fa-fw w3-margin-right w3-text-theme"></i>{{author.displayName}}</p>
          <p><i class="fa fa-github fa-fw w3-margin-right w3-text-theme"></i>{{author.github}}</p>
          <p><i class="fa fa-pencil fa-fw w3-margin-right w3-text-theme"></i>{{author.bio}}</p>
+         {% if author.is_active %}
+         <p><i class="fa fa-pencil fa-fw w3-margin-right w3-text-theme"></i>Status: Activated</p>
+         {% else %}
+         <p><i class="fa fa-pencil fa-fw w3-margin-right w3-text-theme"></i>Status: Awaiting activation</p>
+         
+         {% endif %}
         </div>
       </div>
       <br>
