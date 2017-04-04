@@ -35,8 +35,8 @@ def getNodeAuth(host_root):
     if host_root==HOST_NAME:
         return {
             "success": True,
-            # "auth": ("admin","1234qwer")
-            "auth": ("admin","nimabide")
+             "auth": ("admin","1234qwer")
+            #"auth": ("admin","nimabide")
         }
     # else:
     #     host_root = host_root + '/'
