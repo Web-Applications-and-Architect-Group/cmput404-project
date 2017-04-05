@@ -1,11 +1,13 @@
+{% extends 'base.html' %}
 {% load static %}
 {% load markdown_deux_tags %}
 
+{% block content %}
 <!DOCTYPE html>
 
 <html>
   <head>
-    <title>A shared post from {{ post.author }}</title>
+    <title>A shared Post from {{ post.author }}</title>
     <style type="text/css">
       .post {
         text-align: center;
@@ -23,7 +25,7 @@
       <img alt="user photo" class="img-rounded" height=48 width=48 src="{{ post.author.img.url }}" >
       <a href="{% url 'profile' post.author.id %}" >{{ post.author.displayName }}</a></h3>
       <span>Title:    </span><a> {{ post.title }}</a></br></br>
-      <span>Description:    </span>{{ post.description }}
+      <span>Description :    </span>{{ post.description }}
       <hr class="w3-clear">
       <ul style="list-style: none">
       <li>  </br>
@@ -34,14 +36,15 @@
       {% endif %}
 
     </br></br>
-      <div class="w3-row-padding" style="margin:0 -16px">
-        <div class="w3-half">
-          <img src="/w3images/lights.jpg" style="width:100%" alt="Northern Lights" class="w3-margin-bottom">
-        </div>
-        <div class="w3-half">
-          <img src="/w3images/nature.jpg" style="width:100%" alt="Nature" class="w3-margin-bottom">
+        <div class="w3-row-padding" style="margin:0 -16px">
+         {% for image in images%}
+          {% if post.id == image.post.id%}
+          <div class="w3-half">
+            <img src="{{image.post_image.url}}" style="width:40%" alt="POST IMAGE" class="w3-margin-bottom">
+          </div>
+          {%endif%}
+          {% endfor %}
       </div>
-    </div>
 
     <div style="text-align:left">
         {% for comment in post.comments.all %}
@@ -50,14 +53,27 @@
         {% endfor %}
     </div></br>
       <hr class="w3-clear">
-      <form action="{% url 'comment' %}" method="GET">
-        <input hidden="hidden" name="github" value = "{{user.profile.github}}" id="githubID"/>
-            {% csrf_token %}
-              <input style= "width:80%" name="comment_text"/>
-              <input hidden="hidden" name="post_id" value = "{{post.id }}"/>
-              <input hidden="hidden" name="content_type" value = "{{contentType}}"/>
-              <input type="submit" class="w3-button w3-theme-d2 w3-margin-bottom" value = "Comment"/>
-      </form></br>
+              <button onclick="clickFun()"><i class="fa fa-plus"></i> Comment</button>
+        </br></br>
+
+        <form action="{% url 'comment' %}" method="POST">
+        <div class="editor" id="test" style="display:none">
+            <div class="editor-header">
+                <div style="width:20%">
+                    <select name ="content_type" class="form-control" value = "{{commentType}}">
+                        <option value = 'text/plain' selected="true">Plain Text</option>
+                        <option value = 'text/markdown'>Markdown</option>
+                   </select>
+               </div> <!-- /.form-group -->
+             </div>
+
+         <input hidden="hidden" name="github" value = "{{user.profile.github}}" id="githubID"/>
+             {% csrf_token %}
+               <input style= "width:80%" name="comment_text" class="editor-content"/>
+               <input hidden="hidden" name="post_id" value = "{{post.id }}"/>
+               <input type="submit" class="w3-button w3-theme-d2 w3-margin-bottom" value = "Comment" />
+          </div>
+       </form>
     </div>
 
       </li></br>
@@ -65,3 +81,24 @@
 
   </body>
 </html>
+{% endblock %}
+
+
+
+{%block javascript%}
+<script>
+//alert('x');
+
+function clickFun() {
+  var elm = document.getElementsByClassName("editor");
+  //alert(elm.length);
+  for(i=0;i<elm.length;i++) {
+    if (elm[i].style.display === 'none') {
+        elm[i].style.display = 'block';
+    } else {
+        elm[i].style.display = 'none';
+    }
+  }
+}
+</script>
+{% endblock %}

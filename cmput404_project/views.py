@@ -460,13 +460,17 @@ def DeleteFriend(request):
 
 
 def viewUnlistedPost(request, post_id):
-    post = get_object_by_uuid_or_404(Post, post_id)
-
-    # post_id = request.GET['post_id']
-    unlistedPost = Post.objects.get(pk=post_id)
-    context = { 'post': unlistedPost }
-
-    return render(request, 'post/shared_post.html', context)
+    post = get_object_or_404(Post,pk = post_id)
+    author = post.author
+    viewer = None
+    if request.user.is_authenticated:
+        viewer = request.user.author
+    form = PostForm()
+    post.categories = '#'.join(json.loads(post.categories))
+    post.visibleTo = ';'.join(json.loads(post.visibleTo))
+    images = PostImages.objects.filter(post=post)
+    context = {'post':post,'author':author,'form':form,'viewer':viewer,'images':images}
+    return render(request,'post/shared_post.html',context)
 
 ### reference by: http://brainstorm.it/snippets/get_object_or_404-for-uuids/
 def get_object_by_uuid_or_404(model, uuid_pk):

@@ -145,7 +145,7 @@
 
         {% if post.unlisted %}
       </br></br>
-          <p>This post is publicly shareable by URI only: <a href="{{ STATIC_URL }}/post/{{ post.id }}">{{ STATIC_URL }}/{{ post.author }}/{{ post.id }}</a></p>
+          <p>This post is publicly shareable by URI only: <a href="{% url 'viewUnlistedPost' post.id %}">Click To open</a></p>
         {% endif %}
 
         <div style="text-align:left">
