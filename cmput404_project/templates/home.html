@@ -41,8 +41,26 @@
       <br>
 
 
+      <div class="w3-card-2 w3-round w3-white">
+      <div class="w3-container">
 
+      <h4 class="w3-center">Github Activity</h4>
+
+      <div id = "gitID" class="w3-card-2 w3-round w3-white w3-center">
+
+      </div>
+      
+      <button type="button" class="fa fa-plus" onclick="pullgithub('{{author.github}}')">Pull github activites</button>
+
+
+      </div>
     </div>
+
+
+    </div><br><br>
+
+
+
     <!-- End Left Column -->
       <input hidden="hidden" id="logged" value = "Yes"/>
     {% else %}
@@ -222,6 +240,50 @@ if (document.getElementById('logged').value == "Yes")
         //30 frames per second
         setInterval(update, 30000/30.0);
 
+}
+
+//Took from hindle's assignment code
+function sendJSONXMLHTTPRequest(url, callback) {
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState==4) {
+            try {
+                if (xhr.status==200) {
+                  var response = JSON.parse(xhr.responseText);
+                  callback(response);
+                }
+            }
+            catch(e) {
+                alert('Error: ' + e.name);
+            }
+        }
+    };
+    xhr.open("GET",url);
+    xhr.setRequestHeader("Accept","application/json");
+    xhr.send(null);
+}
+
+function handleGithubJSON(response) {
+  var gitNode = document.getElementById('gitID');
+  for (var i = 0; i < response.length; i++) 
+  {
+    var divNode = document.createElement("DIV");
+    var divString = 'Repo Name :' + response[i].repo.name + '</br>Event Type: ' + response[i].type
+       + '</br>Repo Owner: ' + response[i].actor.display_login + "</br>Time: " + response[i].created_at + '</br></br>'
+    divNode.innerHTML = divString;
+    gitNode.appendChild(divNode);
+  }
+}
+
+var page = 1;
+var per_page = 3;
+//https://api.github.com/users/zhangtuxin/events/public?page=1
+//https://developer.github.com/v3/
+function pullgithub(githubname) {
+  var url = 'https://api.github.com/users/' + githubname + '/events/public?page=';
+  var update_url = url + String(page) + '&per_page=' + String(per_page);
+  sendJSONXMLHTTPRequest(update_url,handleGithubJSON);
+  page++;
 }
 
 </script>
