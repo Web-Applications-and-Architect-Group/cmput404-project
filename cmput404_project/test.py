@@ -77,3 +77,101 @@ class PostTestCase(TestCase):
         """
         posts = Post.objects.filter(title="NotExist")
         self.assertEquals(len(posts), 0, "Post should not exist!")
+
+    def testDeletePost(self):
+        """
+        Test if you can delete a post
+        """
+        user = User.objects.get(username="testuser2")
+        author = Author.objects.get(user=user)
+        newPost = Post.objects.create(author=author,
+                                    title="aNewPost",
+                                    content="new post here",
+                                    visibility="PUBLIC")
+
+        post = Post.objects.filter(title="aNewPost")[0]
+        self.assertIsNotNone(post, "Post should exist!")
+        post.delete()
+        post2 = Post.objects.filter(title="aNewPost")
+        self.assertEquals(len(post2), 0, "Post should not exist")
+
+
+
+"""
+Test comments
+"""
+class CommentTestCase(TestCase):
+
+    def setUp(self):
+        User.objects.create_user(username="mockuser1", password="mockpassword")
+        user1 = User.objects.get(username="mockuser1")
+        author1 = Author.objects.get(user=user1)
+
+        post1 = Post.objects.create(author=author1,
+                                    content="content1",
+                                    title="title1",
+                                    visibility="PUBLIC")
+        post2 = Post.objects.create(author=author1,
+                                    content="content2",
+                                    title="title2",
+                                    visibility="PUBLIC")
+
+        Comment.objects.create(author=author1, comment="comment1", post=post1, contentType="text/plain")
+        Comment.objects.create(author=author1, comment="comment2", post=post1, contentType="text/plain")
+        Comment.objects.create(author=author1, comment="comment3", post=post2, contentType="text/plain")
+
+    def testGetAllComments(self):
+        '''
+        test if you can get all comments in database
+        '''
+        comments = Comment.objects.all()
+        self.assertEquals(len(comments), 3, "3 comments exist but only " + str(len(comments)) + "found" )
+
+    def testGetComment(self):
+        '''
+        test if you can get a single comment
+        '''
+        comment = Comment.objects.filter(comment="comment1")[0]
+        self.assertIsNotNone(comment, "Comment exists, but was not found")
+
+        user1 = User.objects.get(username="mockuser1")
+        author1 = Author.objects.get(user=user1)
+        post1 = Post.objects.filter(title="title1")[0]
+
+        self.assertEquals(comment.author, author1, "Author id does not match")
+        self.assertEquals(comment.post, post1, "Post id does not match")
+        self.assertEquals(comment.comment, "comment1", "Comment (content) does not match")
+        self.assertIsNotNone(comment.published)
+
+    def testGetAllPostComments(self):
+        """
+        test if you can get all comments from a certain post from the database
+        """
+        post2 = Post.objects.filter(title="title2")[0]
+
+        comments = Comment.objects.filter(post=post2)
+        self.assertEqual(len(comments), 1, "Post has one comment, but " +  str(len(comments)) + " were found")
+
+    def testGetNonExistantComment(self):
+        """
+        test get a non existant comment from the database
+        """
+        comments = Comment.objects.filter(comment="dontexist")
+        self.assertEquals(len(comments), 0, "Comment should not exist!")
+
+    def testDeleteComment(self):
+        """
+        test comment deletion from database
+        """
+        post1 = Post.objects.filter(title="title1")[0]
+        user1 = User.objects.get(username="mockuser1")
+        author1= Author.objects.get(user=user1)
+
+        Comment.objects.create(author=author1, post=post1, comment="comment4")
+
+        comment = Comment.objects.get(comment="comment4")
+        self.assertIsNotNone(comment,"Comment exists, but was not found")
+
+        comment.delete()
+        self.assertEquals(len(Comment.objects.filter(comment="comment4")),
+                  0, "Comment was not properly deleted")
