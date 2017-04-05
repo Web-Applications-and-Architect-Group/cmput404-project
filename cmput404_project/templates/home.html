@@ -50,7 +50,7 @@
 
       </div>
       
-      <button type="button" class="fa fa-plus" onclick="pullgithub('{{author.github}}')">Pull github activites</button>
+      <button type="button" class="w3-button w3-theme-d2 w3-margin-bottom" onclick="pullgithub('{{author.github}}')">Pull more github activites</button>
 
 
       </div>
@@ -263,7 +263,7 @@ function sendJSONXMLHTTPRequest(url, callback) {
     xhr.send(null);
 }
 
-function handleGithubJSON(response) {
+function pullgithubByName(response) {
   var gitNode = document.getElementById('gitID');
   for (var i = 0; i < response.length; i++) 
   {
@@ -282,7 +282,7 @@ var per_page = 3;
 function pullgithub(githubname) {
   var url = 'https://api.github.com/users/' + githubname + '/events/public?page=';
   var update_url = url + String(page) + '&per_page=' + String(per_page);
-  sendJSONXMLHTTPRequest(update_url,handleGithubJSON);
+  sendJSONXMLHTTPRequest(update_url,pullgithubByName);
   page++;
 }
 
