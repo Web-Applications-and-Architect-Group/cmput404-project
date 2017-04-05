@@ -79,6 +79,7 @@ urlpatterns = [
     url(r'^(?P<author_id>[a-zA-Z0-9-_]+)/friendList$', views.friendList, name="friendList"),
     #url(r'^onePost',views.onePost, name="onePost"),
     url(r'^(?P<author_id>[a-zA-Z0-9-_]+)/posts/(?P<post_id>[a-zA-Z0-9-]+)$', views.onePost, name="onePost"),
+    url(r'^posts/(?P<post_id>[a-zA-Z0-9-]+)/$', views.viewUnlistedPost, name="viewUnlistedPost"),
 
     #url(r'^friendList', views.friendList, name="friendList"),
 
