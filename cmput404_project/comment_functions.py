@@ -40,7 +40,7 @@ def getNodeAuth(host_root):
     if "/api" in host_root:
         host_root = host_root[0:len(host_root)-4]
     if "/service" in host_root :
-        host_root = host_root[0:len(host_root)-8] 
+        host_root = host_root[0:len(host_root)-8]
     if host_root==HOST_NAME:
         return {
             "success": True,
@@ -160,7 +160,7 @@ def friend_relation_validation(friend_url1, friend_host1, friend_url2, friend_ho
         }
 
     # check friend relationship
-    if (author1["id"] in author2_following["authors"]) and (author2["id"] in author1_following["authors"]):
+    if (author1["id"] in author2_following["authors"]) and (author2["id"] in author1_following["authors"]) or (author1["url"] in author2_following["authors"]) and (author2["url"] in author1_following["authors"]):
         friend_status = True
     else:
         friend_status = False
