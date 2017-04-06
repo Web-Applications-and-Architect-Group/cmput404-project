@@ -314,6 +314,9 @@ class Friendrequest_Handler(APIView):
         if not (data["query"] == "friendrequest"):
             return Response(status=status.HTTP_400_BAD_REQUEST)
         try:
+            data["friend"]["id"] = author_id_parse(data["friend"]["id"])
+            data["author"]["id"] = author_id_parse(data["author"]["id"])
+            
             friend =  Author.objects.get(id=data["friend"]["id"])
 
             # redundent Notify check
