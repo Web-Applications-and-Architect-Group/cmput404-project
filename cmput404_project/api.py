@@ -298,12 +298,34 @@ class Accurate_Friend_Inquiry_Handler(APIView):
     queryset = Friend.objects.all()
 
     def get(self, request, author_id1, author_id2, format=None):
+
         # prepare response
         response = OrderedDict()
         response["query"] = "friends"
         response["authors"] = [author_id1, author_id2]
         response["friends"] = True
 
+        # pull author info
+        try:
+            author1 = Author.objects.get(id=author_id1)
+        except Author.DoesNotExist:
+            response["friends"] = False
+
+        try:
+            author2 = Author.objects.get(id=author_id2)
+        except Author.DoesNotExist:
+            response["friends"] = False
+
+        friend_validation_result = friend_relation_validation(author1.url, author1.host, author2.url, author2.host)
+        if friend_validation_result["success"]:
+            response["friends"] = friend_validation_result["friend_status"]
+            # print "==================="
+            # print(response["friends"])
+        else:
+            response["friends"] = False
+            print friend_validation_result["messages"]
+
+        """
         # pull all the following author by author_id
         following_1 = Friend.objects.filter(requester=author_id1)
         following_2 = Friend.objects.filter(requester=author_id2)
@@ -318,6 +340,7 @@ class Accurate_Friend_Inquiry_Handler(APIView):
             following_2.get(requestee_id=author_id1)
         except Friend.DoesNotExist:
             response["friends"] = False
+        """
 
         # return response
         return Response(response, status=status.HTTP_200_OK)
@@ -337,7 +360,7 @@ class Friendrequest_Handler(APIView):
         try:
             data["friend"]["id"] = author_id_parse(data["friend"]["id"])
             data["author"]["id"] = author_id_parse(data["author"]["id"])
-            
+
             friend =  Author.objects.get(id=data["friend"]["id"])
 
             # redundent Notify check
