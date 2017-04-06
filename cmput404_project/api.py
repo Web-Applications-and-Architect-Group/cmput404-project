@@ -6,19 +6,21 @@ from rest_framework.decorators import api_view
 from .permissions import IsAuthenticatedNodeOrAdmin
 from collections import OrderedDict
 from .settings import MAXIMUM_PAGE_SIZE,HOST_NAME
-from .models import  Author,Post, friend_request, Comment,Notify,Friend
+from .models import  Author,Post, friend_request, Comment,Notify,Friend,PostImages
 from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404,get_list_or_404
 import uuid,json, requests
 from django.http import Http404
 from rest_framework.renderers import JSONRenderer
 from .comment_functions import getNodeAuth,getNodeAPIPrefix,friend_relation_validation,author_id_parse
+import base64
 # ============================================= #
 # ============= Posts API (START) ============= #
 # ============================================= #
 def handle_posts(posts,request):
     size = int(request.GET.get('size', MAXIMUM_PAGE_SIZE))
     paginator = PostPagination()
+    images = []
     paginator.page_size = size
     result_posts = paginator.paginate_queryset(posts, request)
     for post in result_posts:
@@ -32,7 +34,20 @@ def handle_posts(posts,request):
         post['categories'] = json.loads(post.categories)
         post['visibleTo'] = json.loads(post.visibleTo)
         post['author'].id = post['author'].url
+
+        #============= image
+        # if post['contentType'] == 'image/png;base64' or post['contentType'] == 'image/jpeg;base64':
+        #    path = PostImages.objects.filter(post=Post.objects.get(id=post['id']))[0].post_image.url
+        #    #post['content'] = base64.b64encode(pimage)
+        #    fp=open(path,'r+')
+        #    post['content'] = base64.b64encode(fp.read())
+        #============= image
     serializer = PostSerializer(result_posts, many=True)
+        #============= image
+
+        #============= image
+
+
     return paginator.get_paginated_response(serializer.data, size)
 
 class Public_Post_List(APIView):
