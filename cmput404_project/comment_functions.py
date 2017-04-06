@@ -32,6 +32,8 @@ def getNodeAuth(host_root):
         host_root = host_root[0:len(host_root)-1]
     if "/api" in host_root:
         host_root = host_root[0:len(host_root)-4]
+    if "/service" in host_root :
+        host_root = host_root[0:len(host_root)-8] 
     if host_root==HOST_NAME:
         return {
             "success": True,
