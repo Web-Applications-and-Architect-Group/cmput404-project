@@ -12,6 +12,7 @@ from django.shortcuts import get_object_or_404,get_list_or_404
 import uuid,json, requests
 from django.http import Http404
 from rest_framework.renderers import JSONRenderer
+from .comment_functions import getNodeAuth,getNodeAPIPrefix,friend_relation_validation,author_id_parse
 
 # ============================================= #
 # ============= Posts API (START) ============= #
@@ -195,8 +196,10 @@ class AuthorView(APIView):
 
         followlist = author1.follow.all()
         for i in followlist :
-            serializer = AuthorSerializer(Author.objects.get(id=i.requestee_id))
-            author['friends'].append(serializer.data)
+            serializer = AuthorSerializer(Author.objects.get(id=author_id_parse(i.requestee_id)))
+            j = serializer.data
+            j['id'] = j['url']
+            author['friends'].append(j)
 
         return Response(author)
 

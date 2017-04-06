@@ -32,7 +32,7 @@ def author_id_parse(author_id):
         author_id = temp[-1]
         if author_id[-1]=='/':
             author_id = author_id[:-1]
-        return author_id
+    return author_id
 
 def getNodeAuth(host_root):
     if host_root[len(host_root)-1]=="/":
