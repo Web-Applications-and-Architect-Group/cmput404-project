@@ -5,7 +5,7 @@ from .serializers import AuthorSerializer,PostSerializer,CommentSerializer,PostP
 from rest_framework.decorators import api_view
 from .permissions import IsAuthenticatedNodeOrAdmin
 from collections import OrderedDict
-from .settings import MAXIMUM_PAGE_SIZE
+from .settings import MAXIMUM_PAGE_SIZE,HOST_NAME
 from .models import  Author,Post, friend_request, Comment,Notify,Friend
 from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404,get_list_or_404
@@ -13,7 +13,6 @@ import uuid,json, requests
 from django.http import Http404
 from rest_framework.renderers import JSONRenderer
 from .comment_functions import getNodeAuth,getNodeAPIPrefix,friend_relation_validation,author_id_parse
-
 # ============================================= #
 # ============= Posts API (START) ============= #
 # ============================================= #
@@ -255,15 +254,19 @@ class Friend_Inquiry_Handler(APIView):
         # store author ids in a list
         result = []
         for friend in friends:
-            result.append(friend.requestee_id)
+            if friend.requestee_host == HOST_NAME:
+                friend.requestee_host = friend.requestee_host + '/service/'
+            if friend.requestee_host[-1] != '/':
+                friend.requestee_host = friend.requestee_host + '/'
+            result.append(friend.requestee_host + 'author/' + friend.requestee_id)
 
         # return success response
-        return self.successResponse(author_id, result)
+        return self.successResponse(HOST_NAME + '/service/' + author_id, result)
 
     def post(self,request, author_id, format=None):
         data = request.data
 
-        # error handling
+        # error handling TODOXXX
         if not (data["query"] == "friends"):
             return Response(status=status.HTTP_400_BAD_REQUEST)
         if not (data["author"] == author_id):
