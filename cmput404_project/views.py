@@ -59,7 +59,7 @@ class Send_Friendrequest(LoginRequiredMixin, View):
         # print(getNodeAuth(friend_hostname))
         admin_auth=getNodeAuth(friend_hostname)
         print ("================")
-        print (admin)
+        print (admin_auth)
         if(admin_auth["success"]):
             admin_auth = admin_auth["auth"]
         else:
