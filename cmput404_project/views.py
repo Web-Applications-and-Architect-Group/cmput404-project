@@ -321,6 +321,10 @@ def comment(request):
             if serializer.is_valid():
                 if host[-1] == '/':
                     host = host[:-1]
+                if "/api" in host:
+                    host = host[0:len(host)-4]
+                if "/service" in host :
+                    host = host[0:len(host)-8]
                 try:
                     node = Node.objects.get(host=host)
                 except Node.DoesNotExist:
