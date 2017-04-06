@@ -51,11 +51,15 @@ class Send_Friendrequest(LoginRequiredMixin, View):
         if friend_hostname[len(friend_hostname)-1]=="/":
             friend_hostname = friend_hostname[0:len(friend_hostname)-1]
         if "/api" in friend_hostname :
-            friend_hostname = friend_hostname[0:len(friend_hostname)-3]  
+            friend_hostname = friend_hostname[0:len(friend_hostname)-3]
+        if "/service" in friend_hostname :
+            friend_hostname = friend_hostname[0:len(friend_hostname)-8]   
         # print friend_hostname
         # return
         # print(getNodeAuth(friend_hostname))
         admin_auth=getNodeAuth(friend_hostname)
+        print ("================")
+        print (admin_auth)
         if(admin_auth["success"]):
             admin_auth = admin_auth["auth"]
         else:
@@ -81,6 +85,7 @@ class Send_Friendrequest(LoginRequiredMixin, View):
         remote_request = OrderedDict()
         remote_request["query"] = "friendrequest"
         remote_request["author"] = serializer.data
+        remote_request["author"]['id'] = remote_request["author"]['url']
         remote_request["friend"] = remote_friend
 
         # send friend request to remote server

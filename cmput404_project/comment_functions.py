@@ -26,17 +26,26 @@ from collections import OrderedDict
 from .settings import MAXIMUM_PAGE_SIZE, HOST_NAME
 
 
+def author_id_parse(author_id):
+    if 'author/' in author_id:
+        temp = author_id.split('author/')
+        author_id = temp[-1]
+        if author_id[-1]=='/':
+            author_id = author_id[:-1]
+    return author_id
 
 def getNodeAuth(host_root):
     if host_root[len(host_root)-1]=="/":
         host_root = host_root[0:len(host_root)-1]
     if "/api" in host_root:
         host_root = host_root[0:len(host_root)-4]
+    if "/service" in host_root :
+        host_root = host_root[0:len(host_root)-8] 
     if host_root==HOST_NAME:
         return {
             "success": True,
-             "auth": ("admin","1234qwer")
-            #"auth": ("admin","nimabide")
+            #  "auth": ("admin","1234qwer")
+            "auth": ("admin","nimabide")
         }
     # else:
     #     host_root = host_root + '/'
