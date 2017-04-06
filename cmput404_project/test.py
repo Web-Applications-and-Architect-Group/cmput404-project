@@ -1,13 +1,169 @@
+from django.test.client import Client
 from django.test import TestCase
-from cmput404_project.models import Author, Post, Comment, Friend
+from django.test.utils import setup_test_environment
+from cmput404_project.models import Author, Post, friend_request, Comment, Notify,Friend
 from django.contrib.auth.models import User
+import uuid, json
+from .settings import HOST_NAME
+from .forms import ImageForm, ProfileForm, PostForm
+from django import forms
 
-import json
-import uuid
+class test_login_and_profile(TestCase):
 
-"""
-Test post
-"""
+    def set_up(self):
+        user = User.objects.create_user(username = 'lily',email= 'ns@gmail.com', password='lily123')
+        user.save()
+
+    def test_add_user(self):
+        self.set_up()
+        users = User.objects.filter(username="lily")
+        self.assertEqual(len(users), 1)
+
+    def test_login(self):
+        self.set_up()
+        client = Client()
+        response = client.post('/login/', {'username': 'lily', 'password': 'lily123'})
+        self.assertEqual(response.status_code, 302)
+        login = self.client.login(username = 'lily', password = 'lily123')
+        self.assertTrue(login)
+
+    def test_create_profile(self):
+        self.set_up()
+        myUser = User.objects.get(username="lily")
+    	author = Author.objects.get(user = myUser)
+        author.displayName = "lily"
+        author.github = "github"
+        author.bio = "bio"
+        author.save()
+        author = Author.objects.filter(user = myUser, displayName = "lily",github = "github", bio = "bio")
+        self.assertEqual(len(author), 1)
+
+    def test_view_profile(self):
+        self.test_create_profile()
+        client = Client()
+        myUser = User.objects.get(username="lily")
+        client.login(username="lily", password="lily123")
+        author = Author.objects.get(user = myUser)
+        author_id = author.id
+
+        path = "/"+author_id +"/profile"
+        response = client.post(path, {'displayName':'lily'})
+        self.assertEqual(response.status_code, 200)
+
+
+    def test_update_profile(self):
+        self.test_create_profile()
+
+        myUser = User.objects.get(username="lily")
+        author = Author.objects.get(user = myUser)
+
+        form = ProfileForm({'displayName': 'Bob', 'email': 'sk@gmail.com', 'github' : 'git', 'bio':'bios'})
+        self.assertTrue(form.is_valid())
+
+        if form.is_valid():
+            author.displayName = form.cleaned_data['displayName']
+            author.user.email = form.cleaned_data['email']
+            author.github = form.cleaned_data['github']
+            author.bio = form.cleaned_data['bio']
+            author.save()
+            author.user.save()
+
+        author = Author.objects.filter(user = myUser, displayName = "Bob", github = "git", bio = "bios")
+        self.assertEqual(len(author), 1)
+
+        author = Author.objects.get(user = myUser, displayName = "Bob", github = "git", bio = "bios")
+        self.assertTrue(author.user.email == "sk@gmail.com")
+
+
+class test_friend(TestCase):
+
+    def set_up(self):
+        user1 = User.objects.create_user(username = 'sender',email= 'ss@gmail.com', password='user111')
+        user1.save()
+        user2 = User.objects.create_user(username = 'receiver',email= 'kk@gmail.com', password='user222')
+        user2.save()
+
+    def test_send_friend_request(self):
+        self.set_up()
+        sender = User.objects.get(username = "sender")
+        #sender = Author.objects.get(user = user1)
+        receiver = User.objects.get(username = "receiver")
+        #receiver = Author.objects.get(user = user2)
+        status = False
+        new_request = friend_request.create(sender,receiver,status)
+        new_request.save()
+
+        request = friend_request.objects.filter(request_sender = sender, request_receiver = receiver)
+        self.assertEqual(len(request), 1)
+
+    def test_notify(self):
+        self.set_up()
+        user1 = User.objects.get(username = "sender")
+        sender = Author.objects.get(user = user1)
+        user2 = User.objects.get(username = "receiver")
+        receiver = Author.objects.get(user = user2)
+
+        new_notify = Notify.objects.create(requestee= receiver, requester="http://127.0.0.1:5454/author/de305d54-75b4-431b-adb2-eb6b9e546013",
+                                           requester_displayName=sender.displayName,
+                                           requester_host = "Host", 
+                                           requester_id = sender.id)
+        new_notify.save()
+        notify = Notify.objects.filter(requestee = receiver, requester_id = sender.id )
+        self.assertEqual(len(notify), 1)
+
+    def test_reject_friend_request(self):
+        self.test_notify()
+        user1 = User.objects.get(username = "sender")
+        sender = Author.objects.get(user = user1)
+        user2 = User.objects.get(username = "receiver")
+        receiver = Author.objects.get(user = user2)
+
+        notify = Notify.objects.get(requestee = receiver, requester_id = sender.id )
+        notify.delete()
+
+        try:
+            rejected = Notify.objects.get(requestee = receiver, requester_id = sender.id )
+        except:
+            rejected = None
+
+        self.assertEqual(rejected, None)
+
+
+    def test_accept_friend_request(self):
+        self.test_notify()        
+        user1 = User.objects.get(username = "sender")
+        sender = Author.objects.get(user = user1)
+        user2 = User.objects.get(username = "receiver")
+        receiver = Author.objects.get(user = user2)
+
+        notify = Notify.objects.get(requestee = receiver, requester_id = sender.id )
+
+        friend = Friend.objects.create(requester=notify.requestee,requestee=notify.requester,requestee_id = notify.requester_id,requestee_host = notify.requester_host,requestee_displayName= notify.requester_displayName)
+        notify.delete()
+        friend.save()
+
+        new_friend = Friend.objects.filter(requester=notify.requestee,requestee=notify.requester)
+        self.assertEqual(len(new_friend), 1)
+
+
+    def test_delete_friend(self):
+        self.test_accept_friend_request()
+        user1 = User.objects.get(username = "sender")
+        sender = Author.objects.get(user = user1)
+        user2 = User.objects.get(username = "receiver")
+        receiver = Author.objects.get(user = user2)
+
+        friend = Friend.objects.get(requester= receiver, requestee_id= sender.id)
+        
+        friend.delete()
+
+        try:
+            deleted = Friend.objects.get(requester= r, requestee_id= receiver.id)
+        except:
+            deleted = None
+
+        self.assertEqual(deleted, None)
+        
 class PostTestCase(TestCase):
 
     def setUp(self):
@@ -173,5 +329,11 @@ class CommentTestCase(TestCase):
         self.assertIsNotNone(comment,"Comment exists, but was not found")
 
         comment.delete()
-        self.assertEquals(len(Comment.objects.filter(comment="comment4")),
-                  0, "Comment was not properly deleted")
+        self.assertEquals(len(Comment.objects.filter(comment="comment4")), 0, "Comment was not properly deleted")
+
+
+
+
+
+
+
