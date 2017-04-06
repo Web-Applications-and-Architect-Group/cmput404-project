@@ -41,7 +41,10 @@ def handle_posts(posts,request):
             #post['content'] = base64.b64encode(pimage)
             path = PROJECT_ROOT + path
             fp=open(path,'r+')
-            post['content'] = base64.b64encode(fp.read())
+            if post['contentType'] == 'image/png;base64':
+                post['content'] = "data:image/png;base64, " + base64.b64encode(fp.read())
+            if post['contentType'] == 'image/jpeg;base64':
+                post['content'] = "data:image/jpeg;base64, " + base64.b64encode(fp.read())
             # fh = open("imageToSave.jpeg", "wb")
             # fh.write(base64.b64decode(post['content']))
             # fh.close()
