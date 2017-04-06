@@ -85,6 +85,7 @@ class Send_Friendrequest(LoginRequiredMixin, View):
         remote_request = OrderedDict()
         remote_request["query"] = "friendrequest"
         remote_request["author"] = serializer.data
+        remote_request["author"]['id'] = remote_request["author"]['url']
         remote_request["friend"] = remote_friend
 
         # send friend request to remote server

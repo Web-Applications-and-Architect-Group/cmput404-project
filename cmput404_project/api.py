@@ -23,12 +23,15 @@ def handle_posts(posts,request):
     result_posts = paginator.paginate_queryset(posts, request)
     for post in result_posts:
         comments = Comment.objects.filter(post=post).order_by('-published')[:5]
+        for c in comments.all() :
+            c.author.id = c.author.url
         post['comments'] = comments
         post['count'] = comments.count()
         post['size'] = MAXIMUM_PAGE_SIZE
         post['next'] = post.origin + '/comments'
         post['categories'] = json.loads(post.categories)
         post['visibleTo'] = json.loads(post.visibleTo)
+        post['author'].id = post['author'].url
     serializer = PostSerializer(result_posts, many=True)
     return paginator.get_paginated_response(serializer.data, size)
 
@@ -142,14 +145,16 @@ class Comment_list(APIView):
     queryset = Comment.objects.all()
 
     def get(self,request,post_id,format=None):
-        post = get_object_or_404(Post.filter(temp=False),pk=post_id)
+        post = get_object_or_404(Post.objects.filter(temp=False),pk=post_id)
         size = int(request.GET.get('size', 5))
         paginator = CommentPagination()
         paginator.page_size = size
 
         Comments = Comment.objects.filter(post=post_id)
         result_comments = paginator.paginate_queryset(Comments, request)
-
+        for c in result_comments:
+            #post['author'].id = post['author'].url
+            c.author.id = c.author.url
         serializer = CommentSerializer(result_comments, many=True)
         return paginator.get_paginated_response(serializer.data, size)
 
@@ -182,9 +187,18 @@ class AuthorView(APIView):
     queryset = Author.objects.all()
 
     def get(self, request, author_id, format=None):
-        author =  get_object_or_404(Author,pk=author_id)
-        serializer = AuthorSerializer(author)
-        return Response(serializer.data)
+        author1 =  get_object_or_404(Author,pk=author_id)
+        serializer = AuthorSerializer(author1)
+        author = serializer.data
+        author['id'] = author['url']
+        author['friends'] = []
+
+        followlist = author1.follow.all()
+        for i in followlist :
+            serializer = AuthorSerializer(Author.objects.get(id=i.requestee_id))
+            author['friends'].append(serializer.data)
+
+        return Response(author)
 
 # ============= Profile API (END) ============= #
 
