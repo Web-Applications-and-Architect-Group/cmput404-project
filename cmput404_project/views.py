@@ -24,7 +24,7 @@ from rest_framework.decorators import api_view
 from .permissions import IsAuthenticatedNodeOrAdmin
 from collections import OrderedDict
 from .settings import MAXIMUM_PAGE_SIZE,HOST_NAME
-from .comment_functions import getNodeAuth,getNodeAPIPrefix,friend_relation_validation
+from .comment_functions import getNodeAuth,getNodeAPIPrefix,friend_relation_validation,author_id_parse
 
 
 
@@ -104,11 +104,11 @@ class Send_Friendrequest(LoginRequiredMixin, View):
             # varify if there is already an exist friend requests
             varify_result = Friend.objects.all()
             varify_result = varify_result.filter(requestee=remote_friend["url"])
-            varify_result = varify_result.filter(requestee_id=remote_friend["id"])
+            varify_result = varify_result.filter(requestee_id=author_id_parse(remote_friend["id"]))
             varify_result = varify_result.filter(requester=author)
 
             if(len(varify_result)<1):
-                new_friend = Friend.objects.create(requestee=remote_friend["url"], requestee_id=remote_friend["id"], requestee_host=remote_friend["host"], requestee_displayName=remote_friend["displayName"],requester=author)
+                new_friend = Friend.objects.create(requestee=remote_friend["url"], requestee_id=author_id_parse(remote_friend["id"]), requestee_host=remote_friend["host"], requestee_displayName=remote_friend["displayName"],requester=author)
                 new_friend.save()
 
         # return HttpResponse(json.dumps(serializer.data), status=status.HTTP_200_OK)
@@ -441,7 +441,7 @@ def DeleteFriend(request):
     if request.method == "POST":
         author_id = request.POST["author_id"]
 
-    friend = Friend.objects.get(requester= request.user.author, requestee_id= author_id)
+    friend = Friend.objects.get(requester= request.user.author, requestee_id= author_id_parse(author_id))
     if friend:
         friend.delete()
         print ("success")

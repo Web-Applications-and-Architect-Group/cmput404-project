@@ -258,10 +258,11 @@ class Friend_Inquiry_Handler(APIView):
                 friend.requestee_host = friend.requestee_host + '/service/'
             if friend.requestee_host[-1] != '/':
                 friend.requestee_host = friend.requestee_host + '/'
+            print(friend.requestee_id)
             result.append(friend.requestee_host + 'author/' + friend.requestee_id)
 
         # return success response
-        return self.successResponse(HOST_NAME + '/service/' + author_id, result)
+        return self.successResponse(HOST_NAME + '/service/author/' + author_id, result)
 
     def post(self,request, author_id, format=None):
         data = request.data
@@ -342,13 +343,13 @@ class Friendrequest_Handler(APIView):
             # redundent Notify check
             varify_result = Notify.objects.all()
             varify_result = varify_result.filter(requester=data["author"]["url"])
-            varify_result = varify_result.filter(requester_id = data["author"]["id"])
+            varify_result = varify_result.filter(requester_id = author_id_parse(data["author"]["id"]))
             varify_result = varify_result.filter(requestee=friend)
 
             # check if requestee have followed requester
             f_varify_result = Friend.objects.all()
             f_varify_result = f_varify_result.filter(requestee=data["author"]["url"])
-            f_varify_result = f_varify_result.filter(requestee_id=data["author"]["id"])
+            f_varify_result = f_varify_result.filter(requestee_id=author_id_parse(data["author"]["id"]))
             f_varify_result = f_varify_result.filter(requester=friend)
 
             if(len(varify_result)<1 and len(f_varify_result)<1):
@@ -356,7 +357,7 @@ class Friendrequest_Handler(APIView):
                                                    requester=data["author"]["url"],
                                                    requester_displayName=data["author"]["displayName"],
                                                    requester_host = data["author"]["host"],
-                                                   requester_id = data["author"]["id"])
+                                                   requester_id = author_id_parse(data["author"]["id"]))
                 new_notify.save()
 
         except Author.DoesNotExist:
