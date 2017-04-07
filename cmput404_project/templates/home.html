@@ -33,7 +33,9 @@
         </div>
       </div>
       <br>
-      <a href="{% url 'friendList' request.user.author.id %}">
+      <a href={% if request.user.author.id %}
+              "{% url 'friendList' request.user.author.id %}"
+              {% end if %}>
         <div id = "FRID" class="w3-card-2 w3-round w3-white w3-center" style="background-color:#CCEEFF !important;">
         </div>
       </a>
