@@ -181,9 +181,9 @@ MARKDOWN_DEUX_STYLES = {
 }
 # change those settings before put on herok
 # HOST_NAME = "https://cloud-dingkai.c9users.io"
-# HOST_NAME = "http://127.0.0.1:8000"
+#HOST_NAME = "http://127.0.0.1:8000"
 # HOST_NAME = "https://blooming-mountain-69467.herokuapp.com"
-HOST_NAME = "https://fierce-savannah-93127.herokuapp.com"
-# HOST_NAME = "https://safe-lake-64013.herokuapp.com"/
+#HOST_NAME = "https://fierce-savannah-93127.herokuapp.com"
+HOST_NAME = "https://safe-lake-64013.herokuapp.com"
 
 MAXIMUM_PAGE_SIZE = 50

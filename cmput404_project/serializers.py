@@ -54,7 +54,7 @@ class CommentSerializer(serializers.ModelSerializer):
 class PostSerializer(serializers.ModelSerializer):
 
     author = AuthorSerializer()
-    categories = serializers.ListField(child=serializers.CharField(max_length=20),required=False)
+    categories = serializers.ListField(child=serializers.CharField(max_length=100),required=False)
     count = serializers.IntegerField(required=False)
     size = serializers.IntegerField(required=False)
     next = serializers.URLField(required=False)
