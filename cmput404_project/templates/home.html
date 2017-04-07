@@ -28,16 +28,15 @@
          <p><i class="fa fa-pencil fa-fw w3-margin-right w3-text-theme"></i>Status: Activated</p>
          {% else %}
          <p><i class="fa fa-pencil fa-fw w3-margin-right w3-text-theme"></i>Status: Awaiting activation</p>
-         
+
          {% endif %}
         </div>
       </div>
       <br>
-      <div id = "FRID" class="w3-card-2 w3-round w3-white w3-center">
-
-
-
-      </div>
+      <a href="{% url 'friendList' request.user.author.id %}">
+        <div id = "FRID" class="w3-card-2 w3-round w3-white w3-center" style="background-color:#CCEEFF !important;">
+        </div>
+      </a>
       <br>
 
 
@@ -49,7 +48,7 @@
       <div id = "gitID" class="w3-card-2 w3-round w3-white w3-center">
 
       </div>
-      
+
       <button type="button" class="w3-button w3-theme-d2 w3-margin-bottom" onclick="pullgithub('{{author.github}}')">Pull more github activites</button>
 
 
@@ -93,7 +92,7 @@
             {% if post.contentType != 'image/png;base64' and post.contentType != 'image/jpeg;base64' %}
             {{ post.content|urlize }}
             {% endif %}
-            
+
             {% endif %}
 
 
@@ -201,7 +200,7 @@ function clickFun() {
   }
 }
 
-function getXMLHTTPRequest(url) 
+function getXMLHTTPRequest(url)
 { //This code was taken directly from professor's slides.
     var xhr = new XMLHttpRequest();
     xhr.open('GET', url)
@@ -210,23 +209,23 @@ function getXMLHTTPRequest(url)
             try {
                 if (xhr.status==200) {
                     friend_list = JSON.parse(xhr.responseText);
-                }   
+                }
             } catch(e) {
                 alert('XML Get Error: ' + e.name);
             }
         }
-    };   
+    };
     xhr.send();
 }
 
 if (document.getElementById('logged').value == "Yes")
 {
 
-        function update() 
+        function update()
         {
             getXMLHTTPRequest('/friend_request_list');
             var myNode = document.getElementById("FRID");
-            while (myNode.firstChild) 
+            while (myNode.firstChild)
             {
                 myNode.removeChild(myNode.firstChild);
             }
@@ -246,6 +245,8 @@ if (document.getElementById('logged').value == "Yes")
                   break;
                 }
                 var node = document.createElement("DIV");
+                node.href = "{% url 'friendList' request.user.author.id %}";
+                // alert(node.href);
                 var textnode = document.createTextNode(obj.concat(" wants to be your friend"));
                 node.style.fontSize = "large";
                 node.appendChild(textnode);
@@ -281,7 +282,7 @@ function sendJSONXMLHTTPRequest(url, callback) {
 
 function pullgithubByName(response) {
   var gitNode = document.getElementById('gitID');
-  for (var i = 0; i < response.length; i++) 
+  for (var i = 0; i < response.length; i++)
   {
     var divNode = document.createElement("DIV");
     var divString = 'Repo Name :' + response[i].repo.name + '</br>Event Type: ' + response[i].type
