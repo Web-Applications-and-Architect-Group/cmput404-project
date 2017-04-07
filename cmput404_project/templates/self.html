@@ -99,7 +99,7 @@
 
 
             {% if post.visibility == 4 %}
-              <p>This post is publicly shareable by URI only: <a href="{{ STATIC_URL }}/post/{{ post.id }}">{{ STATIC_URL }}/{{ post.author }}/{{ post.id }}</a></p>
+                        <p>This post is publicly shareable by URI only: <a href="{% url 'viewUnlistedPost' post.id %}">Click To open</a></p>
             {% endif %}
 
         </div>
@@ -125,10 +125,10 @@
           <hr class="w3-clear">
           <ul style="list-style: none">
           <li>
-          {% if post.contentType == 1 %}
+          {% if post.contentType == 'text/markdown' %}
           {{ post.content|markdown }}
           {% else %}
-          {{ post.content|urlize }}
+          {{ post.content }}
           {% endif %}
         </br>
           <div class="w3-row-padding" style="margin:0 -16px">

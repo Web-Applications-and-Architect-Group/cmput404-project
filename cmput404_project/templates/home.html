@@ -90,7 +90,8 @@
             {% else %}
 
             {% if post.contentType != 'image/png;base64' and post.contentType != 'image/jpeg;base64' %}
-            {{ post.content|urlize }}
+            <!-- {{ post.content|urlize }} -->
+            {{ post.content }}
             {% endif %}
 
             {% endif %}

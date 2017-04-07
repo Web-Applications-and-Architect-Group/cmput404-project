@@ -1,6 +1,7 @@
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, Http404,HttpResponseForbidden
 from django.views import View
 from django.conf import settings
+from .settings import MAXIMUM_PAGE_SIZE,HOST_NAME,PROJECT_ROOT
 from django.shortcuts import render, get_object_or_404,get_list_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -18,7 +19,7 @@ from rest_framework.views import APIView
 from django.core import serializers
 from rest_framework.response import Response
 from rest_framework import mixins,generics, status, permissions
-
+import base64
 from .serializers import AuthorSerializer,PostSerializer,CommentSerializer,PostPagination,CommentPagination,AddCommentQuerySerializer
 from rest_framework.decorators import api_view
 from .permissions import IsAuthenticatedNodeOrAdmin
@@ -249,9 +250,30 @@ def create_post(request):
 
             #https://www.youtube.com/watch?v=C9MDtQHwGYM
             for count,x in enumerate(request.FILES.getlist("files")):
-                image = PostImages.objects.create(post=new_post,post_image = x)
+                data['unlisted'] = True
+                data['id'] = uuid.uuid4()
+                new_post2 = Post.objects.create(author=request.user.author,**data)
+                image = PostImages.objects.create(post=new_post2,post_image = x)
                 image.save()
 
+                new_post1 = Post.objects.get(id=new_post.id)
+
+                path = image.post_image.url
+                path = PROJECT_ROOT + path
+                fp=open(path,'r+')
+                # if post['contentType'] == 'image/png;base64':
+                #     post['content'] = "data:image/png;base64, " + base64.b64encode(fp.read())
+                # if post['contentType'] == 'image/jpeg;base64':
+                #     post['content'] = "data:image/jpeg;base64, " + base64.b64encode(fp.read())
+
+                new_post1.content = new_post1.content + '![](data:' + new_post1.contentType + ',' + base64.b64encode(fp.read()) + ')'
+                new_post1.contentType = 'text/markdown'
+                new_post1.save()
+
+
+
+
+    
         else:
             print(form.errors)
             form = PostForm()

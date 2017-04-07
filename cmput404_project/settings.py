@@ -171,7 +171,14 @@ DATABASES['default'].update(db_from_env)
 
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
 
-
+MARKDOWN_DEUX_STYLES = {
+    "default": {
+        "extras": {
+            "code-friendly": None,
+        },
+        "safe_mode": False,
+    },
+}
 # change those settings before put on herok
 # HOST_NAME = "https://cloud-dingkai.c9users.io"
 # HOST_NAME = "http://127.0.0.1:8000"
