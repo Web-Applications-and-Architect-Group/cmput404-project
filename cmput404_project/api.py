@@ -30,7 +30,7 @@ def handle_posts(posts,request):
         post['comments'] = comments
         post['count'] = comments.count()
         post['size'] = MAXIMUM_PAGE_SIZE
-        post['next'] = post.origin + '/comments'
+        post['next'] = post.origin + 'comments/'
         post['categories'] = json.loads(post.categories)
         post['visibleTo'] = json.loads(post.visibleTo)
         post['author'].id = post['author'].url
@@ -109,7 +109,7 @@ class Post_Detail(APIView):
         #     )
 
         # get the requested post
-        post = get_object_or_404(Post.filter(temp=False), pk=post_id)
+        post = get_object_or_404(Post.objects.filter(temp=False), pk=post_id)
         # get possible FOAF
         post_author_following_list = Friend.objects.filter(requester=post.author)
         possible_middle_friends = post_author_following_list.filter(requestee_id__in=data["friends"])
