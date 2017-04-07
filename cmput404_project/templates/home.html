@@ -33,9 +33,7 @@
         </div>
       </div>
       <br>
-      <a href={% if request.user.author.id %}
-              "{% url 'friendList' request.user.author.id %}"
-              {% endif %}>
+      <a href="{% url 'friendList' request.user.author.id %}">
         <div id = "FRID" class="w3-card-2 w3-round w3-white w3-center" style="background-color:#CCEEFF !important;">
         </div>
       </a>
@@ -248,7 +246,6 @@ if (document.getElementById('logged').value == "Yes")
                   break;
                 }
                 var node = document.createElement("DIV");
-                node.href = "{% url 'friendList' request.user.author.id %}";
                 // alert(node.href);
                 var textnode = document.createTextNode(obj.concat(" wants to be your friend"));
                 node.style.fontSize = "large";
