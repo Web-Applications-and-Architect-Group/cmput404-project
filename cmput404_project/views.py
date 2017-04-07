@@ -330,7 +330,10 @@ def comment(request):
                 except Node.DoesNotExist:
                     print host + ' is not a conecting node'
                 else:
-                    r = requests.post(post.origin+'/comments/', auth=(node.auth_username, node.auth_password),json=serializer.data)
+                    newUrl = post.origin
+                    if post.origin[len(post.origin)-1]=="/":
+                        newUrl = post.origin[0:len(post.origin)-1]
+                    r = requests.post(newUrl+'/comments/', auth=(node.auth_username, node.auth_password),json=serializer.data)
                     if r.status_code//100 != 2:
                         print r.status_code
             else:
