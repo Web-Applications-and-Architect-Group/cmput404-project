@@ -13,8 +13,8 @@ accept = [
     ('text/plain', 'Plain'),
     ('text/markdown', 'Markdown'),
     ('application/base64', 'Github'),
-    ('image/png; base64', 'PNG'),
-    ('image/jpeg; base64', 'JPEG'),
+    ('image/png;base64', 'PNG'),
+    ('image/jpeg;base64', 'JPEG'),
     ]
 
 @python_2_unicode_compatible

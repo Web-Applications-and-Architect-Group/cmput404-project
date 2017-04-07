@@ -89,8 +89,24 @@
             {% if post.contentType == 'text/markdown' %}
             {{ post.content|markdown }}
             {% else %}
+
+            {% if post.contentType != 'image/png;base64' and post.contentType != 'image/jpeg;base64' %}
             {{ post.content|urlize }}
             {% endif %}
+            
+            {% endif %}
+
+
+
+
+          {% if post.contentType == 'image/png;base64' or post.contentType == 'image/jpeg;base64' and post.temp == True %}
+          <div class="w3-row-padding" style="margin:0 -16px">
+          <div class="w3-half">
+            <img src="{{post.content}}" style="width:40%" alt="POST IMAGE" class="w3-margin-bottom">
+          </div>
+          </div>
+          {% endif %}
+
 
 
         <div class="w3-row-padding" style="margin:0 -16px">

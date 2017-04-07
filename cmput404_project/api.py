@@ -5,20 +5,22 @@ from .serializers import AuthorSerializer,PostSerializer,CommentSerializer,PostP
 from rest_framework.decorators import api_view
 from .permissions import IsAuthenticatedNodeOrAdmin
 from collections import OrderedDict
-from .settings import MAXIMUM_PAGE_SIZE,HOST_NAME
-from .models import  Author,Post, friend_request, Comment,Notify,Friend
+from .settings import MAXIMUM_PAGE_SIZE,HOST_NAME,PROJECT_ROOT
+from .models import  Author,Post, friend_request, Comment,Notify,Friend,PostImages
 from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404,get_list_or_404
 import uuid,json, requests
 from django.http import Http404
 from rest_framework.renderers import JSONRenderer
 from .comment_functions import getNodeAuth,getNodeAPIPrefix,friend_relation_validation,author_id_parse
+import base64
 # ============================================= #
 # ============= Posts API (START) ============= #
 # ============================================= #
 def handle_posts(posts,request):
     size = int(request.GET.get('size', MAXIMUM_PAGE_SIZE))
     paginator = PostPagination()
+    images = []
     paginator.page_size = size
     result_posts = paginator.paginate_queryset(posts, request)
     for post in result_posts:
@@ -28,11 +30,32 @@ def handle_posts(posts,request):
         post['comments'] = comments
         post['count'] = comments.count()
         post['size'] = MAXIMUM_PAGE_SIZE
-        post['next'] = post.origin + '/comments'
+        post['next'] = post.origin + 'comments/'
         post['categories'] = json.loads(post.categories)
         post['visibleTo'] = json.loads(post.visibleTo)
         post['author'].id = post['author'].url
+
+        #============= image
+        if post['contentType'] == 'image/png;base64' or post['contentType'] == 'image/jpeg;base64':
+            path = PostImages.objects.filter(post=Post.objects.get(id=post['id']))[0].post_image.url
+            #post['content'] = base64.b64encode(pimage)
+            path = PROJECT_ROOT + path
+            fp=open(path,'r+')
+            if post['contentType'] == 'image/png;base64':
+                post['content'] = "data:image/png;base64, " + base64.b64encode(fp.read())
+            if post['contentType'] == 'image/jpeg;base64':
+                post['content'] = "data:image/jpeg;base64, " + base64.b64encode(fp.read())
+            # fh = open("imageToSave.jpeg", "wb")
+            # fh.write(base64.b64decode(post['content']))
+            # fh.close()
+
+        #============= image
     serializer = PostSerializer(result_posts, many=True)
+        #============= image
+
+        #============= image
+
+
     return paginator.get_paginated_response(serializer.data, size)
 
 class Public_Post_List(APIView):
@@ -86,7 +109,7 @@ class Post_Detail(APIView):
         #     )
 
         # get the requested post
-        post = get_object_or_404(Post.filter(temp=False), pk=post_id)
+        post = get_object_or_404(Post.objects.filter(temp=False), pk=post_id)
         # get possible FOAF
         post_author_following_list = Friend.objects.filter(requester=post.author)
         possible_middle_friends = post_author_following_list.filter(requestee_id__in=data["friends"])
