@@ -24,6 +24,7 @@ class Node(models.Model):
     auth_username = models.CharField(max_length=50)
     auth_password = models.CharField(max_length=50)
     api_prefix = models.CharField(max_length=50,default="/service",blank=True)
+    shared = models.BooleanField(default=True)
     shareImage = models.BooleanField(default=True)
     auth_post_url = models.CharField(max_length=50,default="author/posts/?format=json")
     

@@ -6,7 +6,7 @@ from rest_framework.decorators import api_view
 from .permissions import IsAuthenticatedNodeOrAdmin
 from collections import OrderedDict
 from .settings import MAXIMUM_PAGE_SIZE,HOST_NAME,PROJECT_ROOT
-from .models import  Author,Post, friend_request, Comment,Notify,Friend,PostImages
+from .models import  Author,Post, friend_request, Comment,Notify,Friend,PostImages,Node
 from django.core.urlresolvers import reverse
 from django.shortcuts import get_object_or_404,get_list_or_404
 import uuid,json, requests
@@ -19,6 +19,13 @@ import base64
 # ============================================= #
 def handle_posts(posts,request):
     size = int(request.GET.get('size', MAXIMUM_PAGE_SIZE))
+    #======
+    #littleAuthor = Author.objects.get(user=request.user)
+    try:
+        littleNode = Node.objects.get(user=request.user)
+    except Node.DoesNotExist:
+        littleNode = None
+    #======
     paginator = PostPagination()
     images = []
     paginator.page_size = size
@@ -34,6 +41,10 @@ def handle_posts(posts,request):
         post['categories'] = json.loads(post.categories)
         post['visibleTo'] = json.loads(post.visibleTo)
         post['author'].id = post['author'].url
+        if littleNode != None:
+            if littleNode.shareImage == False :
+                if post['contentType'] == 'text/markdown':
+                    post['content'] = post['content'].split('![]')[0]
 
         #============= image
         # if post['contentType'] == 'image/png;base64' or post['contentType'] == 'image/jpeg;base64':
