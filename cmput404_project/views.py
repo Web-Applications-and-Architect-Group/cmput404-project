@@ -114,8 +114,8 @@ class Send_Friendrequest(LoginRequiredMixin, View):
 
         # return HttpResponse(json.dumps(serializer.data), status=status.HTTP_200_OK)
         # return HttpResponse(json.dumps(remote_request), status=status.HTTP_200_OK)
-        #return HttpResponse(r, status=r.status_code)
-        return HttpResponseRedirect(reverse('home'))
+        return HttpResponse(r, status=r.status_code)
+        # return HttpResponseRedirect(reverse('home'))
 
 def update():
     Post.objects.filter(temp=True).delete()
