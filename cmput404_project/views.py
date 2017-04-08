@@ -54,7 +54,7 @@ class Send_Friendrequest(LoginRequiredMixin, View):
         if "/api" in friend_hostname :
             friend_hostname = friend_hostname[0:len(friend_hostname)-3]
         if "/service" in friend_hostname :
-            friend_hostname = friend_hostname[0:len(friend_hostname)-8]   
+            friend_hostname = friend_hostname[0:len(friend_hostname)-8]
         # print friend_hostname
         # return
         # print(getNodeAuth(friend_hostname))
@@ -156,6 +156,7 @@ def can_see(post,author):
             return False
         else:
             print("Error! friend validation:",friend_validation["messages"])
+            return False
 
     return True
 
@@ -273,7 +274,7 @@ def create_post(request):
 
 
 
-    
+
         else:
             print(form.errors)
             form = PostForm()
@@ -525,7 +526,7 @@ def friend_request_list(request):
     friend_requests = serializers.serialize('json',friend_requests)
 
     return JsonResponse(friend_requests,safe=False)
-    
+
 def friendList(request,author_id):
     author = Author.objects.get(pk=author_id)
     friend_requests = author.notify.all()
