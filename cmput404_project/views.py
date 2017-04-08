@@ -355,7 +355,13 @@ def comment(request):
                     newUrl = post.origin
                     if post.origin[len(post.origin)-1]=="/":
                         newUrl = post.origin[0:len(post.origin)-1]
-                    r = requests.post(newUrl+'/comments/', auth=(node.auth_username, node.auth_password),json=serializer.data)
+                    #=======
+                    newData = serializer.data
+                    newData['comment']['author']['id'] = newData['comment']['author']['url']
+                    print (newData)
+                    r = requests.post(newUrl+'/comments/', auth=(node.auth_username, node.auth_password),json=newData)
+                    #=======
+                    #r = requests.post(newUrl+'/comments/', auth=(node.auth_username, node.auth_password),json=serializer.data)
                     if r.status_code//100 != 2:
                         print r.status_code
             else:

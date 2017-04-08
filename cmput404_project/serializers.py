@@ -138,6 +138,9 @@ class AddCommentQuerySerializer(serializers.Serializer):
         comment_data = validated_data.pop('comment')
         comment_data['post'] = Post.objects.get(pk=get_id(validated_data.pop('post')))
         author_data = comment_data.pop('author')
+        #==========
+        #author_data['id'] = author_data
+        #========
         author = get_or_create_author(author_data)
         comment = Comment.objects.create(author=author, **comment_data)
         return comment
