@@ -21,7 +21,10 @@ def handle_posts(posts,request):
     size = int(request.GET.get('size', MAXIMUM_PAGE_SIZE))
     #======
     #littleAuthor = Author.objects.get(user=request.user)
-    littleNode = Node.objects.get(user=request.user)
+    try:
+        littleNode = Node.objects.get(user=request.user)
+    except Node.DoesNotExist:
+        littleNode = None
     #======
     paginator = PostPagination()
     images = []
@@ -38,9 +41,10 @@ def handle_posts(posts,request):
         post['categories'] = json.loads(post.categories)
         post['visibleTo'] = json.loads(post.visibleTo)
         post['author'].id = post['author'].url
-        if littleNode.shareImage == False:
-            if post['contentType'] == 'text/markdown':
-                post['content'] = post['content'].split('![]')[0]
+        if littleNode != None:
+            if littleNode.shareImage == False :
+                if post['contentType'] == 'text/markdown':
+                    post['content'] = post['content'].split('![]')[0]
 
         #============= image
         # if post['contentType'] == 'image/png;base64' or post['contentType'] == 'image/jpeg;base64':
