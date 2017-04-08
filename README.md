@@ -35,13 +35,13 @@ Contributors:
 
 References
 ========================
-Base template using bootstrap: https://www.w3schools.com/w3css/tryw3css_templates_social.htm   
-Other Bootstrap: http://getbootstrap.com/
-API specify by: https://github.com/Web-Applications-and-Architect-Group/CMPUT404-project-socialdistribution/blob/master/example-article.json
-AJAX library : https://ajax.googleapis.com
-Django model field : https://docs.djangoproject.com/en/1.10/ref/models/fields/
-UUID :https://docs.djangoproject.com/en/1.10/ref/models/fields/UUIDField
-Upload Multiple Files with Django: https://www.youtube.com/watch?v=C9MDtQHwGYM
+Base template using bootstrap: https://www.w3schools.com/w3css/tryw3css_templates_social.htm   <br />
+Other Bootstrap: http://getbootstrap.com/ <br />
+API specify by: https://github.com/Web-Applications-and-Architect-Group/CMPUT404-project-socialdistribution/blob/master/example-article.json <br />
+AJAX library : https://ajax.googleapis.com <br />
+Django model field : https://docs.djangoproject.com/en/1.10/ref/models/fields/<br />
+UUID :https://docs.djangoproject.com/en/1.10/ref/models/fields/UUIDField<br />
+Upload Multiple Files with Django: https://www.youtube.com/watch?v=C9MDtQHwGYM<br />
 
 
 
