@@ -141,6 +141,9 @@ def can_see(post,author):
     if author.url in json.loads(post.visibleTo):
         return True
     if post.visibility == 'PRIVATE' and post.author != author:
+        print("=======================\n",author.url, post.visibleTo)
+        if author.url in post.visibleTo:
+            return True
         return False
     if post.visibility == 'FRIENDS' and post.author != author:
         # print "==============="
