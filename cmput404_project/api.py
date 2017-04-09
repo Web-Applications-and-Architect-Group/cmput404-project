@@ -288,12 +288,13 @@ class Friend_Inquiry_Handler(APIView):
         # store author ids in a list
         result = []
         for friend in friends:
-            if friend.requestee_host == HOST_NAME:
-                friend.requestee_host = friend.requestee_host + '/service/'
-            if friend.requestee_host[-1] != '/':
-                friend.requestee_host = friend.requestee_host + '/'
-            print(friend.requestee_id)
-            result.append(friend.requestee_host + 'author/' + friend.requestee_id)
+            # if friend.requestee_host == HOST_NAME:
+            #     friend.requestee_host = friend.requestee_host + '/service/'
+            # if friend.requestee_host[-1] != '/':
+            #     friend.requestee_host = friend.requestee_host + '/'
+            # print(friend.requestee_id)
+            # result.append(friend.requestee_host + 'author/' + friend.requestee_id)
+            result.append(friend.requestee)
 
         # return success response
         return self.successResponse(HOST_NAME + '/service/author/' + author_id, result)
