@@ -160,11 +160,10 @@ def friend_relation_validation(friend_url1, friend_host1, friend_url2, friend_ho
         }
 
     # check friend relationship
-
-    if (author1["id"] in author2_following["authors"]) and (author2["id"] in author1_following["authors"]) or \
-    (author1["url"] in author2_following["authors"]) and (author2["url"] in author1_following["authors"]) or \
-    (author1["id"][:-1] in author2_following["authors"]) and (author2["id"][:-1] in author1_following["authors"]) or \
-    (author1["url"][:-1] in author2_following["authors"]) and (author2["url"][:-1] in author1_following["authors"]):
+    if ( (author1["id"] in author2_following["authors"]) or (author1["url"] in author2_following["authors"]) \
+      or (author1["id"]+"/" in author2_following["authors"]) or (author1["url"]+"/"  in author2_following["authors"]) )\
+    and ( (author2["id"] in author1_following["authors"]) or (author2["url"] in author1_following["authors"]) \
+    or (author2["id"]+"/"  in author1_following["authors"]) or (author2["url"]+"/"  in author1_following["authors"])):
         friend_status = True
     else:
         friend_status = False
