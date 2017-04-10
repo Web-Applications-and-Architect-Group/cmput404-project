@@ -5,7 +5,7 @@
 {% block content %}
 
 
-<title>Social Distribution</title>
+<title>Home Page</title>
 
 <!-- Page Container -->
 <div class="w3-container w3-content" style="max-width:1400px;margin-top:80px;margin-left:10em">
@@ -25,9 +25,9 @@
          <p><i class="fa fa-github fa-fw w3-margin-right w3-text-theme"></i>{{author.github}}</p>
          <p><i class="fa fa-pencil fa-fw w3-margin-right w3-text-theme"></i>{{author.bio}}</p>
          {% if author.is_active %}
-         <p><i class="fa fa-pencil fa-fw w3-margin-right w3-text-theme"></i>Status: Activated</p>
+         <p><i class="fa fa-check-circle-o fa-fw w3-margin-right w3-text-theme"></i>Status: Activated</p>
          {% else %}
-         <p><i class="fa fa-pencil fa-fw w3-margin-right w3-text-theme"></i>Status: Awaiting activation</p>
+         <p><i class="fa fa-ban fa-fw w3-margin-right w3-text-theme"></i>Status: Awaiting activation</p>
 
          {% endif %}
         </div>
@@ -40,17 +40,16 @@
       <br>
 
 
-      <div class="w3-card-2 w3-round w3-white">
+      <div class="w3-card-2 w3-round w3-light-grey">
       <div class="w3-container">
 
       <h4 class="w3-center">Github Activity</h4>
 
-      <div id = "gitID" class="w3-card-2 w3-round w3-white w3-center">
+      <div id = "gitID" class="w3-card-2 w3-round w3-sand w3-center">
 
       </div>
-
-      <button type="button" class="w3-button w3-theme-d2 w3-margin-bottom" onclick="pullgithub('{{author.github}}')">Pull more github activites</button>
-
+      <br/>
+      <button type="button" class="w3-button w3-theme-d2 w3-margin-bottom" onclick="pullgithub('{{author.github}}')"style="margin-left:15%">Pull more github activites</button>
 
       </div>
     </div>
@@ -170,7 +169,8 @@
     </li></br></ul></div>
       {% endfor %}
       {% else %}
-        <p>You do no have any stream to show yet.</p>
+      <br/><br/>
+        <h3 style="text-align:center">You do no have any stream to show yet.</h3>
 
       {% endif %}
     </div>
@@ -286,7 +286,7 @@ function pullgithubByName(response) {
   {
     var divNode = document.createElement("DIV");
     var divString = 'Repo Name :' + response[i].repo.name + '</br>Event Type: ' + response[i].type
-       + '</br>Repo Owner: ' + response[i].actor.display_login + "</br>Time: " + response[i].created_at + '</br></br>'
+       + '</br>Repo Owner: ' + response[i].actor.display_login + "</br>Time: " + response[i].created_at + '</br><hr/></br>'
     divNode.innerHTML = divString;
     gitNode.appendChild(divNode);
   }
