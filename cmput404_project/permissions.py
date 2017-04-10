@@ -14,13 +14,21 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
         return obj.user == request.user
 
 # only authenticated nodes and admin can use our api
+# class IsAuthenticatedNodeOrAdmin(permissions.BasePermission):
+#     def has_permission(self,request,view):
+#         if request.user.is_staff:
+#             return True
+#         node = Node.objects.filter(user=request.user.id)
+#         if len(node)== 0:
+#             return False
+#         return True
 class IsAuthenticatedNodeOrAdmin(permissions.BasePermission):
     def has_permission(self,request,view):
         if request.user.is_staff:
             return True
-        try:
-            node = Node.objects.get(user=request.user.id)
-        except Node.DoesNotExist:
+        node = Node.objects.get(user=request.user)
+        print (node)
+        print ("=====")
+        if node == None or node.shared == False:
             return False
         return True
-        

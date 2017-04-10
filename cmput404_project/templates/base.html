@@ -4,7 +4,6 @@
 <html>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="{% static 'css/bootstrap-theme.min.css' %}">
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/3/w3.css">
 <link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-blue-grey.css">
 <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Open+Sans'>
@@ -18,7 +17,7 @@
 
 
 <head>
-  <title>Aname</title>
+  
 </head>
 
 <body class="w3-theme-l5">
@@ -28,8 +27,11 @@
  <div class="w3-bar w3-theme-d2 w3-left-align w3-large">
   <a class="w3-bar-item w3-button w3-hide-medium w3-hide-large w3-right w3-padding-large w3-hover-white w3-large w3-theme-d2" href="javascript:void(0);" onclick="openNav()"><i class="fa fa-bars"></i></a>
   <a href="{% url 'home' %}" class="w3-bar-item w3-button w3-padding-large w3-theme-d4"><i class="fa fa-home w3-margin-right"></i>Home</a>
-  {% if request.user.username %}
+  {% if request.user.username and request.user.author.is_active %}
   <button type="button" class="w3-bar-item w3-button w3-padding-large w3-theme-d4" data-toggle="modal" data-target="#myModal"><i class="fa fa-pencil"></i> Post</button>
+  {% if request.user.is_staff%}
+  <a href="/admin/" class="w3-bar-item w3-button w3-padding-large w3-theme-d4"><i class="fa fa-user-secret w3-margin-right"></i>Admin</a>
+  {% endif %}
   <div class="w3-dropdown-hover w3-hide-small w3-right">
     <button class="w3-button w3-padding-large " title="Edit Profile"><i class="fa fa-user"></i><span class="w3-badge w3-right w3-small w3-green"></span></button>
     <div class="w3-dropdown-content w3-card-4 w3-bar-block" style="width:180px;font-size:80%">
@@ -37,21 +39,39 @@
         <div>Logged in as</div> {{request.user.username}}
       </a>
       <a href="{% url 'stream' request.user.author.id %}" class="w3-bar-item w3-button">My Stream</a>
+      <a href="{% url 'friendList' request.user.author.id %}" class="w3-bar-item w3-button">Friend list</a>
       <a href=" {% url 'profile' request.user.author.id %} " class="w3-bar-item w3-button">Edit Profile</a>
       <a href="/logout/" class="w3-bar-item w3-button" title="logout">Log out</a>
     </div>
-    <a href="#" class="w3-bar-item w3-hide-small w3-right w3-padding-large" ><img src="{{request.user.author.img.url}}" class="w3-circle" style="height:25px;width:25px" alt="Avatar"></a>
+    <a href="" class="w3-bar-item w3-hide-small w3-right w3-padding-large" ><img src="{{request.user.author.img.url}}" class="w3-circle" style="height:25px;width:25px" alt="Avatar"></a>
   </div>
   <div class="w3-dropdown-hover w3-hide-small w3-right">
-    <button class="w3-button w3-padding-large" title="Notifications"><i class="fa fa-bell"></i><span class="w3-badge w3-right w3-small w3-green"></span></button>
+    <button class="w3-button w3-padding-large" title="Notifications">
+      <i class="fa fa-bell"></i>
+      <span class="w3-badge w3-right w3-small w3-green"></span>
+    </button>
     <div class="w3-dropdown-content w3-card-4 w3-bar-block" style="width:180px;font-size:80%">
       <a href="{% url 'friendList' request.user.author.id %}" class="w3-bar-item w3-button">New friend request</a>
-      <a href="#" class="w3-bar-item w3-button">New followers</a>
     </div>
   </div>
   {% else %}
-  <a href="/login/" class="w3-bar-item w3-button w3-hide-small w3-right w3-padding-large w3-hover-white" title="logout">Log in</a>
-  <a href="/register/" class="w3-bar-item w3-button w3-hide-small w3-right w3-padding-large w3-hover-white" title="logout">Sign up</a>
+
+  {% if not request.user.author.is_active and request.user.username%}
+  <div class="w3-dropdown-hover w3-hide-small w3-right">
+    <button class="w3-button w3-padding-large">Awaiting Activation</button>
+    <div class="w3-dropdown-content w3-card-4 w3-bar-block" style="width:200px;font-size:80%">
+      <a href="" class="w3-bar-item w3-button" style="color:#aaa;width:100%" title="NotActive">
+        <p>Your account haven't been activated by site admin. </p>
+        <p>Please wait your account to be activated before you can write posts. </p>
+      </a>
+      <a href="/logout/" class="w3-bar-item w3-button" title="logout">Log out</a>
+    </div>
+  </div>
+  {% else %}
+  <a href="/login/" class="w3-bar-item w3-button w3-hide-small w3-right w3-padding-large w3-hover-white" title="login">Log in</a>
+  <a href="/register/" class="w3-bar-item w3-button w3-hide-small w3-right w3-padding-large w3-hover-white" title="signup">Sign up</a>
+  {% endif %}
+
   {% endif %}
  </div>
 </div>

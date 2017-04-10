@@ -11,7 +11,6 @@
       <div class="btn-group-vertical center-block" role="group">
          <a href="" class="btn btn-primary"><strong>Profile</strong></a>
          <a href="{% url 'friendList' author.id %}" class="btn btn-default">Friendship</a>
-         <a href="" class="btn btn-default">Followers</a>
       </div>
     </div>
   </div>
@@ -22,7 +21,7 @@
       </span>
 
       <span class="col-md-2 float-right">
-        {% if author.id == viewer.id %}
+        {% if author.id == viewer.id or not request.user.author.is_active %}
         {% else %}
         <form id="follow_action" method="post" action="{% url 'send_friendrequest' %}">
           {% csrf_token %}

@@ -16,9 +16,18 @@ def get_or_create_author(author_data):
     author_id = get_id(author_data.pop('id'))
     try:
         author = Author.objects.get(pk=author_id)
+        if author.temp:
+            serializer = AuthorSerializer(author,data=author_data)
+        else:
+            return author
     except Author.DoesNotExist:
-        author = Author.objects.create(id=author_id,temp=True,**author_data)
-    return author
+        author_data['id'] = author_id
+        serializer = AuthorSerializer(data=author_data)
+    if serializer.is_valid():
+        author = serializer.save()
+        return author
+    else:
+        print serializer.errors
 
 class AuthorSerializer(serializers.ModelSerializer):
 
@@ -28,16 +37,16 @@ class AuthorSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'id': {'validators':[]},
         }
-
-
+        
 class CommentSerializer(serializers.ModelSerializer):
 
     author = AuthorSerializer()
-    published = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S")
     class Meta:
         model = Comment
         fields = ('author','comment', 'contentType','published','id')
-       	#read_only_fields = ('id','contentType','author')
+        extra_kwargs = {
+            'id': {'validators':[]},
+        }
 
 
 
@@ -45,17 +54,15 @@ class CommentSerializer(serializers.ModelSerializer):
 class PostSerializer(serializers.ModelSerializer):
 
     author = AuthorSerializer()
-    categories = serializers.ListField(child=serializers.CharField(max_length=20),required=False)
-    count = serializers.IntegerField()
+    categories = serializers.ListField(child=serializers.CharField(max_length=100),required=False)
+    count = serializers.IntegerField(required=False)
     size = serializers.IntegerField(required=False)
     next = serializers.URLField(required=False)
     comments = CommentSerializer(many=True)
-    published = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S")
     visibleTo = serializers.ListField(child=serializers.CharField(max_length=100))
     class Meta:
         model = Post
         fields = ('title','source','origin','description','contentType','content','author','categories','count','size','next','comments','published','id','visibility','visibleTo','unlisted')
-        
 
 
     def create(self,validated_data):
@@ -76,7 +83,7 @@ class PostSerializer(serializers.ModelSerializer):
         for comment in comments:
             author_data = comment.pop('author')
             author = get_or_create_author(author_data)
-            Comment.objects.create(author=author,post=post,temp=True,**comment)
+            Comment.objects.create(author=author,post=post,**comment)
         return post
 
 
@@ -131,6 +138,9 @@ class AddCommentQuerySerializer(serializers.Serializer):
         comment_data = validated_data.pop('comment')
         comment_data['post'] = Post.objects.get(pk=get_id(validated_data.pop('post')))
         author_data = comment_data.pop('author')
+        #==========
+        #author_data['id'] = author_data
+        #========
         author = get_or_create_author(author_data)
         comment = Comment.objects.create(author=author, **comment_data)
         return comment

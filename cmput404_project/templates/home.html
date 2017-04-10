@@ -5,7 +5,7 @@
 {% block content %}
 
 
-<title>Social Distribution</title>
+<title>Home Page</title>
 
 <!-- Page Container -->
 <div class="w3-container w3-content" style="max-width:1400px;margin-top:80px;margin-left:10em">
@@ -24,32 +24,45 @@
          <p><i class="fa fa-envelope fa-fw w3-margin-right w3-text-theme"></i>{{author.displayName}}</p>
          <p><i class="fa fa-github fa-fw w3-margin-right w3-text-theme"></i>{{author.github}}</p>
          <p><i class="fa fa-pencil fa-fw w3-margin-right w3-text-theme"></i>{{author.bio}}</p>
+         {% if author.is_active %}
+         <p><i class="fa fa-check-circle-o fa-fw w3-margin-right w3-text-theme"></i>Status: Activated</p>
+         {% else %}
+         <p><i class="fa fa-ban fa-fw w3-margin-right w3-text-theme"></i>Status: Awaiting activation</p>
+
+         {% endif %}
         </div>
       </div>
       <br>
-      <div class="w3-card-2 w3-round w3-white w3-center">
-        {% for f_request in Friend_request%}
-        <div class="w3-container">
-          <p>Friend Request</p>
-          <!-- <img  src="{{ post.author.profile.img.url }}" alt="Avatar" style="width:50%"><br> -->
-          <span>{{f_request.requester_displayName}}</span>
-          <div class="w3-row w3-opacity">
-            <div class="w3-half">
-              <a href="{% url 'AcceptFriendRequest' f_request.requester_id %}"><button class="w3-button w3-block w3-green w3-section" title="Accept"><i class="fa fa-check"></i></button></a>
-            </div>
-
-          </div>
+      <a href="{% url 'friendList' request.user.author.id %}">
+        <div id = "FRID" class="w3-card-2 w3-round w3-white w3-center" style="background-color:#CCEEFF !important;">
         </div>
-
-        {% endfor %}
-      </div>
+      </a>
       <br>
 
+
+      <div class="w3-card-2 w3-round w3-light-grey">
+      <div class="w3-container">
+
+      <h4 class="w3-center">Github Activity</h4>
+
+      <div id = "gitID" class="w3-card-2 w3-round w3-sand w3-center">
+
+      </div>
+      <br/>
+      <button type="button" class="w3-button w3-theme-d2 w3-margin-bottom" onclick="pullgithub('{{author.github}}')"style="margin-left:15%">Pull more github activites</button>
+
+      </div>
+    </div>
 
 
     </div>
-    <!-- End Left Column -->
 
+
+
+    <!-- End Left Column -->
+      <input hidden="hidden" id="logged" value = "Yes"/>
+    {% else %}
+      <input hidden="hidden" id="logged" value = "No"/>
     {% endif %}
 
     <!-- Middle Column -->
@@ -74,8 +87,25 @@
             {% if post.contentType == 'text/markdown' %}
             {{ post.content|markdown }}
             {% else %}
-            {{ post.content|urlize }}
+
+            {% if post.contentType != 'image/png;base64' and post.contentType != 'image/jpeg;base64' %}
+            <!-- {{ post.content|urlize }} -->
+            {{ post.content }}
             {% endif %}
+
+            {% endif %}
+
+
+
+
+          {% if post.contentType == 'image/png;base64' or post.contentType == 'image/jpeg;base64' and post.temp == True %}
+          <div class="w3-row-padding" style="margin:0 -16px">
+          <div class="w3-half">
+            <img src="{{post.content}}" style="width:40%" alt="POST IMAGE" class="w3-margin-bottom">
+          </div>
+          </div>
+          {% endif %}
+
 
 
         <div class="w3-row-padding" style="margin:0 -16px">
@@ -139,7 +169,8 @@
     </li></br></ul></div>
       {% endfor %}
       {% else %}
-        <p>You do no have any stream to show yet.</p>
+      <br/><br/>
+        <h3 style="text-align:center">You do no have any stream to show yet.</h3>
 
       {% endif %}
     </div>
@@ -156,6 +187,8 @@
 {%block javascript%}
 <script>
 //alert('x');
+var friend_list = {};
+
 function clickFun() {
   var elm = document.getElementsByClassName("editor");
   //alert(elm.length);
@@ -167,5 +200,108 @@ function clickFun() {
     }
   }
 }
+
+function getXMLHTTPRequest(url)
+{ //This code was taken directly from professor's slides.
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', url)
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState == 4) {
+            try {
+                if (xhr.status==200) {
+                    friend_list = JSON.parse(xhr.responseText);
+                }
+            } catch(e) {
+                alert('XML Get Error: ' + e.name);
+            }
+        }
+    };
+    xhr.send();
+}
+
+if (document.getElementById('logged').value == "Yes")
+{
+
+        function update()
+        {
+            getXMLHTTPRequest('/friend_request_list');
+            var myNode = document.getElementById("FRID");
+            while (myNode.firstChild)
+            {
+                myNode.removeChild(myNode.firstChild);
+            }
+
+            //var matches = /"requester_displayName"\:(.+),/gi.exec(friend_list);
+
+            while (friend_list.length >0)
+            {
+                //var obj = matches[1];
+                var first = friend_list.indexOf("requester_displayName");
+                friend_list = friend_list.substr(first+25);
+                var second = friend_list.indexOf("requester_host");
+                friend_list2 = friend_list.substr(0,second-4);
+                var obj = friend_list2;
+                if (friend_list2 == "")
+                {
+                  break;
+                }
+                var node = document.createElement("DIV");
+                // alert(node.href);
+                var textnode = document.createTextNode(obj.concat(" wants to be your friend"));
+                node.style.fontSize = "large";
+                node.appendChild(textnode);
+                document.getElementById("FRID").appendChild(node);
+            }
+        }
+        //https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_node_appendchild
+        //30 frames per second
+        setInterval(update, 30000/30.0);
+
+}
+
+//Took from hindle's assignment code
+function sendJSONXMLHTTPRequest(url, callback) {
+    var xhr = new XMLHttpRequest();
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState==4) {
+            try {
+                if (xhr.status==200) {
+                  var response = JSON.parse(xhr.responseText);
+                  callback(response);
+                }
+            }
+            catch(e) {
+                alert('Error: ' + e.name);
+            }
+        }
+    };
+    xhr.open("GET",url);
+    xhr.setRequestHeader("Accept","application/json");
+    xhr.send(null);
+}
+
+function pullgithubByName(response) {
+  var gitNode = document.getElementById('gitID');
+  for (var i = 0; i < response.length; i++)
+  {
+    var divNode = document.createElement("DIV");
+    var divString = 'Repo Name :' + response[i].repo.name + '</br>Event Type: ' + response[i].type
+       + '</br>Repo Owner: ' + response[i].actor.display_login + "</br>Time: " + response[i].created_at + '</br><hr/></br>'
+    divNode.innerHTML = divString;
+    gitNode.appendChild(divNode);
+  }
+}
+
+var page = 1;
+var per_page = 3;
+//https://api.github.com/users/zhangtuxin/events/public?page=1
+//https://developer.github.com/v3/
+function pullgithub(githubname) {
+  var url = 'https://api.github.com/users/' + githubname + '/events/public?page=';
+  var update_url = url + String(page) + '&per_page=' + String(per_page);
+  sendJSONXMLHTTPRequest(update_url,pullgithubByName);
+  page++;
+}
+
 </script>
 {% endblock %}

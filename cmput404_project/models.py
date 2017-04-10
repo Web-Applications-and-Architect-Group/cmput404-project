@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils import timezone
 from django.contrib.auth.models import User
 import datetime
 from django.utils import timezone
@@ -9,11 +10,11 @@ from .settings import HOST_NAME
 
 
 accept = [
-    ('text/plain', 'text/plain'),
-    ('text/markdown', 'text/markdown'),
-    ('application/base64', 'application/base64'),
-    ('image/png; base64', 'image/png;base64'),
-    ('image/jpeg; base64', 'image/jpeg;base64'),
+    ('text/plain', 'Plain'),
+    ('text/markdown', 'Markdown'),
+    ('application/base64', 'Github'),
+    ('image/png;base64', 'PNG'),
+    ('image/jpeg;base64', 'JPEG'),
     ]
 
 @python_2_unicode_compatible
@@ -22,9 +23,12 @@ class Node(models.Model):
     host = models.URLField(unique=True)
     auth_username = models.CharField(max_length=50)
     auth_password = models.CharField(max_length=50)
-    api_prefix = models.CharField(max_length=50,default="/service")
-    public_post_url = models.CharField(max_length=50,default="/service/posts?format=json")
-    auth_post_url = models.CharField(max_length=50,default="/service/author/posts?format=json")
+    api_prefix = models.CharField(max_length=50,default="/service",blank=True)
+    shared = models.BooleanField(default=True)
+    shareImage = models.BooleanField(default=True)
+    auth_post_url = models.CharField(max_length=50,default="author/posts/?format=json")
+    
+    
     def __str__(self):
         return self.host
 
@@ -72,7 +76,7 @@ class Post(models.Model):
     origin = models.URLField()
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
     content = models.TextField()
-    published = models.DateTimeField(auto_now =True)
+    published = models.DateTimeField(default=timezone.now)
     #categories = models.TextField(null=True)
     #Extra material :  https://docs.djangoproject.com/en/1.10/ref/models/fields/UUIDField
     unlisted = models.BooleanField(default=False)
@@ -97,20 +101,19 @@ class Post(models.Model):
 
     def __getitem__(self, key):
         return getattr(self, key)
-    
-        
-        
-        
+
+
+
+
 @python_2_unicode_compatible
 class Comment(models.Model):
     id = models.CharField(primary_key=True, default=uuid.uuid4,max_length=100)
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
     comment = models.TextField()
     contentType = models.CharField(choices=accept, default='PUBLIC',max_length=20)
-    published = models.DateTimeField(auto_now=True)
+    published = models.DateTimeField(default=timezone.now)
     post = models.ForeignKey(Post, on_delete=models.CASCADE,related_name='comments')
-    temp = models.BooleanField(default=False)
-    
+
     @classmethod
     def create(cls, user, comment_text, post, comment_type):
         new_comment = cls(author=user, comment=comment_text, post=post, contentType=comment_type)
@@ -125,8 +128,8 @@ class Comment(models.Model):
 
     def __getitem__(self, key):
         return json.loads(getattr(self, key))
-        
-        
+
+
 #https://www.youtube.com/watch?v=C9MDtQHwGYM
 def content_file_name(instance, filename):
     return '/'.join(['images', str(str(instance.post.id) + filename)])
@@ -145,10 +148,11 @@ class Friend(models.Model):
     requester = models.ForeignKey(Author,on_delete=models.CASCADE,related_name="follow")
     requestee = models.URLField()
     requestee_id = models.CharField(max_length=200)
-
+    requestee_host = models.CharField(max_length=100,default="Host")
+    requestee_displayName = models.CharField(max_length=30,default ="AuthorName")
     @classmethod
-    def create(cls, requester, requestee, requestee_id):
-        new_post = cls(requester=requester, requestee=requestee, requestee_id=requestee_id)
+    def create(cls, requester, requestee, requestee_id,requestee_displayName):
+        new_post = cls(requester=requester, requestee=requestee, requestee_id=requestee_id, requestee_host=requestee_host,requestee_displayName= requestee_displayName)
         return new_post
 
     def __str__(self):
@@ -187,6 +191,3 @@ class friend_request(models.Model):
 
     def __str__(self):
         return self.request_sender.username
-
-
-

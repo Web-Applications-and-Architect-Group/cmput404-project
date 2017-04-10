@@ -92,7 +92,7 @@
                   </form>
 
                   {% if post.can_view == 4 %}
-                    <p>This post is publicly shareable by URI only: <a href="{{ STATIC_URL }}/post/{{ post.post_id }}">{{ STATIC_URL }}/{{ post.author }}/{{ post.post_id }}</a></p>
+                    <p>This Post is publicly shareable by URI only: <a href="{{ STATIC_URL }}/post/{{ post.post_id }}">{{ STATIC_URL }}/{{ post.author }}/{{ post.post_id }}</a></p>
                   {% endif %}
 
               </div>
