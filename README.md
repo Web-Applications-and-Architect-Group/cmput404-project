@@ -7,6 +7,10 @@ See project.org (plain-text/org-mode) for a description of the project.
 
 Make a distributed social network!
 
+Heroku
+===================================
+https://safe-lake-64013.herokuapp.com/
+
 Contributors / Licensing
 ========================
 
