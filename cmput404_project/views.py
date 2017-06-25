@@ -525,7 +525,7 @@ def get_object_by_uuid_or_404(model, uuid_pk):
     """
     try:
         uuid.UUID(uuid_pk)
-    except Exception, e:
+    except Exception as e:
         raise Http404(str(e))
     return get_object_or_404(model, pk=uuid_pk)
 
