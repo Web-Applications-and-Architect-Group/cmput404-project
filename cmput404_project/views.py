@@ -304,7 +304,8 @@ def update_post(request, post_id):
         if form.is_valid():
             post = form.save()
         else:
-            print form.errors
+            print(form.errors)
+
     else:
         form = PostForm(instance=post)
     return HttpResponseRedirect(reverse('onePost',kwargs={'post_id':post_id,'author_id':post.author.id}))
