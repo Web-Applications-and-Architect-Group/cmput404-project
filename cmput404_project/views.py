@@ -355,7 +355,7 @@ def comment(request):
                 try:
                     node = Node.objects.get(host=host)
                 except Node.DoesNotExist:
-                    print host + ' is not a conecting node'
+                    print(host + ' is not a conecting node')
                 else:
                     newUrl = post.origin
                     if post.origin[len(post.origin)-1]=="/":
@@ -363,14 +363,14 @@ def comment(request):
                     #=======
                     newData = serializer.data
                     newData['comment']['author']['id'] = newData['comment']['author']['url']
-                    print (newData)
+                    print(newData)
                     r = requests.post(newUrl+'/comments/', auth=(node.auth_username, node.auth_password),json=newData)
                     #=======
                     #r = requests.post(newUrl+'/comments/', auth=(node.auth_username, node.auth_password),json=serializer.data)
                     if r.status_code//100 != 2:
-                        print r.status_code
+                        print(r.status_code)
             else:
-                print serializer.errors
+                print(serializer.errors)
     return HttpResponseRedirect(reverse('home'))
 '''
 def postContent(post_type,request):
