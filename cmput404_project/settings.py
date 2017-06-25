@@ -35,6 +35,7 @@ ALLOWED_HOSTS = [
     "blooming-mountain-69467.herokuapp.com",
     "safe-lake-64013.herokuapp.com",
     "fierce-savannah-93127.herokuapp.com",
+    'intense-escarpment-70511.herokuapp.com'
 ]
 
 
@@ -183,7 +184,7 @@ MARKDOWN_DEUX_STYLES = {
 # HOST_NAME = "https://cloud-dingkai.c9users.io"
 #HOST_NAME = "http://127.0.0.1:8000"
 # HOST_NAME = "https://blooming-mountain-69467.herokuapp.com"
-#HOST_NAME = "https://fierce-savannah-93127.herokuapp.com"
-HOST_NAME = "https://safe-lake-64013.herokuapp.com"
+HOST_NAME = "https://fierce-savannah-93127.herokuapp.com"
+#HOST_NAME = "https://safe-lake-64013.herokuapp.com"
 
 MAXIMUM_PAGE_SIZE = 50
